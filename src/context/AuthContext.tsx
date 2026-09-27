@@ -23,13 +23,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (savedUsername) {
       const user = userAccounts.find(u => u.username === savedUsername);
       if (user) {
-        // Refresh permissions from presets based on role
+        // Always refresh permissions from presets based on role
         const freshPermissions = rolePermissionPresets[user.role] || [];
         const updatedUser = { ...user, permissions: freshPermissions };
         setCurrentUser(updatedUser);
       }
     }
   }, []);
+
+  // Auto-refresh permissions when component mounts (ensures new permissions are loaded)
+  useEffect(() => {
+    if (currentUser) {
+      const freshPermissions = rolePermissionPresets[currentUser.role] || [];
+      if (JSON.stringify(currentUser.permissions) !== JSON.stringify(freshPermissions)) {
+        setCurrentUser({ ...currentUser, permissions: freshPermissions });
+      }
+    }
+  }, [currentUser?.role]);
 
   const login = (username: string) => {
     const user = userAccounts.find(u => u.username === username);
