@@ -1,25 +1,32 @@
-import { useState } from 'react';
-import Dashboard from './components/Dashboard';
-import FloorMap from './components/FloorMap';
-import CallLog from './components/CallLog';
-import AccountManagement from './components/AccountManagement';
-import ReportsPage from './components/ReportsPage';
-import SettingsPage from './components/SettingsPage';
-import RoomDetail from './components/RoomDetail';
+import { useEffect, useState } from 'react';
+import ClientData from './components/ClientData';
+import LicenseManager from './components/LicenseManager';
 import LoginPage from './components/LoginPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { Room } from './types';
-import { LayoutDashboard, Map, PhoneCall, Users, Bell, User, Menu, X, LogOut, FileText, Settings } from 'lucide-react';
+import { Building2, KeyRound, User, Menu, X, LogOut, CheckCircle2, AlertCircle } from 'lucide-react';
 
-type Tab = 'dashboard' | 'map' | 'calls' | 'accounts' | 'reports' | 'settings';
+type Tab = 'clients' | 'licenses';
+
+interface Toast {
+  id: number;
+  message: string;
+  type: 'success' | 'error';
+}
 
 function AppContent() {
-  const { currentUser, login, logout, checkMenuAccess } = useAuth();
-  const [activeTab, setActiveTab] = useState<Tab>('dashboard');
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [showRoomDetail, setShowRoomDetail] = useState(false);
+  const { currentUser, login, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState<Tab>('clients');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notifications] = useState(5);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const notify = (message: string, type: 'success' | 'error' = 'success') => {
+    const id = Date.now() + Math.random();
+    setToasts(t => [...t, { id, message, type }]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
+  };
+
+  // Bersihkan toast saat unmount
+  useEffect(() => () => setToasts([]), []);
 
   const handleLogin = (username: string) => {
     login(username);
@@ -27,27 +34,15 @@ function AppContent() {
 
   const handleLogout = () => {
     logout();
-    setActiveTab('dashboard');
+    setActiveTab('clients');
   };
 
-  const handleRoomSelect = (room: Room) => {
-    setSelectedRoom(room);
-    setShowRoomDetail(true);
-  };
-
-  const allTabs = [
-    { id: 'dashboard' as Tab, label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, menuId: 'dashboard' },
-    { id: 'map' as Tab, label: 'Peta Kamar', icon: <Map className="w-5 h-5" />, menuId: 'map' },
-    { id: 'calls' as Tab, label: 'Log Panggilan', icon: <PhoneCall className="w-5 h-5" />, menuId: 'calls' },
-    { id: 'accounts' as Tab, label: 'Kelola Akun', icon: <Users className="w-5 h-5" />, menuId: 'accounts' },
-    { id: 'reports' as Tab, label: 'Laporan', icon: <FileText className="w-5 h-5" />, menuId: 'reports' },
-    { id: 'settings' as Tab, label: 'Pengaturan', icon: <Settings className="w-5 h-5" />, menuId: 'settings' },
+  const tabs = [
+    { id: 'clients' as Tab, label: 'Data Klien', icon: <Building2 className="w-5 h-5" /> },
+    { id: 'licenses' as Tab, label: 'Kelola Lisensi', icon: <KeyRound className="w-5 h-5" /> },
   ];
 
-  // Filter tabs based on permissions
-  const tabs = allTabs.filter(tab => checkMenuAccess(tab.menuId));
-
-  // Show login page if not logged in
+  // Tampilkan halaman login jika belum login
   if (!currentUser) {
     return <LoginPage onLogin={handleLogin} />;
   }
@@ -61,11 +56,11 @@ function AppContent() {
             {/* Logo */}
             <div className="flex items-center gap-3">
               <div className="bg-gradient-to-br from-blue-500 to-blue-700 p-2 rounded-lg">
-                <Bell className="w-6 h-6 text-white" />
+                <KeyRound className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-800 dark:text-white">NurseCall Monitor</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Sistem Monitoring Nurse Call</p>
+                <h1 className="text-lg font-bold text-gray-800 dark:text-white">Nursecall Monitor</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Sistem Manajemen Lisensi</p>
               </div>
             </div>
 
@@ -89,16 +84,6 @@ function AppContent() {
 
             {/* Right Side */}
             <div className="flex items-center gap-3">
-              {/* Notification Bell */}
-              <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                {notifications > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
-                    {notifications}
-                  </span>
-                )}
-              </button>
-
               {/* User Avatar */}
               <div className="hidden md:flex items-center gap-2 pl-3 border-l border-gray-200 dark:border-gray-700">
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
@@ -172,22 +157,20 @@ function AppContent() {
         )}
       </header>
 
-      {/* Live Status Bar */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+      {/* Info Bar */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1.5">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
                 </span>
-                <span>5 Panggilan Aktif</span>
+                <span>Layanan Lisensi Online</span>
               </span>
               <span className="hidden sm:inline text-blue-200">|</span>
-              <span className="hidden sm:inline">🚨 2 Emergency</span>
-              <span className="hidden sm:inline text-blue-200">|</span>
-              <span className="hidden sm:inline">⏱️ Rata-rata respon: 3.2 menit</span>
+              <span className="hidden sm:inline">🔐 Nursecall Monitor License Server v2.0</span>
             </div>
             <div className="text-blue-200 text-xs">
               {new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -198,36 +181,42 @@ function AppContent() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {activeTab === 'dashboard' && <Dashboard />}
-        {activeTab === 'map' && <FloorMap onRoomSelect={handleRoomSelect} />}
-        {activeTab === 'calls' && <CallLog />}
-        {activeTab === 'accounts' && <AccountManagement />}
-        {activeTab === 'reports' && <ReportsPage />}
-        {activeTab === 'settings' && <SettingsPage />}
+        {activeTab === 'clients' && <ClientData onNotify={notify} />}
+        {activeTab === 'licenses' && <LicenseManager onNotify={notify} />}
       </main>
 
-      {/* Room Detail Modal */}
-      {showRoomDetail && (
-        <RoomDetail
-          room={selectedRoom}
-          onClose={() => {
-            setShowRoomDetail(false);
-            setSelectedRoom(null);
-          }}
-        />
-      )}
+      {/* Toast Notifications */}
+      <div className="fixed bottom-6 right-6 z-[100] space-y-2 w-80 max-w-[calc(100vw-3rem)]">
+        {toasts.map(t => (
+          <div
+            key={t.id}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium animate-[fadeIn_.2s_ease-out] ${
+              t.type === 'success'
+                ? 'bg-white border-green-200 text-green-800'
+                : 'bg-white border-red-200 text-red-800'
+            }`}
+          >
+            {t.type === 'success' ? (
+              <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+            ) : (
+              <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+            )}
+            {t.message}
+          </div>
+        ))}
+      </div>
 
       {/* Footer */}
       <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-sm text-gray-500 dark:text-gray-400">
-            <p>© 2026 NurseCall Monitor - Sistem Monitoring Nurse Call RS</p>
+            <p>© 2026 Nursecall Monitor - Sistem Manajemen Lisensi Penggunaan Aplikasi</p>
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                Sistem Online
+                Server Lisensi Online
               </span>
-              <span>Terhubung ke 16 perangkat</span>
+              <span>Lisensi tervalidasi</span>
             </div>
           </div>
         </div>
