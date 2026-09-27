@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import FloorMap from './components/FloorMap';
 import CallLog from './components/CallLog';
+import AccountManagement from './components/AccountManagement';
 import RoomDetail from './components/RoomDetail';
 import LoginPage from './components/LoginPage';
 import { Room } from './types';
-import { LayoutDashboard, Map, PhoneCall, Bell, User, Menu, X, LogOut } from 'lucide-react';
+import { LayoutDashboard, Map, PhoneCall, Users, Bell, User, Menu, X, LogOut } from 'lucide-react';
 
-type Tab = 'dashboard' | 'map' | 'calls';
+type Tab = 'dashboard' | 'map' | 'calls' | 'accounts';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -48,6 +49,7 @@ export default function App() {
     { id: 'dashboard' as Tab, label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     { id: 'map' as Tab, label: 'Peta Kamar', icon: <Map className="w-5 h-5" /> },
     { id: 'calls' as Tab, label: 'Log Panggilan', icon: <PhoneCall className="w-5 h-5" /> },
+    { id: 'accounts' as Tab, label: 'Kelola Akun', icon: <Users className="w-5 h-5" /> },
   ];
 
   // Show login page if not logged in
@@ -204,6 +206,7 @@ export default function App() {
         {activeTab === 'dashboard' && <Dashboard />}
         {activeTab === 'map' && <FloorMap onRoomSelect={handleRoomSelect} />}
         {activeTab === 'calls' && <CallLog />}
+        {activeTab === 'accounts' && <AccountManagement />}
       </main>
 
       {/* Room Detail Modal */}

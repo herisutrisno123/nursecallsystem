@@ -54,3 +54,20 @@ export interface DashboardStats {
   missedCalls: number;
   responseRate: number;
 }
+
+export type UserRole = 'admin' | 'head_nurse' | 'nurse' | 'doctor';
+export type UserStatus = 'active' | 'inactive';
+
+export interface UserAccount {
+  id: string;
+  username: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  role: UserRole;
+  status: UserStatus;
+  department: string;
+  createdAt: string;
+  lastLogin: string;
+  avatar?: string;
+}
