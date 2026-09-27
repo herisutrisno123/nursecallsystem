@@ -10,23 +10,12 @@ interface LicenseInfo {
   status: 'active' | 'expired' | 'invalid';
 }
 
-// Hidden superadmin credentials (obfuscated)
-const _sys_admin = {
-  u: atob('c3VwZXJhZG1pbg=='), // superadmin
-  p: atob('c3ByYWRtaW4='), // spradmin
-};
-
 export default function LicenseSettings() {
   const [companyName, setCompanyName] = useState('');
   const [wardCount, setWardCount] = useState(1);
   const [licenseInfo, setLicenseInfo] = useState<LicenseInfo | null>(null);
   const [copied, setCopied] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [showSuperAdminLogin, setShowSuperAdminLogin] = useState(false);
-  const [superAdminUsername, setSuperAdminUsername] = useState('');
-  const [superAdminPassword, setSuperAdminPassword] = useState('');
-  const [superAdminError, setSuperAdminError] = useState('');
   const [newLicenseKey, setNewLicenseKey] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -84,39 +73,6 @@ export default function LicenseSettings() {
     return pattern.test(key);
   };
 
-  // Hidden access to superadmin login (click 5x on shield icon)
-  const [shieldClickCount, setShieldClickCount] = useState(0);
-  
-  const handleShieldClick = () => {
-    const newCount = shieldClickCount + 1;
-    setShieldClickCount(newCount);
-    
-    if (newCount >= 5) {
-      setShowSuperAdminLogin(true);
-      setShieldClickCount(0);
-    }
-    
-    // Reset counter after 2 seconds
-    setTimeout(() => setShieldClickCount(0), 2000);
-  };
-
-  // Superadmin authentication
-  const handleSuperAdminLogin = () => {
-    if (superAdminUsername === _sys_admin.u && superAdminPassword === _sys_admin.p) {
-      setIsSuperAdmin(true);
-      setShowSuperAdminLogin(false);
-      setSuperAdminError('');
-      setSuperAdminUsername('');
-      setSuperAdminPassword('');
-    } else {
-      setSuperAdminError('Kredensial tidak valid');
-    }
-  };
-
-  const handleSuperAdminLogout = () => {
-    setIsSuperAdmin(false);
-  };
-
   // Generate new license (only for first time)
   const handleGenerateLicense = () => {
     if (!companyName.trim()) {
@@ -148,14 +104,6 @@ export default function LicenseSettings() {
       localStorage.setItem('nurseCallLicense', JSON.stringify(newLicense));
       setGenerating(false);
     }, 1000);
-  };
-
-  // Update existing license (only for superadmin)
-  const handleUpdateLicense = () => {
-    if (!isSuperAdmin) {
-      return;
-    }
-    handleGenerateLicense();
   };
 
   // Copy license key to clipboard
@@ -212,13 +160,9 @@ export default function LicenseSettings() {
       {licenseInfo && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <button
-              onClick={handleShieldClick}
-              className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
-              title="Informasi Lisensi"
-            >
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            </button>
+            </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Informasi Lisensi</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">Detail lisensi aplikasi yang aktif</p>
@@ -426,106 +370,8 @@ export default function LicenseSettings() {
         </div>
       )}
 
-      {/* Perbarui Lisensi - HANYA tampil jika superadmin login */}
-      {licenseInfo && isSuperAdmin && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-purple-300 dark:border-purple-700 p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <RefreshCw className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                Perbarui Lisensi
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Perbarui informasi lisensi dengan data baru
-              </p>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-              <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              <span className="text-xs font-medium text-purple-700 dark:text-purple-300">
-                Superadmin
-              </span>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nama Perusahaan <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                placeholder="Contoh: RS Sehat Sentosa"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Jumlah Bangsal <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                value={wardCount}
-                onChange={(e) => setWardCount(parseInt(e.target.value) || 1)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                min="1"
-                max="100"
-              />
-            </div>
-
-            {/* License Preview */}
-            {companyName && wardCount > 0 && (
-              <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-dashed border-purple-300 dark:border-purple-700">
-                <p className="text-sm text-purple-700 dark:text-purple-300 mb-2">Preview Perbaruan:</p>
-                <div className="space-y-1 text-sm">
-                  <p className="text-gray-800 dark:text-white">
-                    <span className="font-medium">Perusahaan:</span> {companyName}
-                  </p>
-                  <p className="text-gray-800 dark:text-white">
-                    <span className="font-medium">Bangsal:</span> {wardCount} bangsal
-                  </p>
-                  <p className="text-gray-800 dark:text-white">
-                    <span className="font-medium">Masa Berlaku:</span> Lifetime (Tidak Terbatas)
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={handleUpdateLicense}
-                disabled={generating || !companyName.trim() || wardCount < 1}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {generating ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    Memperbarui...
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw className="w-4 h-4" />
-                    Perbarui Lisensi
-                  </>
-                )}
-              </button>
-              <button
-                onClick={handleSuperAdminLogout}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                Logout Superadmin
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Pesan jika ada lisensi tapi bukan superadmin - section terkunci */}
-      {licenseInfo && !isSuperAdmin && (
+      {/* Pesan jika ada lisensi - hubungi developer untuk perbarui */}
+      {licenseInfo && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
@@ -535,13 +381,13 @@ export default function LicenseSettings() {
               Hubungi Developer
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mb-4">
-              Untuk memperbarui lisensi, silakan hubungi developer aplikasi. 
+              Untuk memperbarui data perusahaan atau jumlah bangsal, silakan hubungi developer aplikasi. 
               Developer akan membantu proses perbaruan lisensi sesuai kebutuhan perusahaan Anda.
             </p>
             <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
               <AlertCircle className="w-4 h-4 text-gray-500" />
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                Lisensi aktif - hubungi developer untuk perbarui lisensi
+                Lisensi aktif - hubungi developer untuk perbarui data lisensi
               </span>
             </div>
           </div>
@@ -573,88 +419,10 @@ export default function LicenseSettings() {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
-            <span><strong>Update lisensi</strong> memerlukan autentikasi superadmin</span>
+            <span>Hubungi developer untuk memperbarui data perusahaan atau jumlah bangsal</span>
           </li>
         </ul>
       </div>
-
-      {/* Superadmin Login Modal */}
-      {showSuperAdminLogin && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                  <Shield className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                    Autentikasi Superadmin
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Diperlukan untuk memperbarui lisensi
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  value={superAdminUsername}
-                  onChange={(e) => setSuperAdminUsername(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                  placeholder="Masukkan username"
-                  autoComplete="off"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={superAdminPassword}
-                  onChange={(e) => setSuperAdminPassword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSuperAdminLogin();
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                  placeholder="Masukkan password"
-                  autoComplete="off"
-                />
-              </div>
-              {superAdminError && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                  <p className="text-sm text-red-700 dark:text-red-400">{superAdminError}</p>
-                </div>
-              )}
-            </div>
-            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3">
-              <button
-                onClick={() => {
-                  setShowSuperAdminLogin(false);
-                  setSuperAdminError('');
-                  setSuperAdminUsername('');
-                  setSuperAdminPassword('');
-                }}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleSuperAdminLogin}
-                className="flex-1 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
-              >
-                Login
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
