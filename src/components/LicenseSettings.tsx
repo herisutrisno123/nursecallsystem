@@ -27,6 +27,8 @@ export default function LicenseSettings() {
   const [superAdminUsername, setSuperAdminUsername] = useState('');
   const [superAdminPassword, setSuperAdminPassword] = useState('');
   const [superAdminError, setSuperAdminError] = useState('');
+  const [newLicenseKey, setNewLicenseKey] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Load existing license from localStorage
   useEffect(() => {
@@ -167,14 +169,37 @@ export default function LicenseSettings() {
     }
   };
 
-  // Reset license
-  const handleResetLicense = () => {
-    if (confirm('Apakah Anda yakin ingin mereset lisensi? Aplikasi akan memerlukan lisensi baru.')) {
-      localStorage.removeItem('nurseCallLicense');
-      setLicenseInfo(null);
-      setCompanyName('');
-      setWardCount(1);
+  // Save new license key
+  const handleSaveLicense = () => {
+    if (!newLicenseKey.trim()) {
+      alert('Kode lisensi harus diisi');
+      return;
     }
+
+    if (!validateLicenseKey(newLicenseKey.trim())) {
+      alert('Format kode lisensi tidak valid. Format yang benar: XXXX-XXXX-XXXX-XXXX-X');
+      return;
+    }
+
+    if (!licenseInfo) {
+      alert('Tidak ada lisensi aktif untuk diperbarui');
+      return;
+    }
+
+    // Update license with new key
+    const updatedLicense: LicenseInfo = {
+      ...licenseInfo,
+      licenseKey: newLicenseKey.trim(),
+      issuedDate: new Date().toISOString(),
+      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year from now
+    };
+
+    setLicenseInfo(updatedLicense);
+    localStorage.setItem('nurseCallLicense', JSON.stringify(updatedLicense));
+    setNewLicenseKey('');
+    setSaveSuccess(true);
+    
+    setTimeout(() => setSaveSuccess(false), 3000);
   };
 
   // Check if license is expired
@@ -295,13 +320,43 @@ export default function LicenseSettings() {
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <button
-              onClick={handleResetLicense}
-              className="flex items-center gap-2 px-4 py-2 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Reset Lisensi
-            </button>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Simpan Kode Lisensi Baru
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newLicenseKey}
+                    onChange={(e) => setNewLicenseKey(e.target.value.toUpperCase())}
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white font-mono"
+                    placeholder="XXXX-XXXX-XXXX-XXXX-X"
+                    maxLength={21}
+                  />
+                  <button
+                    onClick={handleSaveLicense}
+                    disabled={!newLicenseKey.trim()}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {saveSuccess ? (
+                      <>
+                        <CheckCircle className="w-4 h-4" />
+                        Tersimpan!
+                      </>
+                    ) : (
+                      <>
+                        <Key className="w-4 h-4" />
+                        Simpan
+                      </>
+                    )}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Masukkan kode lisensi baru dari developer. Format: XXXX-XXXX-XXXX-XXXX-X
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}
