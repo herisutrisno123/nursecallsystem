@@ -58,6 +58,27 @@ export interface DashboardStats {
 export type UserRole = 'admin' | 'head_nurse' | 'nurse' | 'doctor';
 export type UserStatus = 'active' | 'inactive';
 
+export interface Permission {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  module: string;
+  submenu?: string;
+  icon?: string;
+}
+
+export interface MenuPermission {
+  menuId: string;
+  menuName: string;
+  icon: string;
+  children?: {
+    id: string;
+    name: string;
+    permissionCode: string;
+  }[];
+}
+
 export interface UserAccount {
   id: string;
   username: string;
@@ -70,4 +91,5 @@ export interface UserAccount {
   createdAt: string;
   lastLogin: string;
   avatar?: string;
+  permissions: string[]; // array of permission codes
 }

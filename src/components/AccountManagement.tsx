@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { UserAccount, UserRole, UserStatus } from '../types';
 import { userAccounts as initialAccounts } from '../data/userData';
+import { allPermissions, rolePermissionPresets } from '../data/permissions';
+import PermissionManager from './PermissionManager';
 import {
   Users,
   Search,
@@ -21,6 +23,7 @@ import {
   Calendar,
   Clock,
   AlertCircle,
+  Key,
 } from 'lucide-react';
 
 export default function AccountManagement() {
@@ -32,6 +35,7 @@ export default function AccountManagement() {
   const [editingAccount, setEditingAccount] = useState<UserAccount | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [viewDetail, setViewDetail] = useState<UserAccount | null>(null);
+  const [permissionManager, setPermissionManager] = useState<UserAccount | null>(null);
 
   const filteredAccounts = accounts.filter(acc => {
     const matchesSearch =
@@ -75,6 +79,17 @@ export default function AccountManagement() {
         a.id === id ? { ...a, status: a.status === 'active' ? 'inactive' : 'active' } : a
       )
     );
+  };
+
+  const handleSavePermissions = (permissions: string[]) => {
+    if (permissionManager) {
+      setAccounts(
+        accounts.map(a =>
+          a.id === permissionManager.id ? { ...a, permissions } : a
+        )
+      );
+      setPermissionManager(null);
+    }
   };
 
   const stats = {
@@ -163,6 +178,7 @@ export default function AccountManagement() {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">User</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Role</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Departemen</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Hak Akses</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Login Terakhir</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Aksi</th>
@@ -200,6 +216,16 @@ export default function AccountManagement() {
                   </td>
                   <td className="px-4 py-3">
                     <button
+                      onClick={() => setPermissionManager(account)}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 transition-colors"
+                      title="Kelola Hak Akses"
+                    >
+                      <Key className="w-3 h-3" />
+                      {account.permissions.length} / {allPermissions.length}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
                       onClick={() => toggleStatus(account.id)}
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                         account.status === 'active'
@@ -226,6 +252,13 @@ export default function AccountManagement() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => setPermissionManager(account)}
+                        className="p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 text-purple-600 dark:text-purple-400 transition-colors"
+                        title="Kelola Hak Akses"
+                      >
+                        <Key className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={() => handleEdit(account)}
                         className="p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 transition-colors"
@@ -288,6 +321,15 @@ export default function AccountManagement() {
           }}
         />
       )}
+
+      {/* Permission Manager Modal */}
+      {permissionManager && (
+        <PermissionManager
+          account={permissionManager}
+          onSave={handleSavePermissions}
+          onClose={() => setPermissionManager(null)}
+        />
+      )}
     </div>
   );
 }
@@ -343,6 +385,7 @@ function AccountFormModal({ account, onSave, onClose }: {
       department: '',
       createdAt: new Date().toISOString().split('T')[0],
       lastLogin: new Date().toISOString(),
+      permissions: rolePermissionPresets.nurse,
     }
   );
   const [password, setPassword] = useState('');
@@ -617,6 +660,22 @@ function AccountDetailModal({ account, onClose, onEdit }: {
                   <span className={`w-1.5 h-1.5 rounded-full ${account.status === 'active' ? 'bg-green-500' : 'bg-gray-500'}`}></span>
                   {account.status === 'active' ? 'Aktif' : 'Nonaktif'}
                 </span>
+              }
+            />
+            <DetailRow
+              icon={<Key className="w-4 h-4" />}
+              label="Hak Akses"
+              value={
+                <div>
+                  <span className="font-semibold text-purple-600 dark:text-purple-400">
+                    {account.permissions.length} permission
+                  </span>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {account.permissions.length > 0
+                      ? `${account.permissions.slice(0, 3).join(', ')}${account.permissions.length > 3 ? '...' : ''}`
+                      : 'Tidak ada permission'}
+                  </p>
+                </div>
               }
             />
             <DetailRow

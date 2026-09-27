@@ -1,42 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Dashboard from './components/Dashboard';
 import FloorMap from './components/FloorMap';
 import CallLog from './components/CallLog';
 import AccountManagement from './components/AccountManagement';
 import RoomDetail from './components/RoomDetail';
 import LoginPage from './components/LoginPage';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Room } from './types';
-import { LayoutDashboard, Map, PhoneCall, Users, Bell, User, Menu, X, LogOut } from 'lucide-react';
+import { LayoutDashboard, Map, PhoneCall, Users, Bell, User, Menu, X, LogOut, FileText, Settings } from 'lucide-react';
 
-type Tab = 'dashboard' | 'map' | 'calls' | 'accounts';
+type Tab = 'dashboard' | 'map' | 'calls' | 'accounts' | 'reports' | 'settings';
 
-export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState('');
+function AppContent() {
+  const { currentUser, login, logout, checkMenuAccess } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [showRoomDetail, setShowRoomDetail] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifications] = useState(5);
 
-  // Check login status on mount
-  useEffect(() => {
-    const savedUser = localStorage.getItem('nurseCallUser');
-    if (savedUser) {
-      setCurrentUser(savedUser);
-      setIsLoggedIn(true);
-    }
-  }, []);
-
   const handleLogin = (username: string) => {
-    setCurrentUser(username);
-    setIsLoggedIn(true);
+    login(username);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('nurseCallUser');
-    setCurrentUser('');
-    setIsLoggedIn(false);
+    logout();
     setActiveTab('dashboard');
   };
 
@@ -45,15 +33,20 @@ export default function App() {
     setShowRoomDetail(true);
   };
 
-  const tabs = [
-    { id: 'dashboard' as Tab, label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { id: 'map' as Tab, label: 'Peta Kamar', icon: <Map className="w-5 h-5" /> },
-    { id: 'calls' as Tab, label: 'Log Panggilan', icon: <PhoneCall className="w-5 h-5" /> },
-    { id: 'accounts' as Tab, label: 'Kelola Akun', icon: <Users className="w-5 h-5" /> },
+  const allTabs = [
+    { id: 'dashboard' as Tab, label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, menuId: 'dashboard' },
+    { id: 'map' as Tab, label: 'Peta Kamar', icon: <Map className="w-5 h-5" />, menuId: 'map' },
+    { id: 'calls' as Tab, label: 'Log Panggilan', icon: <PhoneCall className="w-5 h-5" />, menuId: 'calls' },
+    { id: 'accounts' as Tab, label: 'Kelola Akun', icon: <Users className="w-5 h-5" />, menuId: 'accounts' },
+    { id: 'reports' as Tab, label: 'Laporan', icon: <FileText className="w-5 h-5" />, menuId: 'reports' },
+    { id: 'settings' as Tab, label: 'Pengaturan', icon: <Settings className="w-5 h-5" />, menuId: 'settings' },
   ];
 
+  // Filter tabs based on permissions
+  const tabs = allTabs.filter(tab => checkMenuAccess(tab.menuId));
+
   // Show login page if not logged in
-  if (!isLoggedIn) {
+  if (!currentUser) {
     return <LoginPage onLogin={handleLogin} />;
   }
 
@@ -110,8 +103,8 @@ export default function App() {
                   <User className="w-4 h-4 text-white" />
                 </div>
                 <div className="hidden lg:block">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{currentUser}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Nurse</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{currentUser?.fullName}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{currentUser?.role === 'admin' ? 'Administrator' : currentUser?.role === 'head_nurse' ? 'Head Nurse' : currentUser?.role === 'doctor' ? 'Dokter' : 'Nurse'}</p>
                 </div>
                 <button
                   onClick={handleLogout}
@@ -160,8 +153,8 @@ export default function App() {
                     <User className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{currentUser}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Nurse</p>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{currentUser?.fullName}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{currentUser?.role === 'admin' ? 'Administrator' : currentUser?.role === 'head_nurse' ? 'Head Nurse' : currentUser?.role === 'doctor' ? 'Dokter' : 'Nurse'}</p>
                   </div>
                 </div>
                 <button
@@ -207,6 +200,20 @@ export default function App() {
         {activeTab === 'map' && <FloorMap onRoomSelect={handleRoomSelect} />}
         {activeTab === 'calls' && <CallLog />}
         {activeTab === 'accounts' && <AccountManagement />}
+        {activeTab === 'reports' && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Laporan</h2>
+            <p className="text-gray-500 dark:text-gray-400">Halaman laporan harian, bulanan, dan kinerja perawat</p>
+          </div>
+        )}
+        {activeTab === 'settings' && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <Settings className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Pengaturan</h2>
+            <p className="text-gray-500 dark:text-gray-400">Pengaturan umum sistem, notifikasi, dan backup data</p>
+          </div>
+        )}
       </main>
 
       {/* Room Detail Modal */}
@@ -236,5 +243,13 @@ export default function App() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }

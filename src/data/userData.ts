@@ -1,4 +1,5 @@
 import { UserAccount } from '../types';
+import { rolePermissionPresets } from './permissions';
 
 export const userAccounts: UserAccount[] = [
   {
@@ -12,6 +13,7 @@ export const userAccounts: UserAccount[] = [
     department: 'IT',
     createdAt: '2025-01-01',
     lastLogin: '2026-01-16T08:30:00',
+    permissions: rolePermissionPresets.admin,
   },
   {
     id: 'u2',
@@ -24,6 +26,7 @@ export const userAccounts: UserAccount[] = [
     department: 'Rawat Inap',
     createdAt: '2025-02-15',
     lastLogin: '2026-01-16T08:25:00',
+    permissions: rolePermissionPresets.head_nurse,
   },
   {
     id: 'u3',
@@ -36,6 +39,7 @@ export const userAccounts: UserAccount[] = [
     department: 'Rawat Inap',
     createdAt: '2025-03-10',
     lastLogin: '2026-01-16T07:45:00',
+    permissions: rolePermissionPresets.nurse,
   },
   {
     id: 'u4',
@@ -48,6 +52,7 @@ export const userAccounts: UserAccount[] = [
     department: 'Rawat Inap',
     createdAt: '2025-04-20',
     lastLogin: '2026-01-16T06:30:00',
+    permissions: rolePermissionPresets.nurse,
   },
   {
     id: 'u5',
@@ -60,6 +65,7 @@ export const userAccounts: UserAccount[] = [
     department: 'Penyakit Dalam',
     createdAt: '2025-01-15',
     lastLogin: '2026-01-16T08:00:00',
+    permissions: rolePermissionPresets.doctor,
   },
   {
     id: 'u6',
@@ -72,6 +78,7 @@ export const userAccounts: UserAccount[] = [
     department: 'Jantung',
     createdAt: '2025-02-01',
     lastLogin: '2026-01-15T16:20:00',
+    permissions: rolePermissionPresets.doctor,
   },
   {
     id: 'u7',
@@ -84,6 +91,7 @@ export const userAccounts: UserAccount[] = [
     department: 'Jantung',
     createdAt: '2025-03-05',
     lastLogin: '2026-01-14T14:15:00',
+    permissions: rolePermissionPresets.doctor,
   },
   {
     id: 'u8',
@@ -96,6 +104,7 @@ export const userAccounts: UserAccount[] = [
     department: 'Rawat Inap',
     createdAt: '2025-05-12',
     lastLogin: '2025-12-20T10:00:00',
+    permissions: rolePermissionPresets.nurse,
   },
   {
     id: 'u9',
@@ -108,6 +117,7 @@ export const userAccounts: UserAccount[] = [
     department: 'IGD',
     createdAt: '2025-06-18',
     lastLogin: '2026-01-16T07:00:00',
+    permissions: rolePermissionPresets.nurse,
   },
   {
     id: 'u10',
@@ -120,5 +130,6 @@ export const userAccounts: UserAccount[] = [
     department: 'IGD',
     createdAt: '2025-07-22',
     lastLogin: '2026-01-16T08:10:00',
+    permissions: rolePermissionPresets.head_nurse,
   },
 ];
