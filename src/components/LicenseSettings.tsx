@@ -1,0 +1,374 @@
+import { useState, useEffect } from 'react';
+import { Key, Building2, Save, Copy, CheckCircle, AlertCircle, RefreshCw, Shield, Calendar } from 'lucide-react';
+
+interface LicenseInfo {
+  companyName: string;
+  wardCount: number;
+  licenseKey: string;
+  issuedDate: string;
+  expiryDate: string;
+  status: 'active' | 'expired' | 'invalid';
+}
+
+export default function LicenseSettings() {
+  const [companyName, setCompanyName] = useState('');
+  const [wardCount, setWardCount] = useState(1);
+  const [licenseInfo, setLicenseInfo] = useState<LicenseInfo | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [generating, setGenerating] = useState(false);
+
+  // Load existing license from localStorage
+  useEffect(() => {
+    const savedLicense = localStorage.getItem('nurseCallLicense');
+    if (savedLicense) {
+      try {
+        const parsed = JSON.parse(savedLicense);
+        setLicenseInfo(parsed);
+        setCompanyName(parsed.companyName);
+        setWardCount(parsed.wardCount);
+      } catch (e) {
+        console.error('Failed to parse license:', e);
+      }
+    }
+  }, []);
+
+  // Generate unique license key
+  const generateLicenseKey = (companyName: string, wardCount: number): string => {
+    // Create base string from company name and ward count
+    const baseString = `${companyName.toUpperCase()}-${wardCount}-${Date.now()}`;
+    
+    // Simple hash function
+    let hash = 0;
+    for (let i = 0; i < baseString.length; i++) {
+      const char = baseString.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    
+    // Convert to positive number and use base36
+    const positiveHash = Math.abs(hash);
+    const hashString = positiveHash.toString(36).toUpperCase().padStart(16, '0');
+    
+    // Add checksum
+    let checksum = 0;
+    for (let i = 0; i < hashString.length; i++) {
+      checksum += hashString.charCodeAt(i);
+    }
+    const checksumChar = (checksum % 36).toString(36).toUpperCase();
+    
+    // Format as XXXX-XXXX-XXXX-XXXX-X
+    const part1 = hashString.substring(0, 4);
+    const part2 = hashString.substring(4, 8);
+    const part3 = hashString.substring(8, 12);
+    const part4 = hashString.substring(12, 16);
+    
+    return `${part1}-${part2}-${part3}-${part4}-${checksumChar}`;
+  };
+
+  // Validate license key format
+  const validateLicenseKey = (key: string): boolean => {
+    const pattern = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]$/;
+    return pattern.test(key);
+  };
+
+  // Generate new license
+  const handleGenerateLicense = () => {
+    if (!companyName.trim()) {
+      alert('Nama perusahaan harus diisi');
+      return;
+    }
+    if (wardCount < 1) {
+      alert('Jumlah bangsal minimal 1');
+      return;
+    }
+
+    setGenerating(true);
+    
+    // Simulate generation delay
+    setTimeout(() => {
+      const licenseKey = generateLicenseKey(companyName, wardCount);
+      const issuedDate = new Date();
+      const expiryDate = new Date();
+      expiryDate.setFullYear(expiryDate.getFullYear() + 1); // 1 year validity
+
+      const newLicense: LicenseInfo = {
+        companyName: companyName.trim(),
+        wardCount,
+        licenseKey,
+        issuedDate: issuedDate.toISOString(),
+        expiryDate: expiryDate.toISOString(),
+        status: 'active',
+      };
+
+      setLicenseInfo(newLicense);
+      localStorage.setItem('nurseCallLicense', JSON.stringify(newLicense));
+      setGenerating(false);
+    }, 1000);
+  };
+
+  // Copy license key to clipboard
+  const handleCopyLicense = () => {
+    if (licenseInfo) {
+      navigator.clipboard.writeText(licenseInfo.licenseKey);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  // Reset license
+  const handleResetLicense = () => {
+    if (confirm('Apakah Anda yakin ingin mereset lisensi? Aplikasi akan memerlukan lisensi baru.')) {
+      localStorage.removeItem('nurseCallLicense');
+      setLicenseInfo(null);
+      setCompanyName('');
+      setWardCount(1);
+    }
+  };
+
+  // Check if license is expired
+  const isLicenseExpired = (expiryDate: string): boolean => {
+    return new Date(expiryDate) < new Date();
+  };
+
+  // Get license status
+  const getLicenseStatus = () => {
+    if (!licenseInfo) return null;
+    if (isLicenseExpired(licenseInfo.expiryDate)) {
+      return { label: 'Kedaluwarsa', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', icon: <AlertCircle className="w-4 h-4" /> };
+    }
+    return { label: 'Aktif', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: <CheckCircle className="w-4 h-4" /> };
+  };
+
+  const status = getLicenseStatus();
+
+  return (
+    <div className="space-y-6">
+      {/* License Information Card */}
+      {licenseInfo && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Informasi Lisensi</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Detail lisensi aplikasi yang aktif</p>
+            </div>
+            {status && (
+              <div className={`ml-auto flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${status.color}`}>
+                {status.icon}
+                {status.label}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Building2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Nama Perusahaan</span>
+                </div>
+                <p className="text-lg font-semibold text-gray-800 dark:text-white">{licenseInfo.companyName}</p>
+              </div>
+              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Building2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah Bangsal</span>
+                </div>
+                <p className="text-lg font-semibold text-gray-800 dark:text-white">{licenseInfo.wardCount} Bangsal</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Key className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Kode Lisensi</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <code className="flex-1 text-lg font-mono font-bold text-blue-900 dark:text-blue-100 break-all">
+                  {licenseInfo.licenseKey}
+                </code>
+                <button
+                  onClick={handleCopyLicense}
+                  className="flex items-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm"
+                >
+                  {copied ? (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      Tersalin!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      Salin
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Terbit</span>
+                </div>
+                <p className="text-base text-gray-800 dark:text-white">
+                  {new Date(licenseInfo.issuedDate).toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+              </div>
+              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Kedaluwarsa</span>
+                </div>
+                <p className={`text-base ${isLicenseExpired(licenseInfo.expiryDate) ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-800 dark:text-white'}`}>
+                  {new Date(licenseInfo.expiryDate).toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <button
+              onClick={handleResetLicense}
+              className="flex items-center gap-2 px-4 py-2 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Reset Lisensi
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Generate New License */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+            <Key className="w-5 h-5 text-green-600 dark:text-green-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+              {licenseInfo ? 'Perbarui Lisensi' : 'Generate Lisensi Baru'}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {licenseInfo ? 'Perbarui informasi lisensi dengan data baru' : 'Buat kode lisensi unik untuk aplikasi ini'}
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Nama Perusahaan <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              placeholder="Contoh: RS Sehat Sentosa"
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Nama perusahaan atau rumah sakit yang akan tertera di lisensi
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Jumlah Bangsal <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              value={wardCount}
+              onChange={(e) => setWardCount(parseInt(e.target.value) || 1)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              min="1"
+              max="100"
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Jumlah bangsal/ward yang akan dikelola oleh aplikasi (1-100)
+            </p>
+          </div>
+
+          {/* License Preview */}
+          {companyName && wardCount > 0 && (
+            <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview Lisensi:</p>
+              <div className="space-y-1 text-sm">
+                <p className="text-gray-800 dark:text-white">
+                  <span className="font-medium">Perusahaan:</span> {companyName}
+                </p>
+                <p className="text-gray-800 dark:text-white">
+                  <span className="font-medium">Bangsal:</span> {wardCount} bangsal
+                </p>
+                <p className="text-gray-800 dark:text-white">
+                  <span className="font-medium">Masa Berlaku:</span> 1 tahun dari tanggal aktivasi
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button
+              onClick={handleGenerateLicense}
+              disabled={generating || !companyName.trim() || wardCount < 1}
+              className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {generating ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Key className="w-4 h-4" />
+                  {licenseInfo ? 'Perbarui Lisensi' : 'Generate Lisensi'}
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* License Information */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+        <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-3 flex items-center gap-2">
+          <AlertCircle className="w-5 h-5" />
+          Informasi Penting
+        </h4>
+        <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-400">
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
+            <span>Lisensi berlaku selama <strong>1 tahun</strong> dari tanggal aktivasi</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
+            <span>Kode lisensi unik berdasarkan nama perusahaan dan jumlah bangsal</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
+            <span>Simpan kode lisensi dengan aman untuk keperluan aktivasi ulang</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
+            <span>Hubungi administrator untuk perpanjangan lisensi sebelum kedaluwarsa</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
+            <span>Lisensi hanya berlaku untuk satu instalasi aplikasi</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+}

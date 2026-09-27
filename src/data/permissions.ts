@@ -258,6 +258,15 @@ export const allPermissions: Permission[] = [
     submenu: 'SLA',
     icon: '🎯',
   },
+  {
+    id: 'perm-033',
+    code: 'settings.license',
+    name: 'Manajemen Lisensi',
+    description: 'Akses untuk mengelola lisensi aplikasi dan generate kode lisensi',
+    module: 'Pengaturan',
+    submenu: 'Lisensi',
+    icon: '🔑',
+  },
 
   // ===== MODULE: LAPORAN =====
   {
@@ -366,6 +375,7 @@ export const menuStructure: MenuPermission[] = [
       { id: 'settings-iot-devices', name: 'IoT Devices', permissionCode: 'settings.iot_devices' },
       { id: 'settings-iot-logs', name: 'IoT Logs', permissionCode: 'settings.iot_logs' },
       { id: 'settings-sla', name: 'SLA Management', permissionCode: 'settings.sla' },
+      { id: 'settings-license', name: 'Lisensi', permissionCode: 'settings.license' },
     ],
   },
 ];
@@ -380,7 +390,7 @@ export const rolePermissionPresets: Record<UserRole, string[]> = {
     'accounts.view', 'accounts.toggle_status',
     'reports.view', 'reports.daily', 'reports.monthly', 'reports.performance',
     'settings.iot_gateway', 'settings.iot_devices', 'settings.iot_logs',
-    'settings.sla',
+    'settings.sla', 'settings.license',
   ],
   nurse: [
     'dashboard.view', 'dashboard.stats', 'dashboard.active_calls',
