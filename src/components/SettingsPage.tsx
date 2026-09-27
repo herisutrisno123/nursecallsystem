@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Settings, Bell, Database, Save, RotateCcw } from 'lucide-react';
+import { Settings, Bell, Database, Save, RotateCcw, Wifi } from 'lucide-react';
+import IoTGatewaySettings from './IoTGatewaySettings';
 
-type SettingsTab = 'general' | 'notifications' | 'backup';
+type SettingsTab = 'general' | 'notifications' | 'backup' | 'iot';
 
 export default function SettingsPage() {
   const { checkPermission } = useAuth();
@@ -12,6 +13,7 @@ export default function SettingsPage() {
     { id: 'general' as SettingsTab, label: 'Pengaturan Umum', icon: <Settings className="w-4 h-4" />, permission: 'settings.general' },
     { id: 'notifications' as SettingsTab, label: 'Notifikasi', icon: <Bell className="w-4 h-4" />, permission: 'settings.notifications' },
     { id: 'backup' as SettingsTab, label: 'Backup & Restore', icon: <Database className="w-4 h-4" />, permission: 'settings.backup' },
+    { id: 'iot' as SettingsTab, label: 'IoT Gateway', icon: <Wifi className="w-4 h-4" />, permission: 'settings.iot_gateway' },
   ];
 
   const availableTabs = tabs.filter(tab => checkPermission(tab.permission));
@@ -56,6 +58,7 @@ export default function SettingsPage() {
       {activeTab === 'general' && checkPermission('settings.general') && <GeneralSettings />}
       {activeTab === 'notifications' && checkPermission('settings.notifications') && <NotificationSettings />}
       {activeTab === 'backup' && checkPermission('settings.backup') && <BackupSettings />}
+      {activeTab === 'iot' && checkPermission('settings.iot_gateway') && <IoTGatewaySettings />}
     </div>
   );
 }

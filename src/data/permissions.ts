@@ -222,6 +222,33 @@ export const allPermissions: Permission[] = [
     submenu: 'Backup',
     icon: '💾',
   },
+  {
+    id: 'perm-029',
+    code: 'settings.iot_gateway',
+    name: 'IoT Gateway',
+    description: 'Akses untuk konfigurasi IoT Gateway dan koneksi ke perangkat',
+    module: 'Pengaturan',
+    submenu: 'IoT Gateway',
+    icon: '🔌',
+  },
+  {
+    id: 'perm-030',
+    code: 'settings.iot_devices',
+    name: 'Kelola Device IoT',
+    description: 'Akses untuk menambah, edit, dan menghapus device IoT',
+    module: 'Pengaturan',
+    submenu: 'IoT Devices',
+    icon: '📡',
+  },
+  {
+    id: 'perm-031',
+    code: 'settings.iot_logs',
+    name: 'Log IoT Gateway',
+    description: 'Akses untuk melihat log aktivitas IoT Gateway',
+    module: 'Pengaturan',
+    submenu: 'IoT Logs',
+    icon: '📋',
+  },
 
   // ===== MODULE: LAPORAN =====
   {
@@ -326,6 +353,9 @@ export const menuStructure: MenuPermission[] = [
       { id: 'settings-general', name: 'Umum', permissionCode: 'settings.general' },
       { id: 'settings-notifications', name: 'Notifikasi', permissionCode: 'settings.notifications' },
       { id: 'settings-backup', name: 'Backup', permissionCode: 'settings.backup' },
+      { id: 'settings-iot-gateway', name: 'IoT Gateway', permissionCode: 'settings.iot_gateway' },
+      { id: 'settings-iot-devices', name: 'IoT Devices', permissionCode: 'settings.iot_devices' },
+      { id: 'settings-iot-logs', name: 'IoT Logs', permissionCode: 'settings.iot_logs' },
     ],
   },
 ];
@@ -339,6 +369,7 @@ export const rolePermissionPresets: Record<UserRole, string[]> = {
     'calls.view', 'calls.history', 'calls.active', 'calls.search', 'calls.respond', 'calls.export',
     'accounts.view', 'accounts.toggle_status',
     'reports.view', 'reports.daily', 'reports.monthly', 'reports.performance',
+    'settings.iot_gateway', 'settings.iot_devices', 'settings.iot_logs',
   ],
   nurse: [
     'dashboard.view', 'dashboard.stats', 'dashboard.active_calls',
