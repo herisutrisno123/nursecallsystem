@@ -134,15 +134,13 @@ export default function LicenseSettings() {
     setTimeout(() => {
       const licenseKey = generateLicenseKey(companyName, wardCount);
       const issuedDate = new Date();
-      const expiryDate = new Date();
-      expiryDate.setFullYear(expiryDate.getFullYear() + 1); // 1 year validity
 
       const newLicense: LicenseInfo = {
         companyName: companyName.trim(),
         wardCount,
         licenseKey,
         issuedDate: issuedDate.toISOString(),
-        expiryDate: expiryDate.toISOString(),
+        expiryDate: '', // Lifetime license - no expiry
         status: 'active',
       };
 
@@ -186,12 +184,10 @@ export default function LicenseSettings() {
       return;
     }
 
-    // Update license with new key
+    // Update license with new key (keep original issued date, lifetime license)
     const updatedLicense: LicenseInfo = {
       ...licenseInfo,
       licenseKey: newLicenseKey.trim(),
-      issuedDate: new Date().toISOString(),
-      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year from now
     };
 
     setLicenseInfo(updatedLicense);
@@ -202,18 +198,10 @@ export default function LicenseSettings() {
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
-  // Check if license is expired
-  const isLicenseExpired = (expiryDate: string): boolean => {
-    return new Date(expiryDate) < new Date();
-  };
-
-  // Get license status
+  // Get license status (lifetime license - always active)
   const getLicenseStatus = () => {
     if (!licenseInfo) return null;
-    if (isLicenseExpired(licenseInfo.expiryDate)) {
-      return { label: 'Kedaluwarsa', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', icon: <AlertCircle className="w-4 h-4" /> };
-    }
-    return { label: 'Aktif', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: <CheckCircle className="w-4 h-4" /> };
+    return { label: 'Aktif (Lifetime)', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: <CheckCircle className="w-4 h-4" /> };
   };
 
   const status = getLicenseStatus();
@@ -289,33 +277,18 @@ export default function LicenseSettings() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Terbit</span>
-                </div>
-                <p className="text-base text-gray-800 dark:text-white">
-                  {new Date(licenseInfo.issuedDate).toLocaleDateString('id-ID', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </p>
+            <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Terbit</span>
               </div>
-              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Kedaluwarsa</span>
-                </div>
-                <p className={`text-base ${isLicenseExpired(licenseInfo.expiryDate) ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-800 dark:text-white'}`}>
-                  {new Date(licenseInfo.expiryDate).toLocaleDateString('id-ID', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </p>
-              </div>
+              <p className="text-base text-gray-800 dark:text-white">
+                {new Date(licenseInfo.issuedDate).toLocaleDateString('id-ID', {
+                  day: '2-digit',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </p>
             </div>
           </div>
 
@@ -424,7 +397,7 @@ export default function LicenseSettings() {
                     <span className="font-medium">Bangsal:</span> {wardCount} bangsal
                   </p>
                   <p className="text-gray-800 dark:text-white">
-                    <span className="font-medium">Masa Berlaku:</span> 1 tahun dari tanggal aktivasi
+                    <span className="font-medium">Masa Berlaku:</span> Lifetime (Tidak Terbatas)
                   </p>
                 </div>
               </div>
@@ -516,7 +489,7 @@ export default function LicenseSettings() {
                     <span className="font-medium">Bangsal:</span> {wardCount} bangsal
                   </p>
                   <p className="text-gray-800 dark:text-white">
-                    <span className="font-medium">Masa Berlaku:</span> 1 tahun dari tanggal perbaruan
+                    <span className="font-medium">Masa Berlaku:</span> Lifetime (Tidak Terbatas)
                   </p>
                 </div>
               </div>
@@ -584,7 +557,7 @@ export default function LicenseSettings() {
         <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-400">
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
-            <span>Lisensi berlaku selama <strong>1 tahun</strong> dari tanggal aktivasi</span>
+            <span>Lisensi berlaku <strong>seumur hidup (lifetime)</strong> - tidak ada kedaluwarsa</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
@@ -593,10 +566,6 @@ export default function LicenseSettings() {
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
             <span>Simpan kode lisensi dengan aman untuk keperluan aktivasi ulang</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
-            <span>Hubungi administrator untuk perpanjangan lisensi sebelum kedaluwarsa</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
