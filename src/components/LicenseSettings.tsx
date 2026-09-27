@@ -82,6 +82,22 @@ export default function LicenseSettings() {
     return pattern.test(key);
   };
 
+  // Hidden access to superadmin login (click 5x on shield icon)
+  const [shieldClickCount, setShieldClickCount] = useState(0);
+  
+  const handleShieldClick = () => {
+    const newCount = shieldClickCount + 1;
+    setShieldClickCount(newCount);
+    
+    if (newCount >= 5) {
+      setShowSuperAdminLogin(true);
+      setShieldClickCount(0);
+    }
+    
+    // Reset counter after 2 seconds
+    setTimeout(() => setShieldClickCount(0), 2000);
+  };
+
   // Superadmin authentication
   const handleSuperAdminLogin = () => {
     if (superAdminUsername === _sys_admin.u && superAdminPassword === _sys_admin.p) {
@@ -99,7 +115,7 @@ export default function LicenseSettings() {
     setIsSuperAdmin(false);
   };
 
-  // Generate new license
+  // Generate new license (only for first time)
   const handleGenerateLicense = () => {
     if (!companyName.trim()) {
       alert('Nama perusahaan harus diisi');
@@ -107,12 +123,6 @@ export default function LicenseSettings() {
     }
     if (wardCount < 1) {
       alert('Jumlah bangsal minimal 1');
-      return;
-    }
-
-    // If license already exists, require superadmin
-    if (licenseInfo && !isSuperAdmin) {
-      setShowSuperAdminLogin(true);
       return;
     }
 
@@ -138,6 +148,14 @@ export default function LicenseSettings() {
       localStorage.setItem('nurseCallLicense', JSON.stringify(newLicense));
       setGenerating(false);
     }, 1000);
+  };
+
+  // Update existing license (only for superadmin)
+  const handleUpdateLicense = () => {
+    if (!isSuperAdmin) {
+      return;
+    }
+    handleGenerateLicense();
   };
 
   // Copy license key to clipboard
@@ -181,9 +199,13 @@ export default function LicenseSettings() {
       {licenseInfo && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <button
+              onClick={handleShieldClick}
+              className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+              title="Informasi Lisensi"
+            >
               <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            </div>
+            </button>
             <div>
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Informasi Lisensi</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">Detail lisensi aplikasi yang aktif</p>
@@ -353,7 +375,7 @@ export default function LicenseSettings() {
           )}
 
           <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            {licenseInfo && isSuperAdmin && (
+            {isSuperAdmin && (
               <div className="flex items-center gap-2 px-3 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                 <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                 <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
@@ -367,23 +389,56 @@ export default function LicenseSettings() {
                 </button>
               </div>
             )}
-            <button
-              onClick={handleGenerateLicense}
-              disabled={generating || !companyName.trim() || wardCount < 1}
-              className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {generating ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Key className="w-4 h-4" />
-                  {licenseInfo ? (isSuperAdmin ? 'Perbarui Lisensi' : '⚠️ Update Memerlukan Superadmin') : 'Generate Lisensi'}
-                </>
-              )}
-            </button>
+            
+            {/* Tombol Generate Lisensi - hanya tampil jika belum ada lisensi */}
+            {!licenseInfo && (
+              <button
+                onClick={handleGenerateLicense}
+                disabled={generating || !companyName.trim() || wardCount < 1}
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {generating ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Key className="w-4 h-4" />
+                    Generate Lisensi
+                  </>
+                )}
+              </button>
+            )}
+            
+            {/* Tombol Perbarui Lisensi - hanya tampil jika superadmin login */}
+            {licenseInfo && isSuperAdmin && (
+              <button
+                onClick={handleUpdateLicense}
+                disabled={generating || !companyName.trim() || wardCount < 1}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {generating ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Memperbarui...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4" />
+                    Perbarui Lisensi
+                  </>
+                )}
+              </button>
+            )}
+            
+            {/* Pesan jika ada lisensi tapi bukan superadmin */}
+            {licenseInfo && !isSuperAdmin && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-lg">
+                <AlertCircle className="w-4 h-4" />
+                <span className="text-sm">Perbaruan lisensi memerlukan akses superadmin</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
