@@ -3,6 +3,8 @@ import Dashboard from './components/Dashboard';
 import FloorMap from './components/FloorMap';
 import CallLog from './components/CallLog';
 import AccountManagement from './components/AccountManagement';
+import ReportsPage from './components/ReportsPage';
+import SettingsPage from './components/SettingsPage';
 import RoomDetail from './components/RoomDetail';
 import LoginPage from './components/LoginPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -200,20 +202,8 @@ function AppContent() {
         {activeTab === 'map' && <FloorMap onRoomSelect={handleRoomSelect} />}
         {activeTab === 'calls' && <CallLog />}
         {activeTab === 'accounts' && <AccountManagement />}
-        {activeTab === 'reports' && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-            <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Laporan</h2>
-            <p className="text-gray-500 dark:text-gray-400">Halaman laporan harian, bulanan, dan kinerja perawat</p>
-          </div>
-        )}
-        {activeTab === 'settings' && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-            <Settings className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Pengaturan</h2>
-            <p className="text-gray-500 dark:text-gray-400">Pengaturan umum sistem, notifikasi, dan backup data</p>
-          </div>
-        )}
+        {activeTab === 'reports' && <ReportsPage />}
+        {activeTab === 'settings' && <SettingsPage />}
       </main>
 
       {/* Room Detail Modal */}

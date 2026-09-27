@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { UserAccount } from '../types';
 import { userAccounts } from '../data/userData';
-import { hasPermission, hasMenuAccess } from '../data/permissions';
+import { hasPermission, hasMenuAccess, hasSubmenuAccess } from '../data/permissions';
 
 interface AuthContextType {
   currentUser: UserAccount | null;
@@ -9,6 +9,7 @@ interface AuthContextType {
   logout: () => void;
   checkPermission: (permissionCode: string) => boolean;
   checkMenuAccess: (menuId: string) => boolean;
+  checkSubmenuAccess: (menuId: string, submenuId: string) => boolean;
   updatePermissions: (userId: string, permissions: string[]) => void;
 }
 
@@ -65,6 +66,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return hasMenuAccess(currentUser.permissions, menuId);
   };
 
+  const checkSubmenuAccess = (menuId: string, submenuId: string): boolean => {
+    if (!currentUser) return false;
+    return hasSubmenuAccess(currentUser.permissions, menuId, submenuId);
+  };
+
   const updatePermissions = (userId: string, permissions: string[]) => {
     // Update in userAccounts
     const userIndex = userAccounts.findIndex(u => u.id === userId);
@@ -84,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout,
       checkPermission,
       checkMenuAccess,
+      checkSubmenuAccess,
       updatePermissions,
     }}>
       {children}

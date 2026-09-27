@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react';
 import { dashboardStats, hourlyCallData, callTypeData, responseTimeData, nurseCalls } from '../data/mockData';
 import { AreaChart, PieChart, LineChart } from './Charts';
-import { Activity, Phone, Clock, AlertTriangle, CheckCircle, XCircle, TrendingUp, Users } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { Activity, Phone, Clock, AlertTriangle, CheckCircle, XCircle, TrendingUp, Users, Lock } from 'lucide-react';
 
 export default function Dashboard() {
+  const { checkPermission } = useAuth();
   const stats = dashboardStats;
   const activeCalls = nurseCalls.filter(c => c.status === 'active');
 
@@ -89,86 +91,99 @@ export default function Dashboard() {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Hourly Calls Chart */}
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Panggilan Per Jam</h3>
-          <AreaChart
-            data={hourlyChartData}
-            color="#3b82f6"
-            color2="#ef4444"
-            label1="Total Panggilan"
-            label2="Emergency"
-            height={280}
-          />
-        </div>
+      {checkPermission('dashboard.charts') && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Hourly Calls Chart */}
+          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Panggilan Per Jam</h3>
+            <AreaChart
+              data={hourlyChartData}
+              color="#3b82f6"
+              color2="#ef4444"
+              label1="Total Panggilan"
+              label2="Emergency"
+              height={280}
+            />
+          </div>
 
-        {/* Call Type Pie Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Jenis Panggilan</h3>
-          <PieChart data={pieChartData} height={280} />
+          {/* Call Type Pie Chart */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Jenis Panggilan</h3>
+            <PieChart data={pieChartData} height={280} />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Response Time Chart & Active Calls */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Response Time Trend */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Waktu Respon (menit)</h3>
-          <LineChart
-            data={responseChartData}
-            color="#8b5cf6"
-            color2="#ef4444"
-            label1="Rata-rata Respon"
-            label2="Target (3 min)"
-            height={250}
-          />
-        </div>
+        {checkPermission('dashboard.charts') && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Waktu Respon (menit)</h3>
+            <LineChart
+              data={responseChartData}
+              color="#8b5cf6"
+              color2="#ef4444"
+              label1="Rata-rata Respon"
+              label2="Target (3 min)"
+              height={250}
+            />
+          </div>
+        )}
 
         {/* Active Calls List */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-            </span>
-            Panggilan Aktif ({activeCalls.length})
-          </h3>
-          <div className="space-y-3 max-h-[250px] overflow-y-auto scrollbar-thin">
-            {activeCalls.map(call => (
-              <div key={call.id} className={`p-3 rounded-lg border-l-4 ${
-                call.priority === 'critical' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' :
-                call.priority === 'high' ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' :
-                call.priority === 'medium' ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' :
-                'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-              }`}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-semibold text-sm text-gray-800 dark:text-white">
-                      Kamar {call.roomNumber} - {call.patientName}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{call.notes}</p>
+        {checkPermission('dashboard.active_calls') ? (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+              </span>
+              Panggilan Aktif ({activeCalls.length})
+            </h3>
+            <div className="space-y-3 max-h-[250px] overflow-y-auto scrollbar-thin">
+              {activeCalls.map(call => (
+                <div key={call.id} className={`p-3 rounded-lg border-l-4 ${
+                  call.priority === 'critical' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' :
+                  call.priority === 'high' ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' :
+                  call.priority === 'medium' ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' :
+                  'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                }`}>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold text-sm text-gray-800 dark:text-white">
+                        Kamar {call.roomNumber} - {call.patientName}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{call.notes}</p>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
+                      call.type === 'emergency' ? 'bg-red-100 text-red-700' :
+                      call.type === 'bathroom' ? 'bg-purple-100 text-purple-700' :
+                      call.type === 'medication' ? 'bg-green-100 text-green-700' :
+                      call.type === 'meal' ? 'bg-amber-100 text-amber-700' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>
+                      {call.type === 'emergency' ? '🚨 Emergency' :
+                       call.type === 'bathroom' ? '🚿 KM Mandi' :
+                       call.type === 'medication' ? '💊 Obat' :
+                       call.type === 'meal' ? '🍽️ Makan' : '📞 Reguler'}
+                    </span>
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
-                    call.type === 'emergency' ? 'bg-red-100 text-red-700' :
-                    call.type === 'bathroom' ? 'bg-purple-100 text-purple-700' :
-                    call.type === 'medication' ? 'bg-green-100 text-green-700' :
-                    call.type === 'meal' ? 'bg-amber-100 text-amber-700' :
-                    'bg-blue-100 text-blue-700'
-                  }`}>
-                    {call.type === 'emergency' ? '🚨 Emergency' :
-                     call.type === 'bathroom' ? '🚿 KM Mandi' :
-                     call.type === 'medication' ? '💊 Obat' :
-                     call.type === 'meal' ? '🍽️ Makan' : '📞 Reguler'}
-                  </span>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {new Date(call.timestamp).toLocaleTimeString('id-ID')}
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {new Date(call.timestamp).toLocaleTimeString('id-ID')}
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          !checkPermission('dashboard.charts') && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center col-span-full">
+              <Lock className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+              <p className="text-gray-500 dark:text-gray-400">Anda tidak memiliki izin untuk melihat konten ini</p>
+            </div>
+          )
+        )}
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { UserAccount, UserRole, UserStatus } from '../types';
 import { userAccounts as initialAccounts } from '../data/userData';
 import { allPermissions, rolePermissionPresets } from '../data/permissions';
 import PermissionManager from './PermissionManager';
+import { useAuth } from '../context/AuthContext';
 import {
   Users,
   Search,
@@ -27,6 +28,7 @@ import {
 } from 'lucide-react';
 
 export default function AccountManagement() {
+  const { checkPermission } = useAuth();
   const [accounts, setAccounts] = useState<UserAccount[]>(initialAccounts);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<UserRole | 'all'>('all');
@@ -125,13 +127,15 @@ export default function AccountManagement() {
               Mengelola akun pengguna sistem NurseCall Monitor
             </p>
           </div>
-          <button
-            onClick={handleAdd}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
-          >
-            <Plus className="w-5 h-5" />
-            Tambah Akun
-          </button>
+          {checkPermission('accounts.create') && (
+            <button
+              onClick={handleAdd}
+              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
+            >
+              <Plus className="w-5 h-5" />
+              Tambah Akun
+            </button>
+          )}
         </div>
 
         {/* Filters */}
@@ -215,29 +219,49 @@ export default function AccountManagement() {
                     <span className="text-sm text-gray-700 dark:text-gray-300">{account.department}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <button
-                      onClick={() => setPermissionManager(account)}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 transition-colors"
-                      title="Kelola Hak Akses"
-                    >
-                      <Key className="w-3 h-3" />
-                      {account.permissions.length} / {allPermissions.length}
-                    </button>
+                    {checkPermission('accounts.permissions') ? (
+                      <button
+                        onClick={() => setPermissionManager(account)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 transition-colors"
+                        title="Kelola Hak Akses"
+                      >
+                        <Key className="w-3 h-3" />
+                        {account.permissions.length} / {allPermissions.length}
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                        <Key className="w-3 h-3" />
+                        {account.permissions.length} / {allPermissions.length}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
-                    <button
-                      onClick={() => toggleStatus(account.id)}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                    {checkPermission('accounts.toggle_status') ? (
+                      <button
+                        onClick={() => toggleStatus(account.id)}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                          account.status === 'active'
+                            ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900/30 dark:text-gray-400'
+                        }`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          account.status === 'active' ? 'bg-green-500' : 'bg-gray-500'
+                        }`}></span>
+                        {account.status === 'active' ? 'Aktif' : 'Nonaktif'}
+                      </button>
+                    ) : (
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                         account.status === 'active'
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900/30 dark:text-gray-400'
-                      }`}
-                    >
-                      <span className={`w-1.5 h-1.5 rounded-full ${
-                        account.status === 'active' ? 'bg-green-500' : 'bg-gray-500'
-                      }`}></span>
-                      {account.status === 'active' ? 'Aktif' : 'Nonaktif'}
-                    </button>
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          account.status === 'active' ? 'bg-green-500' : 'bg-gray-500'
+                        }`}></span>
+                        {account.status === 'active' ? 'Aktif' : 'Nonaktif'}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -252,27 +276,36 @@ export default function AccountManagement() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      <button
-                        onClick={() => setPermissionManager(account)}
-                        className="p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 text-purple-600 dark:text-purple-400 transition-colors"
-                        title="Kelola Hak Akses"
-                      >
-                        <Key className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleEdit(account)}
-                        className="p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 transition-colors"
-                        title="Edit"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => setDeleteConfirm(account.id)}
-                        className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
-                        title="Hapus"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {checkPermission('accounts.permissions') && (
+                        <button
+                          onClick={() => setPermissionManager(account)}
+                          className="p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 text-purple-600 dark:text-purple-400 transition-colors"
+                          title="Kelola Hak Akses"
+                        >
+                          <Key className="w-4 h-4" />
+                        </button>
+                      )}
+                      {checkPermission('accounts.edit') && (
+                        <button
+                          onClick={() => handleEdit(account)}
+                          className="p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 transition-colors"
+                          title="Edit"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      )}
+                      {checkPermission('accounts.delete') && (
+                        <button
+                          onClick={() => setDeleteConfirm(account.id)}
+                          className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
+                          title="Hapus"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                      {!checkPermission('accounts.permissions') && !checkPermission('accounts.edit') && !checkPermission('accounts.delete') && (
+                        <span className="text-xs text-gray-400 dark:text-gray-500 italic">Tidak ada aksi</span>
+                      )}
                     </div>
                   </td>
                 </tr>

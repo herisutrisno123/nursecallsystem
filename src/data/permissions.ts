@@ -361,9 +361,18 @@ export function hasPermission(userPermissions: string[], permissionCode: string)
 export function hasMenuAccess(userPermissions: string[], menuId: string): boolean {
   const menu = menuStructure.find(m => m.menuId === menuId);
   if (!menu) return false;
-  // Check if user has any permission in this menu
+  // Check if user has any permission in this menu by checking module name match
   const menuPermissions = allPermissions.filter(p => p.module === menu.menuName);
   return menuPermissions.some(p => userPermissions.includes(p.code));
+}
+
+// Check if user has a specific submenu access
+export function hasSubmenuAccess(userPermissions: string[], menuId: string, submenuId: string): boolean {
+  const menu = menuStructure.find(m => m.menuId === menuId);
+  if (!menu || !menu.children) return false;
+  const submenu = menu.children.find(c => c.id === submenuId);
+  if (!submenu) return false;
+  return userPermissions.includes(submenu.permissionCode);
 }
 
 export function getPermissionsByModule(permissions: Permission[]) {
