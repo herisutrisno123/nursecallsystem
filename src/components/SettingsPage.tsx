@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Settings, Bell, Database, Save, RotateCcw, Wifi } from 'lucide-react';
+import { Settings, Bell, Database, Save, RotateCcw, Wifi, Target } from 'lucide-react';
 import IoTGatewaySettings from './IoTGatewaySettings';
+import SLASettings from './SLASettings';
 
-type SettingsTab = 'general' | 'notifications' | 'backup' | 'iot';
+type SettingsTab = 'general' | 'notifications' | 'backup' | 'iot' | 'sla';
 
 export default function SettingsPage() {
   const { checkPermission } = useAuth();
@@ -14,6 +15,7 @@ export default function SettingsPage() {
     { id: 'notifications' as SettingsTab, label: 'Notifikasi', icon: <Bell className="w-4 h-4" />, permission: 'settings.notifications' },
     { id: 'backup' as SettingsTab, label: 'Backup & Restore', icon: <Database className="w-4 h-4" />, permission: 'settings.backup' },
     { id: 'iot' as SettingsTab, label: 'IoT Gateway', icon: <Wifi className="w-4 h-4" />, permission: 'settings.iot_gateway' },
+    { id: 'sla' as SettingsTab, label: 'SLA Management', icon: <Target className="w-4 h-4" />, permission: 'settings.sla' },
   ];
 
   const availableTabs = tabs.filter(tab => checkPermission(tab.permission));
@@ -59,6 +61,7 @@ export default function SettingsPage() {
       {activeTab === 'notifications' && checkPermission('settings.notifications') && <NotificationSettings />}
       {activeTab === 'backup' && checkPermission('settings.backup') && <BackupSettings />}
       {activeTab === 'iot' && checkPermission('settings.iot_gateway') && <IoTGatewaySettings />}
+      {activeTab === 'sla' && checkPermission('settings.sla') && <SLASettings />}
     </div>
   );
 }

@@ -249,6 +249,15 @@ export const allPermissions: Permission[] = [
     submenu: 'IoT Logs',
     icon: '📋',
   },
+  {
+    id: 'perm-032',
+    code: 'settings.sla',
+    name: 'SLA Management',
+    description: 'Akses untuk mengelola Service Level Agreement dan monitoring kinerja',
+    module: 'Pengaturan',
+    submenu: 'SLA',
+    icon: '🎯',
+  },
 
   // ===== MODULE: LAPORAN =====
   {
@@ -356,6 +365,7 @@ export const menuStructure: MenuPermission[] = [
       { id: 'settings-iot-gateway', name: 'IoT Gateway', permissionCode: 'settings.iot_gateway' },
       { id: 'settings-iot-devices', name: 'IoT Devices', permissionCode: 'settings.iot_devices' },
       { id: 'settings-iot-logs', name: 'IoT Logs', permissionCode: 'settings.iot_logs' },
+      { id: 'settings-sla', name: 'SLA Management', permissionCode: 'settings.sla' },
     ],
   },
 ];
@@ -370,6 +380,7 @@ export const rolePermissionPresets: Record<UserRole, string[]> = {
     'accounts.view', 'accounts.toggle_status',
     'reports.view', 'reports.daily', 'reports.monthly', 'reports.performance',
     'settings.iot_gateway', 'settings.iot_devices', 'settings.iot_logs',
+    'settings.sla',
   ],
   nurse: [
     'dashboard.view', 'dashboard.stats', 'dashboard.active_calls',
