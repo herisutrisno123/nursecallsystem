@@ -8,18 +8,25 @@ import SettingsPage from './components/SettingsPage';
 import RoomDetail from './components/RoomDetail';
 import LoginPage from './components/LoginPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { LicenseProvider, useLicense } from './context/LicenseContext';
 import { Room } from './types';
-import { LayoutDashboard, Map, PhoneCall, Users, Bell, User, Menu, X, LogOut, FileText, Settings } from 'lucide-react';
+import { LayoutDashboard, Map, PhoneCall, Users, Bell, User, Menu, X, LogOut, FileText, Settings, AlertTriangle, Key } from 'lucide-react';
 
 type Tab = 'dashboard' | 'map' | 'calls' | 'accounts' | 'reports' | 'settings';
 
 function AppContent() {
   const { currentUser, login, logout, checkMenuAccess } = useAuth();
+  const { isLicenseValid, validationMessage } = useLicense();
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [showRoomDetail, setShowRoomDetail] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifications] = useState(5);
+
+  // Jika lisensi tidak valid, paksa ke tab settings
+  if (!isLicenseValid && activeTab !== 'settings') {
+    setActiveTab('settings');
+  }
 
   const handleLogin = (username: string) => {
     login(username);
@@ -44,8 +51,15 @@ function AppContent() {
     { id: 'settings' as Tab, label: 'Pengaturan', icon: <Settings className="w-5 h-5" />, menuId: 'settings' },
   ];
 
-  // Filter tabs based on permissions
-  const tabs = allTabs.filter(tab => checkMenuAccess(tab.menuId));
+  // Filter tabs based on permissions AND license validity
+  const tabs = allTabs.filter(tab => {
+    // Jika lisensi tidak valid, hanya tampilkan menu Pengaturan
+    if (!isLicenseValid) {
+      return tab.id === 'settings';
+    }
+    // Jika lisensi valid, cek permission
+    return checkMenuAccess(tab.menuId);
+  });
 
   // Show login page if not logged in
   if (!currentUser) {
@@ -196,14 +210,48 @@ function AppContent() {
         </div>
       </div>
 
+      {/* License Warning Banner */}
+      {!isLicenseValid && (
+        <div className="bg-gradient-to-r from-red-500 to-red-600 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-6 h-6 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold">Lisensi Tidak Valid</p>
+                  <p className="text-sm text-red-100">{validationMessage || 'Silakan masukkan kode lisensi yang valid di menu Pengaturan → Lisensi'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {activeTab === 'dashboard' && <Dashboard />}
-        {activeTab === 'map' && <FloorMap onRoomSelect={handleRoomSelect} />}
-        {activeTab === 'calls' && <CallLog />}
-        {activeTab === 'accounts' && <AccountManagement />}
-        {activeTab === 'reports' && <ReportsPage />}
+        {activeTab === 'dashboard' && isLicenseValid && <Dashboard />}
+        {activeTab === 'map' && isLicenseValid && <FloorMap onRoomSelect={handleRoomSelect} />}
+        {activeTab === 'calls' && isLicenseValid && <CallLog />}
+        {activeTab === 'accounts' && isLicenseValid && <AccountManagement />}
+        {activeTab === 'reports' && isLicenseValid && <ReportsPage />}
         {activeTab === 'settings' && <SettingsPage />}
+        
+        {/* License Required Message */}
+        {!isLicenseValid && activeTab !== 'settings' && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-red-200 dark:border-red-800 p-12 text-center">
+            <Key className="w-16 h-16 mx-auto text-red-400 mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Lisensi Diperlukan</h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
+              {validationMessage || 'Silakan masukkan kode lisensi yang valid untuk mengakses aplikasi.'}
+            </p>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+            >
+              Buka Pengaturan Lisensi
+            </button>
+          </div>
+        )}
       </main>
 
       {/* Room Detail Modal */}
@@ -239,7 +287,9 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <LicenseProvider>
+        <AppContent />
+      </LicenseProvider>
     </AuthProvider>
   );
 }

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Key, Building2, Copy, CheckCircle, AlertCircle, RefreshCw, Shield, Calendar } from 'lucide-react';
+import { validateLicense, generateVendorLicenseKey } from '../utils/licenseValidator';
+import { useLicense } from '../context/LicenseContext';
 
 interface LicenseInfo {
   companyName: string;
@@ -18,6 +20,8 @@ export default function LicenseSettings() {
   const [generating, setGenerating] = useState(false);
   const [newLicenseKey, setNewLicenseKey] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [validationError, setValidationError] = useState('');
+  const { updateLicenseStatus } = useLicense();
 
   // Load existing license from localStorage
   useEffect(() => {
@@ -118,30 +122,37 @@ export default function LicenseSettings() {
   // Save new license key
   const handleSaveLicense = () => {
     if (!newLicenseKey.trim()) {
-      alert('Kode lisensi harus diisi');
+      setValidationError('Kode lisensi harus diisi');
       return;
     }
 
-    if (!validateLicenseKey(newLicenseKey.trim())) {
-      alert('Format kode lisensi tidak valid. Format yang benar: XXXX-XXXX-XXXX-XXXX-X');
+    // Validasi kode lisensi menggunakan vendor validator
+    const validation = validateLicense(newLicenseKey.trim());
+    
+    if (!validation.isValid) {
+      setValidationError(validation.message);
       return;
     }
 
     if (!licenseInfo) {
-      alert('Tidak ada lisensi aktif untuk diperbarui');
+      setValidationError('Tidak ada lisensi aktif untuk diperbarui');
       return;
     }
 
     // Update license with new key (keep original issued date, lifetime license)
     const updatedLicense: LicenseInfo = {
       ...licenseInfo,
-      licenseKey: newLicenseKey.trim(),
+      licenseKey: newLicenseKey.trim().toUpperCase(),
     };
 
     setLicenseInfo(updatedLicense);
     localStorage.setItem('nurseCallLicense', JSON.stringify(updatedLicense));
     setNewLicenseKey('');
+    setValidationError('');
     setSaveSuccess(true);
+    
+    // Update global license status
+    updateLicenseStatus();
     
     setTimeout(() => setSaveSuccess(false), 3000);
   };
@@ -240,14 +251,19 @@ export default function LicenseSettings() {
             <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Simpan Kode Lisensi Baru
+                  Simpan Kode Lisensi dari Vendor
                 </label>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={newLicenseKey}
-                    onChange={(e) => setNewLicenseKey(e.target.value.toUpperCase())}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white font-mono"
+                    onChange={(e) => {
+                      setNewLicenseKey(e.target.value.toUpperCase());
+                      setValidationError('');
+                    }}
+                    className={`flex-1 px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white font-mono ${
+                      validationError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                    }`}
                     placeholder="XXXX-XXXX-XXXX-XXXX-X"
                     maxLength={21}
                   />
@@ -269,8 +285,16 @@ export default function LicenseSettings() {
                     )}
                   </button>
                 </div>
+                {validationError && (
+                  <div className="mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-700 dark:text-red-400 flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <span>{validationError}</span>
+                    </p>
+                  </div>
+                )}
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Masukkan kode lisensi baru dari developer. Format: XXXX-XXXX-XXXX-XXXX-X
+                  Masukkan kode lisensi unik yang diberikan oleh vendor melalui aplikasi khusus.
                 </p>
               </div>
             </div>
@@ -407,7 +431,11 @@ export default function LicenseSettings() {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
-            <span>Kode lisensi unik berdasarkan nama perusahaan dan jumlah bangsal</span>
+            <span>Kode lisensi <strong>harus diperoleh dari vendor</strong> melalui aplikasi khusus</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
+            <span>Kode lisensi yang tidak valid akan <strong>memblokir semua menu</strong> kecuali Pengaturan</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
@@ -423,6 +451,34 @@ export default function LicenseSettings() {
           </li>
         </ul>
       </div>
+
+      {/* Demo: Generate Vendor License Key */}
+      {!licenseInfo && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-6">
+          <h4 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-3 flex items-center gap-2">
+            <Key className="w-5 h-5" />
+            Demo: Generate Kode Lisensi Vendor
+          </h4>
+          <p className="text-sm text-yellow-800 dark:text-yellow-400 mb-4">
+            Di produksi, kode lisensi diperoleh dari vendor melalui aplikasi terpisah. 
+            Untuk demo, Anda dapat generate kode lisensi vendor di sini:
+          </p>
+          <button
+            onClick={() => {
+              if (companyName && wardCount > 0) {
+                const vendorKey = generateVendorLicenseKey(companyName, wardCount);
+                setNewLicenseKey(vendorKey);
+                alert(`Kode lisensi vendor telah di-generate:\n\n${vendorKey}\n\nSilakan klik tombol "Simpan" untuk mengaktifkan lisensi.`);
+              } else {
+                alert('Silakan isi nama perusahaan dan jumlah bangsal terlebih dahulu di form di atas.');
+              }
+            }}
+            className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors text-sm font-medium"
+          >
+            Generate Kode Vendor
+          </button>
+        </div>
+      )}
     </div>
   );
 }
