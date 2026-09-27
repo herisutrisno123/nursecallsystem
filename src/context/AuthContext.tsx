@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { UserAccount } from '../types';
 import { userAccounts } from '../data/userData';
-import { hasPermission, hasMenuAccess, hasSubmenuAccess } from '../data/permissions';
+import { hasPermission, hasMenuAccess, hasSubmenuAccess, rolePermissionPresets } from '../data/permissions';
 
 interface AuthContextType {
   currentUser: UserAccount | null;
@@ -22,14 +22,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const savedUsername = localStorage.getItem('nurseCallUser');
     if (savedUsername) {
       const user = userAccounts.find(u => u.username === savedUsername);
-      if (user) setCurrentUser(user);
+      if (user) {
+        // Refresh permissions from presets based on role
+        const freshPermissions = rolePermissionPresets[user.role] || [];
+        const updatedUser = { ...user, permissions: freshPermissions };
+        setCurrentUser(updatedUser);
+      }
     }
   }, []);
 
   const login = (username: string) => {
     const user = userAccounts.find(u => u.username === username);
     if (user) {
-      setCurrentUser(user);
+      // Refresh permissions from presets based on role
+      const freshPermissions = rolePermissionPresets[user.role] || [];
+      const updatedUser = { ...user, permissions: freshPermissions };
+      setCurrentUser(updatedUser);
       localStorage.setItem('nurseCallUser', username);
     } else {
       // Fallback for demo users not in the list - create with nurse permissions
@@ -44,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         department: 'Rawat Inap',
         createdAt: new Date().toISOString().split('T')[0],
         lastLogin: new Date().toISOString(),
-        permissions: ['dashboard.view', 'dashboard.stats', 'dashboard.active_calls', 'map.view', 'map.floor1', 'map.room_detail', 'calls.view', 'calls.history', 'calls.active', 'calls.respond'],
+        permissions: rolePermissionPresets.nurse,
       };
       setCurrentUser(defaultUser);
       localStorage.setItem('nurseCallUser', username);
