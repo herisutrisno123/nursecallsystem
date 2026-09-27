@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Key, Building2, Save, Copy, CheckCircle, AlertCircle, RefreshCw, Shield, Calendar } from 'lucide-react';
+import { Key, Building2, Copy, CheckCircle, AlertCircle, RefreshCw, Shield, Calendar } from 'lucide-react';
 
 interface LicenseInfo {
   companyName: string;
@@ -10,12 +10,23 @@ interface LicenseInfo {
   status: 'active' | 'expired' | 'invalid';
 }
 
+// Hidden superadmin credentials (obfuscated)
+const _sys_admin = {
+  u: atob('c3VwZXJhZG1pbg=='), // superadmin
+  p: atob('c3ByYWRtaW4='), // spradmin
+};
+
 export default function LicenseSettings() {
   const [companyName, setCompanyName] = useState('');
   const [wardCount, setWardCount] = useState(1);
   const [licenseInfo, setLicenseInfo] = useState<LicenseInfo | null>(null);
   const [copied, setCopied] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [showSuperAdminLogin, setShowSuperAdminLogin] = useState(false);
+  const [superAdminUsername, setSuperAdminUsername] = useState('');
+  const [superAdminPassword, setSuperAdminPassword] = useState('');
+  const [superAdminError, setSuperAdminError] = useState('');
 
   // Load existing license from localStorage
   useEffect(() => {
@@ -71,6 +82,23 @@ export default function LicenseSettings() {
     return pattern.test(key);
   };
 
+  // Superadmin authentication
+  const handleSuperAdminLogin = () => {
+    if (superAdminUsername === _sys_admin.u && superAdminPassword === _sys_admin.p) {
+      setIsSuperAdmin(true);
+      setShowSuperAdminLogin(false);
+      setSuperAdminError('');
+      setSuperAdminUsername('');
+      setSuperAdminPassword('');
+    } else {
+      setSuperAdminError('Kredensial tidak valid');
+    }
+  };
+
+  const handleSuperAdminLogout = () => {
+    setIsSuperAdmin(false);
+  };
+
   // Generate new license
   const handleGenerateLicense = () => {
     if (!companyName.trim()) {
@@ -79,6 +107,12 @@ export default function LicenseSettings() {
     }
     if (wardCount < 1) {
       alert('Jumlah bangsal minimal 1');
+      return;
+    }
+
+    // If license already exists, require superadmin
+    if (licenseInfo && !isSuperAdmin) {
+      setShowSuperAdminLogin(true);
       return;
     }
 
@@ -319,6 +353,20 @@ export default function LicenseSettings() {
           )}
 
           <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            {licenseInfo && isSuperAdmin && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                  Mode Superadmin Aktif
+                </span>
+                <button
+                  onClick={handleSuperAdminLogout}
+                  className="ml-2 text-xs text-purple-600 dark:text-purple-400 hover:underline"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
             <button
               onClick={handleGenerateLicense}
               disabled={generating || !companyName.trim() || wardCount < 1}
@@ -332,7 +380,7 @@ export default function LicenseSettings() {
               ) : (
                 <>
                   <Key className="w-4 h-4" />
-                  {licenseInfo ? 'Perbarui Lisensi' : 'Generate Lisensi'}
+                  {licenseInfo ? (isSuperAdmin ? 'Perbarui Lisensi' : '⚠️ Update Memerlukan Superadmin') : 'Generate Lisensi'}
                 </>
               )}
             </button>
@@ -367,8 +415,90 @@ export default function LicenseSettings() {
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
             <span>Lisensi hanya berlaku untuk satu instalasi aplikasi</span>
           </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
+            <span><strong>Update lisensi</strong> memerlukan autentikasi superadmin</span>
+          </li>
         </ul>
       </div>
+
+      {/* Superadmin Login Modal */}
+      {showSuperAdminLogin && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                  <Shield className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                    Autentikasi Superadmin
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Diperlukan untuk memperbarui lisensi
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  value={superAdminUsername}
+                  onChange={(e) => setSuperAdminUsername(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                  placeholder="Masukkan username"
+                  autoComplete="off"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={superAdminPassword}
+                  onChange={(e) => setSuperAdminPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSuperAdminLogin();
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                  placeholder="Masukkan password"
+                  autoComplete="off"
+                />
+              </div>
+              {superAdminError && (
+                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                  <p className="text-sm text-red-700 dark:text-red-400">{superAdminError}</p>
+                </div>
+              )}
+            </div>
+            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3">
+              <button
+                onClick={() => {
+                  setShowSuperAdminLogin(false);
+                  setSuperAdminError('');
+                  setSuperAdminUsername('');
+                  setSuperAdminPassword('');
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSuperAdminLogin}
+                className="flex-1 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
+              >
+                Login
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
