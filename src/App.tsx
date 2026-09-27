@@ -1,19 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import FloorMap from './components/FloorMap';
 import CallLog from './components/CallLog';
 import RoomDetail from './components/RoomDetail';
+import LoginPage from './components/LoginPage';
 import { Room } from './types';
-import { LayoutDashboard, Map, PhoneCall, Bell, User, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Map, PhoneCall, Bell, User, Menu, X, LogOut } from 'lucide-react';
 
 type Tab = 'dashboard' | 'map' | 'calls';
 
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState('');
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [showRoomDetail, setShowRoomDetail] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifications] = useState(5);
+
+  // Check login status on mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('nurseCallUser');
+    if (savedUser) {
+      setCurrentUser(savedUser);
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogin = (username: string) => {
+    setCurrentUser(username);
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('nurseCallUser');
+    setCurrentUser('');
+    setIsLoggedIn(false);
+    setActiveTab('dashboard');
+  };
 
   const handleRoomSelect = (room: Room) => {
     setSelectedRoom(room);
@@ -25,6 +49,11 @@ export default function App() {
     { id: 'map' as Tab, label: 'Peta Kamar', icon: <Map className="w-5 h-5" /> },
     { id: 'calls' as Tab, label: 'Log Panggilan', icon: <PhoneCall className="w-5 h-5" /> },
   ];
+
+  // Show login page if not logged in
+  if (!isLoggedIn) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -79,9 +108,16 @@ export default function App() {
                   <User className="w-4 h-4 text-white" />
                 </div>
                 <div className="hidden lg:block">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Ns. Rina</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Head Nurse</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{currentUser}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Nurse</p>
                 </div>
+                <button
+                  onClick={handleLogout}
+                  className="ml-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  title="Logout"
+                >
+                  <LogOut className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                </button>
               </div>
 
               {/* Mobile Menu Button */}
@@ -116,6 +152,24 @@ export default function App() {
                   {tab.label}
                 </button>
               ))}
+              <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2">
+                <div className="flex items-center gap-3 px-4 py-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{currentUser}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Nurse</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all w-full"
+                >
+                  <LogOut className="w-5 h-5" />
+                  Logout
+                </button>
+              </div>
             </nav>
           </div>
         )}
