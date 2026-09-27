@@ -1,10 +1,30 @@
+import type { ReactNode } from 'react';
 import { dashboardStats, hourlyCallData, callTypeData, responseTimeData, nurseCalls } from '../data/mockData';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend, Area, AreaChart } from 'recharts';
+import { AreaChart, PieChart, LineChart } from './Charts';
 import { Activity, Phone, Clock, AlertTriangle, CheckCircle, XCircle, TrendingUp, Users } from 'lucide-react';
 
 export default function Dashboard() {
   const stats = dashboardStats;
   const activeCalls = nurseCalls.filter(c => c.status === 'active');
+
+  // Transform data for custom charts
+  const hourlyChartData = hourlyCallData.map(d => ({
+    label: d.hour.replace(':00', ''),
+    value: d.calls,
+    value2: d.emergency,
+  }));
+
+  const pieChartData = callTypeData.map(d => ({
+    name: d.name,
+    value: d.value,
+    color: d.color,
+  }));
+
+  const responseChartData = responseTimeData.map(d => ({
+    label: d.day,
+    value: d.avgTime,
+    value2: d.target,
+  }));
 
   return (
     <div className="space-y-6">
@@ -73,44 +93,20 @@ export default function Dashboard() {
         {/* Hourly Calls Chart */}
         <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Panggilan Per Jam</h3>
-          <ResponsiveContainer width="100%" height={280}>
-            <AreaChart data={hourlyCallData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="hour" stroke="#6b7280" fontSize={12} />
-              <YAxis stroke="#6b7280" fontSize={12} />
-              <Tooltip
-                contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#fff' }}
-              />
-              <Area type="monotone" dataKey="calls" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.2} name="Total" />
-              <Area type="monotone" dataKey="emergency" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} name="Emergency" />
-            </AreaChart>
-          </ResponsiveContainer>
+          <AreaChart
+            data={hourlyChartData}
+            color="#3b82f6"
+            color2="#ef4444"
+            label1="Total Panggilan"
+            label2="Emergency"
+            height={280}
+          />
         </div>
 
         {/* Call Type Pie Chart */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Jenis Panggilan</h3>
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie
-                data={callTypeData}
-                cx="50%"
-                cy="50%"
-                innerRadius={50}
-                outerRadius={80}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {callTypeData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#fff' }}
-              />
-              <Legend wrapperStyle={{ fontSize: '12px' }} />
-            </PieChart>
-          </ResponsiveContainer>
+          <PieChart data={pieChartData} height={280} />
         </div>
       </div>
 
@@ -119,18 +115,14 @@ export default function Dashboard() {
         {/* Response Time Trend */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Waktu Respon (menit)</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={responseTimeData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="day" stroke="#6b7280" fontSize={12} />
-              <YAxis stroke="#6b7280" fontSize={12} />
-              <Tooltip
-                contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#fff' }}
-              />
-              <Line type="monotone" dataKey="avgTime" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: '#8b5cf6' }} name="Rata-rata" />
-              <Line type="monotone" dataKey="target" stroke="#ef4444" strokeWidth={2} strokeDasharray="5 5" dot={false} name="Target" />
-            </LineChart>
-          </ResponsiveContainer>
+          <LineChart
+            data={responseChartData}
+            color="#8b5cf6"
+            color2="#ef4444"
+            label1="Rata-rata Respon"
+            label2="Target (3 min)"
+            height={250}
+          />
         </div>
 
         {/* Active Calls List */}
@@ -142,7 +134,7 @@ export default function Dashboard() {
             </span>
             Panggilan Aktif ({activeCalls.length})
           </h3>
-          <div className="space-y-3 max-h-[250px] overflow-y-auto">
+          <div className="space-y-3 max-h-[250px] overflow-y-auto scrollbar-thin">
             {activeCalls.map(call => (
               <div key={call.id} className={`p-3 rounded-lg border-l-4 ${
                 call.priority === 'critical' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' :
@@ -157,7 +149,7 @@ export default function Dashboard() {
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{call.notes}</p>
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
                     call.type === 'emergency' ? 'bg-red-100 text-red-700' :
                     call.type === 'bathroom' ? 'bg-purple-100 text-purple-700' :
                     call.type === 'medication' ? 'bg-green-100 text-green-700' :
@@ -165,7 +157,7 @@ export default function Dashboard() {
                     'bg-blue-100 text-blue-700'
                   }`}>
                     {call.type === 'emergency' ? '🚨 Emergency' :
-                     call.type === 'bathroom' ? '🚿 Kamar Mandi' :
+                     call.type === 'bathroom' ? '🚿 KM Mandi' :
                      call.type === 'medication' ? '💊 Obat' :
                      call.type === 'meal' ? '🍽️ Makan' : '📞 Reguler'}
                   </span>
@@ -185,7 +177,7 @@ export default function Dashboard() {
 function StatCard({ title, value, icon, color, trend, pulse }: {
   title: string;
   value: string | number;
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: string;
   trend?: string;
   pulse?: boolean;

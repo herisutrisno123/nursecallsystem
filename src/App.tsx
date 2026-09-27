@@ -4,7 +4,7 @@ import FloorMap from './components/FloorMap';
 import CallLog from './components/CallLog';
 import RoomDetail from './components/RoomDetail';
 import { Room } from './types';
-import { LayoutDashboard, Map, PhoneCall, Bell, Settings, User, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Map, PhoneCall, Bell, User, Menu, X } from 'lucide-react';
 
 type Tab = 'dashboard' | 'map' | 'calls';
 

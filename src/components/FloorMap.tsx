@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { rooms } from '../data/mockData';
 import { Room, RoomStatus } from '../types';
-import { MapPin, Bed, User, AlertTriangle, Phone, Bath, Pill, UtensilsCrossed } from 'lucide-react';
+import { MapPin, Bed, AlertTriangle, Phone } from 'lucide-react';
 
 interface FloorMapProps {
   onRoomSelect: (room: Room) => void;
