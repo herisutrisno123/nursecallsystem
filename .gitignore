@@ -1,5 +1,9 @@
+# Dependencies
 node_modules/
-.next/
+
+# Build output
 dist/
-build/
-*.log
+
+# Archives
+*.zip
+*.tar.gz
