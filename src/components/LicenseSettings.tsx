@@ -306,92 +306,76 @@ export default function LicenseSettings() {
         </div>
       )}
 
-      {/* Generate New License */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-            <Key className="w-5 h-5 text-green-600 dark:text-green-400" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-              {licenseInfo ? 'Perbarui Lisensi' : 'Generate Lisensi Baru'}
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {licenseInfo ? 'Perbarui informasi lisensi dengan data baru' : 'Buat kode lisensi unik untuk aplikasi ini'}
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Nama Perusahaan <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-              placeholder="Contoh: RS Sehat Sentosa"
-            />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Nama perusahaan atau rumah sakit yang akan tertera di lisensi
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Jumlah Bangsal <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              value={wardCount}
-              onChange={(e) => setWardCount(parseInt(e.target.value) || 1)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-              min="1"
-              max="100"
-            />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Jumlah bangsal/ward yang akan dikelola oleh aplikasi (1-100)
-            </p>
-          </div>
-
-          {/* License Preview */}
-          {companyName && wardCount > 0 && (
-            <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview Lisensi:</p>
-              <div className="space-y-1 text-sm">
-                <p className="text-gray-800 dark:text-white">
-                  <span className="font-medium">Perusahaan:</span> {companyName}
-                </p>
-                <p className="text-gray-800 dark:text-white">
-                  <span className="font-medium">Bangsal:</span> {wardCount} bangsal
-                </p>
-                <p className="text-gray-800 dark:text-white">
-                  <span className="font-medium">Masa Berlaku:</span> 1 tahun dari tanggal aktivasi
-                </p>
-              </div>
+      {/* Generate New License - hanya tampil jika BELUM ada lisensi */}
+      {!licenseInfo && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <Key className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
-          )}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                Generate Lisensi Baru
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Buat kode lisensi unik untuk aplikasi ini
+              </p>
+            </div>
+          </div>
 
-          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            {isSuperAdmin && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                  Mode Superadmin Aktif
-                </span>
-                <button
-                  onClick={handleSuperAdminLogout}
-                  className="ml-2 text-xs text-purple-600 dark:text-purple-400 hover:underline"
-                >
-                  Logout
-                </button>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Nama Perusahaan <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                placeholder="Contoh: RS Sehat Sentosa"
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Nama perusahaan atau rumah sakit yang akan tertera di lisensi
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Jumlah Bangsal <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                value={wardCount}
+                onChange={(e) => setWardCount(parseInt(e.target.value) || 1)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                min="1"
+                max="100"
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Jumlah bangsal/ward yang akan dikelola oleh aplikasi (1-100)
+              </p>
+            </div>
+
+            {/* License Preview */}
+            {companyName && wardCount > 0 && (
+              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview Lisensi:</p>
+                <div className="space-y-1 text-sm">
+                  <p className="text-gray-800 dark:text-white">
+                    <span className="font-medium">Perusahaan:</span> {companyName}
+                  </p>
+                  <p className="text-gray-800 dark:text-white">
+                    <span className="font-medium">Bangsal:</span> {wardCount} bangsal
+                  </p>
+                  <p className="text-gray-800 dark:text-white">
+                    <span className="font-medium">Masa Berlaku:</span> 1 tahun dari tanggal aktivasi
+                  </p>
+                </div>
               </div>
             )}
-            
-            {/* Tombol Generate Lisensi - hanya tampil jika belum ada lisensi */}
-            {!licenseInfo && (
+
+            <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={handleGenerateLicense}
                 disabled={generating || !companyName.trim() || wardCount < 1}
@@ -409,10 +393,81 @@ export default function LicenseSettings() {
                   </>
                 )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Perbarui Lisensi - HANYA tampil jika superadmin login */}
+      {licenseInfo && isSuperAdmin && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-purple-300 dark:border-purple-700 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <RefreshCw className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                Perbarui Lisensi
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Perbarui informasi lisensi dengan data baru
+              </p>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+              <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span className="text-xs font-medium text-purple-700 dark:text-purple-300">
+                Superadmin
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Nama Perusahaan <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                placeholder="Contoh: RS Sehat Sentosa"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Jumlah Bangsal <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                value={wardCount}
+                onChange={(e) => setWardCount(parseInt(e.target.value) || 1)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                min="1"
+                max="100"
+              />
+            </div>
+
+            {/* License Preview */}
+            {companyName && wardCount > 0 && (
+              <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-dashed border-purple-300 dark:border-purple-700">
+                <p className="text-sm text-purple-700 dark:text-purple-300 mb-2">Preview Perbaruan:</p>
+                <div className="space-y-1 text-sm">
+                  <p className="text-gray-800 dark:text-white">
+                    <span className="font-medium">Perusahaan:</span> {companyName}
+                  </p>
+                  <p className="text-gray-800 dark:text-white">
+                    <span className="font-medium">Bangsal:</span> {wardCount} bangsal
+                  </p>
+                  <p className="text-gray-800 dark:text-white">
+                    <span className="font-medium">Masa Berlaku:</span> 1 tahun dari tanggal perbaruan
+                  </p>
+                </div>
+              </div>
             )}
-            
-            {/* Tombol Perbarui Lisensi - hanya tampil jika superadmin login */}
-            {licenseInfo && isSuperAdmin && (
+
+            <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={handleUpdateLicense}
                 disabled={generating || !companyName.trim() || wardCount < 1}
@@ -430,18 +485,40 @@ export default function LicenseSettings() {
                   </>
                 )}
               </button>
-            )}
-            
-            {/* Pesan jika ada lisensi tapi bukan superadmin */}
-            {licenseInfo && !isSuperAdmin && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-lg">
-                <AlertCircle className="w-4 h-4" />
-                <span className="text-sm">Perbaruan lisensi memerlukan akses superadmin</span>
-              </div>
-            )}
+              <button
+                onClick={handleSuperAdminLogout}
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                Logout Superadmin
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Pesan jika ada lisensi tapi bukan superadmin - section terkunci */}
+      {licenseInfo && !isSuperAdmin && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
+              <Shield className="w-10 h-10 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+              Akses Terbatas
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mb-4">
+              Fitur perbaruan lisensi hanya tersedia untuk akun superadmin. 
+              Hubungi administrator sistem jika Anda perlu memperbarui lisensi.
+            </p>
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <AlertCircle className="w-4 h-4 text-gray-500" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                Lisensi aktif - perbaruan memerlukan autentikasi superadmin
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* License Information */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
