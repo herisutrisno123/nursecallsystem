@@ -4,6 +4,18 @@ import fs from 'fs';
 
 let pool = null;
 
+/** Buang pool lama (mis. setelah MySQL restart) agar getPool() membuat koneksi baru */
+export function resetPool() {
+  if (pool) {
+    try { pool.end().catch(() => {}); } catch {}
+    pool = null;
+  }
+}
+
+function isFatalDbError(err) {
+  return ['PROTOCOL_CONNECTION_LOST', 'ECONNREFUSED', 'ER_SERVER_SHUTDOWN', 'CONN_NOT_AVAILABLE', 'POOL_CLOSED'].includes(err?.code);
+}
+
 function loadEnvFile() {
   try {
     const txt = fs.readFileSync(new URL('../.env', import.meta.url), 'utf8');
@@ -33,6 +45,13 @@ export function dbConfig() {
 export async function getPool() {
   if (pool) return pool;
   pool = await mysql.createPool({ ...dbConfig(), waitForConnections: true, connectionLimit: 10 });
+  // Jika koneksi pool putus (MySQL dimatikan/restart), buang pool lama
+  // agar permintaan berikutnya otomatis membuat koneksi baru.
+  pool.on('connection', (conn) => {
+    conn.on('error', (err) => {
+      if (isFatalDbError(err)) resetPool();
+    });
+  });
   return pool;
 }
 
@@ -67,6 +86,7 @@ export async function testConnection(opts = {}) {
     }
   } catch (err) {
     out.error = err.message;
+    if (isFatalDbError(err)) resetPool(); // pool lama mungkin rusak, buat ulang di request berikutnya
     if (connectToServer && err.code === 'ER_BAD_DB_ERROR') {
       // Database belum ada, tapi server MySQL-nya hidup — coba ping tanpa database
       out.serverReachable = true;

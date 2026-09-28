@@ -121,14 +121,37 @@ app.post('/api/db/init', wrap(async (req, res) => {
 
 const PORT = process.env.API_PORT || 3001;
 
-initDb()
-  .then(() => {
-    console.log('[DB] Tabel clients & licenses siap (dibuat otomatis bila belum ada).');
-    app.listen(PORT, () => console.log(`[API] Server lisensi berjalan di http://localhost:${PORT}`));
-  })
-  .catch((err) => {
-    console.error('[DB] Gagal menghubungkan MySQL:', err.message);
-    console.error('     Periksa isi file .env (DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)');
-    console.error('     dan pastikan service MySQL/XAMPP berjalan.');
-    process.exit(1);
-  });
+// ---- Agar server tetap AKTIF walau MySQL sedang mati ----
+// 1) API listen langsung; initDb dicoba berkala di latar belakang.
+app.listen(PORT, () => console.log(`[API] Server lisensi berjalan di http://localhost:${PORT}`));
+
+let dbReady = false;
+async function tryInit(retry = 0) {
+  try {
+    await initDb();
+    if (!dbReady) console.log('[DB] Tabel clients & licenses siap (dibuat otomatis bila belum ada).');
+    dbReady = true;
+  } catch (err) {
+    dbReady = false;
+    if (retry === 0) {
+      console.error('[DB] Gagal menghubungkan MySQL:', err.message);
+      console.error('     API TETAP berjalan — tabel akan dibuat otomatis begitu MySQL aktif.');
+      console.error('     Periksa isi file .env (DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)');
+      console.error('     dan pastikan service MySQL/XAMPP berjalan.');
+    }
+    setTimeout(() => tryInit(retry + 1), 15000); // coba lagi tiap 15 detik
+  }
+}
+tryInit();
+
+// 2) Error query yang gagal (mis. MySQL dimatikan saat server jalan)
+//    tidak boleh menghentikan proses Node.
+process.on('unhandledRejection', (err) => {
+  console.error('[API] Rejected promise tak tertangani (kemungkinan MySQL putus):', err?.message || err);
+});
+process.on('uncaughtException', (err) => {
+  console.error('[API] Exception tak tertangkap (server tetap hidup):', err?.message || err);
+});
+
+// 3) Jika pool lama rusak (MySQL restart), pool akan dibuat ulang
+//    secara otomatis oleh getPool() setelah resetPool() dipanggil dari db.js.
