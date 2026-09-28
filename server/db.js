@@ -150,10 +150,10 @@ const SEED_CLIENTS = [
 ];
 
 const SEED_LICENSES = [
-  ['lic-001', 'NCM-7KQ2-M4XB-P9RT', 'cli-001', 'RS Umum Sehat Selalu', 'CLI-0001', 12, 'enterprise', 250, 120, '2026-01-01', 'active', '2026-01-05', 'SRV-RSS-2026-A1B2C3', JSON.stringify(['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik', 'Integrasi IoT Gateway', 'Notifikasi SMS / WhatsApp', 'Multi-Rumah Sakit', 'API Access']), 'Perpanjangan tahunan, termasuk support prioritas 24/7.'],
-  ['lic-002', 'NCM-3HG8-TN5D-W2LM', 'cli-002', 'RSIA Bunda Keluarga', 'CLI-0002', 6, 'professional', 80, 40, '2025-09-01', 'active', '2025-09-10', 'SRV-RSIA-BGR-9X8Y7Z', JSON.stringify(['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik', 'Integrasi IoT Gateway']), 'Akan dinegosiasikan untuk upgrade ke Enterprise.'],
-  ['lic-003', 'NCM-QW41-8ZCV-K6PD', 'cli-003', 'Klinik Harapan Bangsa', 'CLI-0003', 3, 'basic', 20, 10, '2025-06-01', 'expired', '2025-06-03', 'SRV-KHB-SBY-11AA22', JSON.stringify(['Dashboard Monitoring', 'Log Panggilan']), 'Lisensi lama sudah kedaluwarsa — diganti lisensi baru.'],
-  ['lic-004', 'NCM-B5TR-9XHN-D3JK', 'cli-003', 'Klinik Harapan Bangsa', 'CLI-0003', 3, 'standard', 50, 25, '2026-06-15', 'active', '2026-06-20', 'SRV-KHB-SBY-11AA22', JSON.stringify(['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik']), 'Upgrade dari Basic setelah masa percobaan.'],
+  ['lic-001', 'NCM-7KQ2-M4XB-P9RT', 'cli-001', 'RS Umum Sehat Selalu', 'CLI-0001', 12, 'enterprise', 250, 120, '2026-01-01', 'active', '2026-01-05', 'SRV-RSS-2026-A1B2C3', JSON.stringify(['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik', 'Integrasi IoT Gateway', 'Notifikasi SMS / WhatsApp', 'Multi-Rumah Sakit', 'API Access']), 'Perpanjangan tahunan, termasuk support prioritas 24/7. [kunci: NURSECALL-MASTER-01]'],
+  ['lic-002', 'NCM-3HG8-TN5D-W2LM', 'cli-002', 'RSIA Bunda Keluarga', 'CLI-0002', 6, 'professional', 80, 40, '2025-09-01', 'active', '2025-09-10', 'SRV-RSIA-BGR-9X8Y7Z', JSON.stringify(['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik', 'Integrasi IoT Gateway']), 'Akan dinegosiasikan untuk upgrade ke Enterprise. [kunci: NURSECALL-MASTER-01]'],
+  ['lic-003', 'NCM-QW41-8ZCV-K6PD', 'cli-003', 'Klinik Harapan Bangsa', 'CLI-0003', 3, 'basic', 20, 10, '2025-06-01', 'expired', '2025-06-03', 'SRV-KHB-SBY-11AA22', JSON.stringify(['Dashboard Monitoring', 'Log Panggilan']), 'Lisensi lama sudah kedaluwarsa — diganti lisensi baru. [kunci: NURSECALL-MASTER-01]'],
+  ['lic-004', 'NCM-B5TR-9XHN-D3JK', 'cli-003', 'Klinik Harapan Bangsa', 'CLI-0003', 3, 'standard', 50, 25, '2026-06-15', 'active', '2026-06-20', 'SRV-KHB-SBY-11AA22', JSON.stringify(['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik']), 'Upgrade dari Basic setelah masa percobaan. [kunci: NURSECALL-MASTER-01]'],
 ];
 
 

@@ -1,7 +1,7 @@
 import { Client, License } from '../types-license';
 
 const CLIENTS_KEY = 'ncm_clients_v1';
-const LICENSES_KEY = 'ncm_licenses_v3';
+const LICENSES_KEY = 'ncm_licenses_v4';
 
 // ===== Data awal (seed) =====
 const seedClients: Client[] = [
@@ -59,7 +59,7 @@ const seedLicenses: License[] = [
     activatedAt: '2026-01-05',
     machineFingerprint: 'SRV-RSS-2026-A1B2C3',
     modules: ['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik', 'Integrasi IoT Gateway', 'Notifikasi SMS / WhatsApp', 'Multi-Rumah Sakit', 'API Access'],
-    notes: 'Perpanjangan tahunan, termasuk support prioritas 24/7.',
+    notes: 'Perpanjangan tahunan, termasuk support prioritas 24/7. [kunci: NURSECALL-MASTER-01]',
   },
   {
     id: 'lic-002',
@@ -76,7 +76,7 @@ const seedLicenses: License[] = [
     activatedAt: '2025-09-10',
     machineFingerprint: 'SRV-RSIA-BGR-9X8Y7Z',
     modules: ['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik', 'Integrasi IoT Gateway'],
-    notes: 'Akan dinegosiasikan untuk upgrade ke Enterprise.',
+    notes: 'Akan dinegosiasikan untuk upgrade ke Enterprise. [kunci: NURSECALL-MASTER-01]',
   },
   {
     id: 'lic-003',
@@ -93,7 +93,7 @@ const seedLicenses: License[] = [
     activatedAt: '2025-06-03',
     machineFingerprint: 'SRV-KHB-SBY-11AA22',
     modules: ['Dashboard Monitoring', 'Log Panggilan'],
-    notes: 'Lisensi lama sudah kedaluwarsa — diganti lisensi baru.',
+    notes: 'Lisensi lama sudah kedaluwarsa — diganti lisensi baru. [kunci: NURSECALL-MASTER-01]',
   },
   {
     id: 'lic-004',
@@ -110,7 +110,7 @@ const seedLicenses: License[] = [
     activatedAt: '2026-06-20',
     machineFingerprint: 'SRV-KHB-SBY-11AA22',
     modules: ['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik'],
-    notes: 'Upgrade dari Basic setelah masa percobaan.',
+    notes: 'Upgrade dari Basic setelah masa percobaan. [kunci: NURSECALL-MASTER-01]',
   },
 ];
 

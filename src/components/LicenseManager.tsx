@@ -27,7 +27,7 @@ interface LicenseFormState {
   customerName: string;   // nama pelanggan
   customerId: string;     // ID pelanggan
   wardCount: string;      // jumlah bangsal
-  secretKey: string;      // kunci rahasia (tidak disimpan ke DB)
+  secretKey: string;      // kunci rahasia (disimpan dalam penanda [kunci: ...] pada catatan)
   licenseKey: string;
   plan: LicensePlan;
   maxDevices: string;
@@ -94,6 +94,8 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'expired' | 'suspended'>('all');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  /** Kunci rahasia yang tersimpan pada lisensi yang sedang diedit (untuk prefilled form) */
+  const [editingSavedSecret, setEditingSavedSecret] = useState('');
   const [form, setForm] = useState<LicenseFormState>(emptyForm());
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [deleteTarget, setDeleteTarget] = useState<License | null>(null);
@@ -131,21 +133,31 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
     return { active, expired, suspended };
   }, [licenses]);
 
+  /** Ambil kunci rahasia yang tersimpan pada sebuah lisensi (kolom notes berformat [kunci: ...]) */
+  const savedSecretOf = (l: License): string => {
+    const m = (l.notes || '').match(/\[kunci:\s*([^\]]+)\]/);
+    return m ? m[1] : '';
+  };
+
   const openAdd = () => {
     setEditingId(null);
+    setEditingSavedSecret('');
     setForm(emptyForm());
     setErrors({});
     setShowForm(true);
   };
 
   const openEdit = (l: License) => {
+    const savedSecret = savedSecretOf(l);
     setEditingId(l.id);
+    setEditingSavedSecret(savedSecret);
     setForm({
       clientId: l.clientId,
       customerName: l.customerName || clientName(l.clientId),
       customerId: l.customerId || '',
       wardCount: String(l.wardCount ?? ''),
-      secretKey: '',
+      // Tampilkan kembali semua data saat buat lisensi, termasuk kunci rahasia & catatan aslinya
+      secretKey: savedSecret,
       licenseKey: l.licenseKey,
       plan: l.plan,
       maxDevices: String(l.maxDevices),
@@ -154,10 +166,21 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
       status: l.status,
       machineFingerprint: l.machineFingerprint || '',
       modules: l.modules,
-      notes: l.notes || '',
+      // Catatan ditampilkan tanpa penanda [kunci: ...] internal
+      notes: stripKeyTag(l.notes || ''),
     });
     setErrors({});
     setShowForm(true);
+  };
+
+  /** Buang penanda internal [kunci: ...] dari catatan */
+  const stripKeyTag = (notes: string) => notes.replace(/\s*\[kunci:\s*[^\]]*\]/g, '').trim();
+
+  /** Sisipkan/ubah penanda [kunci: ...] pada catatan agar bisa dibaca ulang saat edit */
+  const withKeyTag = (notes: string, secret: string) => {
+    const base = stripKeyTag(notes);
+    const tag = `[kunci: ${secret}]`;
+    return base ? `${base} ${tag}` : tag;
   };
 
   /** Saat klien dipilih, isi otomatis nama & ID pelanggan dari data klien */
@@ -213,7 +236,8 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
       status: form.status,
       machineFingerprint: form.machineFingerprint.trim() || undefined,
       modules: form.modules,
-      notes: form.notes.trim() || undefined,
+      // Simpan kunci rahasia di dalam catatan (penanda [kunci: ...]) agar bisa ditampilkan kembali saat edit
+      notes: withKeyTag(form.notes.trim(), form.secretKey.trim()) || undefined,
     };
     if (editingId) {
       const edited = licenses.find(l => l.id === editingId)!;
@@ -401,7 +425,7 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
-                        <button onClick={() => { setDetailSecret(""); setDetailTarget(l); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-600" title="Detail">
+                        <button onClick={() => { setDetailSecret(savedSecretOf(l)); setDetailTarget(l); }} className="p-2 rounded-lg hover:bg-gray-100 text-gray-600" title="Detail">
                           <Eye className="w-4 h-4" />
                         </button>
                         <button onClick={() => openEdit(l)} className="p-2 rounded-lg hover:bg-blue-100 text-blue-600" title="Edit">
@@ -512,12 +536,17 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
                       Kunci Rahasia <span className="text-red-500">*</span>
                     </label>
                     <input
-                      type="password"
+                      type={editingId && form.secretKey === editingSavedSecret && editingSavedSecret ? 'text' : 'password'}
                       className={`${inputCls('secretKey')} font-mono`}
                       placeholder="kunci internal vendor"
                       value={form.secretKey}
                       onChange={e => setForm(f => ({ ...f, secretKey: e.target.value }))}
                     />
+                    {editingId && editingSavedSecret ? (
+                      <p className="text-xs text-emerald-600 mt-1">Kunci rahasia tersimpan — ditampilkan kembali sesuai data saat lisensi dibuat.</p>
+                    ) : editingId ? (
+                      <p className="text-xs text-amber-600 mt-1">Lisensi lama ini dibuat sebelum kunci rahasia disimpan. Masukkan kunci aslinya agar bisa diedit/divalidasi.</p>
+                    ) : null}
                     {errors.secretKey && <p className="text-xs text-red-500 mt-1">{errors.secretKey}</p>}
                   </div>
 
@@ -755,13 +784,16 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
                       </p>
                       <div className="flex gap-2">
                         <input
-                          type="password"
+                          type={detailSecret === savedSecretOf(l) && savedSecretOf(l) ? 'text' : 'password'}
                           value={detailSecret}
                           onChange={e => setDetailSecret(e.target.value)}
                           placeholder="Masukkan kunci rahasia untuk memverifikasi..."
                           className="flex-1 px-3 py-1.5 rounded-lg border border-gray-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
+                      {!savedSecretOf(l) && (
+                        <p className="mt-1 text-xs text-amber-600">Kunci rahasia lisensi ini tidak tersimpan (dibuat sebelum fitur ini). Masukkan kunci aslinya untuk verifikasi.</p>
+                      )}
                       {detailSecret.trim() && (
                         <p className={`mt-2 text-xs font-semibold flex items-center gap-1 ${ok ? 'text-green-700' : 'text-red-700'}`}>
                           {ok ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
@@ -781,10 +813,10 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
                   </div>
                 </div>
 
-                {l.notes && (
+                {stripKeyTag(l.notes || '') && (
                   <div>
                     <p className="text-gray-500 text-xs mb-1">Catatan</p>
-                    <p className="text-sm text-gray-700">{l.notes}</p>
+                    <p className="text-sm text-gray-700">{stripKeyTag(l.notes || '')}</p>
                   </div>
                 )}
               </div>
