@@ -29,7 +29,6 @@ export interface License {
   issueDate: string;            // ISO date (tanggal terbit lisensi)
   status: LicenseStatus;
   activatedAt?: string;         // tanggal aktivasi pertama
-  machineFingerprint?: string;  // fingerprint server klien
   modules: string[];            // modul yang diaktifkan
   notes?: string;
 }

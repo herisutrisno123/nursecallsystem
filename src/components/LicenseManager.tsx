@@ -34,7 +34,6 @@ interface LicenseFormState {
   maxUsers: string;
   issueDate: string;
   status: License['status'];
-  machineFingerprint: string;
   modules: string[];
   notes: string;
 }
@@ -53,7 +52,6 @@ const emptyForm = (): LicenseFormState => ({
   maxUsers: '25',
   issueDate: today(),
   status: 'active',
-  machineFingerprint: '',
   modules: ['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan'],
   notes: '',
 });
@@ -119,7 +117,7 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
     return licenses.filter(l => {
       if (statusFilter !== 'all' && l.status !== statusFilter) return false;
       if (!q) return true;
-      return [l.licenseKey, clientName(l.clientId), PLAN_LABELS[l.plan], l.machineFingerprint || '']
+      return [l.licenseKey, clientName(l.clientId), PLAN_LABELS[l.plan]]
         .join(' ')
         .toLowerCase()
         .includes(q);
@@ -164,7 +162,6 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
       maxUsers: String(l.maxUsers),
       issueDate: l.issueDate,
       status: l.status,
-      machineFingerprint: l.machineFingerprint || '',
       modules: l.modules,
       // Catatan ditampilkan tanpa penanda [kunci: ...] internal
       notes: stripKeyTag(l.notes || ''),
@@ -234,7 +231,6 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
       maxUsers: Number(form.maxUsers),
       issueDate: form.issueDate,
       status: form.status,
-      machineFingerprint: form.machineFingerprint.trim() || undefined,
       modules: form.modules,
       // Simpan kunci rahasia di dalam catatan (penanda [kunci: ...]) agar bisa ditampilkan kembali saat edit
       notes: withKeyTag(form.notes.trim(), form.secretKey.trim()) || undefined,
@@ -352,7 +348,7 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Cari license key, nama klien, fingerprint..."
+            placeholder="Cari license key, nama klien..."
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -677,16 +673,6 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Machine Fingerprint</label>
-                  <input
-                    className={`${inputCls('machineFingerprint')} font-mono`}
-                    placeholder="cth: SRV-RSS-2026-A1B2C3 (opsional)"
-                    value={form.machineFingerprint}
-                    onChange={e => setForm(f => ({ ...f, machineFingerprint: e.target.value }))}
-                  />
-                </div>
-
-                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Modul yang Diaktifkan</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {MODULE_OPTIONS.map(m => (
@@ -770,7 +756,6 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
                   <div><p className="text-gray-500 text-xs">Maks. Perangkat</p><p className="font-semibold">{l.maxDevices}</p></div>
                   <div><p className="text-gray-500 text-xs">Maks. User</p><p className="font-semibold">{l.maxUsers}</p></div>
                   {l.activatedAt && <div><p className="text-gray-500 text-xs">Aktivasi</p><p className="font-semibold">{formatDateID(l.activatedAt)}</p></div>}
-                  {l.machineFingerprint && <div><p className="text-gray-500 text-xs">Fingerprint</p><p className="font-mono text-xs font-semibold break-all">{l.machineFingerprint}</p></div>}
                 </div>
 
                 {/* Verifikasi kecocokan key dengan rumus */}

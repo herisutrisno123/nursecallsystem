@@ -28,7 +28,6 @@ CREATE TABLE IF NOT EXISTS licenses (
   issue_date DATE NOT NULL,
   status VARCHAR(20) NOT NULL DEFAULT 'active',
   activated_at DATE NULL,
-  machine_fingerprint VARCHAR(255) NULL,
   modules TEXT NULL,
   notes TEXT NULL,
   INDEX idx_client (client_id),
