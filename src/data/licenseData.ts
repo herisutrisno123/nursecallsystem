@@ -115,7 +115,23 @@ const seedLicenses: License[] = [
 ];
 
 // ===== Sinkronisasi MySQL <-> localStorage =====
-const API_BASE = 'http://localhost:3001';
+// API basis ditentukan otomatis dari halaman yang dibuka:
+//  - Aplikasi diakses via http://IP-ANDA:3001 (npm start / pm2) -> pakai server yang sama.
+//  - Aplikasi diakses via vite dev (port 5173/3000)             -> fallback ke localhost:3001.
+// Ini memperbaiki error "Tidak dapat menghubungi API server di http://localhost:3001"
+// ketika aplikasi dibuka lewat IP/LAN, atau saat PM2 memakai API_PORT lain dari .env.
+const DEFAULT_API_PORT = 3001;
+const API_BASE = (() => {
+  try {
+    if (typeof window !== 'undefined' && window.location && window.location.hostname) {
+      const host = window.location.hostname; // mis. localhost / 192.168.1.10
+      const port = window.location.port || '80';
+      // Jika halaman disajikan oleh server API itu sendiri, gunakan origin yang sama.
+      return `${window.location.protocol}//${host}:${port}`;
+    }
+  } catch { /* SSR/non-browser */ }
+  return `http://localhost:${DEFAULT_API_PORT}`;
+})();
 const API_FLAG_KEY = 'ncm_api_available';
 
 export function apiAvailable(): boolean {

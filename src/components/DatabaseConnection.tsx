@@ -200,7 +200,8 @@ export default function DatabaseConnection({ onNotify }: Props) {
                 <ul className="list-disc pl-4 space-y-1">
                   <li>Pastikan MySQL/XAMPP berjalan (phpMyAdmin bisa dibuka).</li>
                   <li>Pastikan database dibuat di phpMyAdmin, namanya sama dengan DB_NAME di .env.</li>
-                  <li>Jalankan terminal di folder proyek: <code>npm run server</code> (API port 3001).</li>
+                  <li>Jalankan server di folder proyek: <code>npm start</code> — aplikasi &amp; API berada di alamat yang sama (mis. http://localhost:3001). Bila memakai PM2: <code>pm2 start server/index.js --name nursecall-lisensi</code>.</li>
+                  <li>Buka aplikasi dari alamat yang ditampilkan server (bukan lewat file .html atau port lain), agar otomatis terhubung ke API.</li>
                   <li>Tabel <b>clients</b> &amp; <b>licenses</b> dibuat otomatis oleh server / tombol “Buat / Perbaiki Tabel”.</li>
                 </ul>
               </div>

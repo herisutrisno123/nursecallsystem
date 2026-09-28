@@ -71,6 +71,29 @@ Perintah berguna lainnya:
 
 Setelah langkah di atas, buka **http://localhost:3001** dari browser mana pun.
 
+### ⚠️ Muncul pesan "Tidak dapat menghubungi API server di http://localhost:3001"?
+Artinya browser tidak menemukan server pada port 3001. Penyebab yang sering terjadi
+saat memakai PM2:
+
+1. **Dua server berjalan bersamaan.** Instance PM2 dan `npm run server`/`npm start`
+   manual berebut port — yang kedua langsung mati dengan pesan
+   `PORT 3001 SUDAH DIPAKAI proses lain`. Solusi: jalankan hanya SATU cara.
+   Hentikan salah satunya:
+   ```bat
+   pm2 delete nursecall-lisensi      :: hapus versi PM2, ATAU
+   taskkill /IM node.exe /F          :: matikan semua node lalu mulai ulang PM2 saja
+   ```
+2. **Aplikasi dibuka lewat alamat lain** (mis. `npm run dev` di port 5173/3000,
+   file `.html` langsung, atau IP komputer lain). Versi terbaru sudah otomatis
+   mengarahkan API ke alamat yang sama dengan halaman dibuka — tetap disarankan
+   membuka aplikasi dari **http://localhost:3001** hasil `npm start`/PM2.
+3. **Cek cepat:** buka `http://localhost:3001/api/health` di browser. Jika muncul
+   `{"ok":true,...}` berarti server hidup; jika ditolak, server belum jalan di
+   port itu (`pm2 logs nursecall-lisensi` untuk melihat errornya).
+4. **Firewall Windows** memblokir node.exe → izinkan saat diminta, atau gunakan
+   port lain dengan mengubah `API_PORT` di `.env` (server kini membaca nilai itu
+   langsung dari file `.env`, meski dijalankan lewat PM2).
+
 ---
 
 ## Solusi 3 — Jadikan Service Windows (opsional, paling "server")

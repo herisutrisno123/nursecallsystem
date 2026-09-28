@@ -133,7 +133,15 @@ app.post('/api/db/init', wrap(async (req, res) => {
   res.json({ ok: true });
 }));
 
-const PORT = process.env.API_PORT || 3001;
+// Baca API_PORT dari .env juga (bukan hanya environment) — penting saat dijalankan
+// lewat PM2 yang kadang tidak mewarisi variabel .env.
+let apiPortFromEnvFile = null;
+try {
+  const envTxt = fs.readFileSync(path.resolve(__dirname, '..', '.env'), 'utf8');
+  const m = envTxt.match(/^\s*API_PORT\s*=\s*(.+)$/m);
+  if (m) apiPortFromEnvFile = parseInt(m[1].trim(), 10) || null;
+} catch { /* .env opsional */ }
+const PORT = Number(process.env.PORT) || apiPortFromEnvFile || 3001;
 
 // ---- SPA fallback: semua route non-API dilayani dari index.html hasil build ----
 if (fs.existsSync(distDir)) {
@@ -144,7 +152,7 @@ if (fs.existsSync(distDir)) {
 
 // ---- Agar server tetap AKTIF walau MySQL sedang mati ----
 // 1) API listen langsung; initDb dicoba berkala di latar belakang.
-app.listen(PORT, '0.0.0.0', () => {
+const httpServer = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[API] Server lisensi berjalan di http://localhost:${PORT}`);
   if (fs.existsSync(distDir)) {
     console.log('[API] Aplikasi web siap dibuka di  ->  http://localhost:' + PORT);
@@ -152,6 +160,23 @@ app.listen(PORT, '0.0.0.0', () => {
   } else {
     console.log('[API] Catatan: folder dist/ belum ada. Jalankan "npm run build" bila ingin');
     console.log('      aplikasi web ikut dilayani oleh server ini.');
+  }
+});
+
+// Jika port sudah dipakai proses lain (mis. "npm run server" manual berjalan
+// bersamaan dengan instance PM2), tampilkan pesan yang jelas alih-alih crash diam-diam.
+httpServer.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`[API] PORT ${PORT} SUDAH DIPAKAI proses lain.`);
+    console.error('      Kemungkinan "npm run server"/"npm start" manual masih berjalan');
+    console.error('      berdampingan dengan instance PM2. Hentikan salah satu:');
+    console.error('        npm run pm2:stop   (hentikan versi PM2), ATAU');
+    console.error('        tutup terminal server manual / Ctrl+C.');
+    console.error('      Lalu jalankan ulang hanya SATU cara.');
+    process.exit(1);
+  } else {
+    console.error('[API] Gagal memulai server:', err.message);
+    process.exit(1);
   }
 });
 
