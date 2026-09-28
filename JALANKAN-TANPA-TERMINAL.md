@@ -71,6 +71,48 @@ Perintah berguna lainnya:
 
 Setelah langkah di atas, buka **http://localhost:3001** dari browser mana pun.
 
+### ⚠️ Muncul pesan "[PM2][ERROR] Process or Namespace nursecall-lisensi not found"?
+
+Pesan ini berarti PM2 **belum pernah men-start aplikasi dengan nama itu**. Penyebab umum:
+
+1. **Perintah start belum dijalankan / gagal.** `pm2 restart`, `pm2 stop`,
+   `pm2 logs`, dll. hanya bekerja jika prosesnya sudah terdaftar. Jalankan dulu:
+   ```bat
+   cd C:\path\ke\folder\aplikasi     :: folder yang berisi server\index.js & package.json
+   pm2 start server/index.js --name nursecall-lisensi
+   ```
+   Perintah `pm2 start` WAJIB dijalankan dari dalam folder aplikasi, karena
+   `server/index.js` adalah path relatif.
+2. **Salah ketik nama.** Perhatikan tanda hubung vs garis bawah:
+   gunakan `nursecall-lisensi` (pakai `-`), bukan `nursecall_lisensi` (pakai `_`).
+   Cek daftar nama yang benar-benar terdaftar:
+   ```bat
+   pm2 list
+   ```
+3. **PM2 daemon berbeda user/session.** Jika sebelumnya start dilakukan sebagai
+   Administrator lalu perintah berikutnya sebagai user biasa (atau sebaliknya),
+   PM2 memakai daemon yang berbeda sehingga daftar prosesnya kosong. Gunakan
+   mode user yang sama, atau mulai ulang: `pm2 kill` lalu `pm2 start ...` lagi.
+4. **Nama lama masih tersisa.** Jika dulu pernah memakai nama lain, hapus lalu
+   start ulang dengan nama standar:
+   ```bat
+   pm2 delete all        :: hapus semua entri PM2 (aman, tidak menghapus file)
+   pm2 start server/index.js --name nursecall-lisensi
+   pm2 save
+   ```
+
+Cara paling aman setelah ekstrak zip baru — jalankan 3 perintah ini berurutan
+dari dalam folder aplikasi:
+
+```bat
+npm install
+npm run build
+npm run pm2:start      :: = pm2 start server/index.js --name nursecall-lisensi
+```
+
+Lalu cek dengan `pm2 status` (status harus `online`) dan buka
+http://localhost:3001/api/health — harus muncul `{"ok":true,...}`.
+
 ### ⚠️ Muncul pesan "Tidak dapat menghubungi API server di http://localhost:3001"?
 Artinya browser tidak menemukan server pada port 3001. Penyebab yang sering terjadi
 saat memakai PM2:
