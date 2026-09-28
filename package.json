@@ -7,7 +7,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "server": "node server/index.js"
+    "server": "node server/index.js",
+    "start": "npm run build && node server/index.js",
+    "pm2:start": "pm2 start server/index.js --name nursecall-lisensi",
+    "pm2:stop": "pm2 delete nursecall-lisensi",
+    "pm2:logs": "pm2 logs nursecall-lisensi"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",

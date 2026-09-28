@@ -3,9 +3,23 @@ import express from 'express';
 import cors from 'cors';
 import { getPool, initDb, rowToClient, rowToLicense, clientToRow, licenseToRow, testConnection } from './db.js';
 
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// ---- Sajikan hasil build produksi (dist/) dari server yang sama ----
+// Dengan ini aplikasi cukup dijalankan SATU perintah (npm start) dan
+// bisa diakses lewat http://localhost:3001 — tanpa terminal vite dev.
+const distDir = path.resolve(__dirname, '..', 'dist');
+if (fs.existsSync(distDir)) {
+  app.use(express.static(distDir));
+}
 
 const wrap = (fn) => (req, res) =>
   fn(req, res).catch((err) => {
@@ -121,9 +135,25 @@ app.post('/api/db/init', wrap(async (req, res) => {
 
 const PORT = process.env.API_PORT || 3001;
 
+// ---- SPA fallback: semua route non-API dilayani dari index.html hasil build ----
+if (fs.existsSync(distDir)) {
+  app.get(/^(?!\/api).*/, (req, res) => {
+    res.sendFile(path.join(distDir, 'index.html'));
+  });
+}
+
 // ---- Agar server tetap AKTIF walau MySQL sedang mati ----
 // 1) API listen langsung; initDb dicoba berkala di latar belakang.
-app.listen(PORT, () => console.log(`[API] Server lisensi berjalan di http://localhost:${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[API] Server lisensi berjalan di http://localhost:${PORT}`);
+  if (fs.existsSync(distDir)) {
+    console.log('[API] Aplikasi web siap dibuka di  ->  http://localhost:' + PORT);
+    console.log('      (satu server untuk web + API, tanpa perlu "npm run dev")');
+  } else {
+    console.log('[API] Catatan: folder dist/ belum ada. Jalankan "npm run build" bila ingin');
+    console.log('      aplikasi web ikut dilayani oleh server ini.');
+  }
+});
 
 let dbReady = false;
 async function tryInit(retry = 0) {
