@@ -228,20 +228,32 @@ export async function testDbConnection(input?: DbConfigInput): Promise<DbTestRes
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(20000),
     });
-  } catch {
+  } catch (e) {
+    // Bedakan: API server benar-benar mati vs API hidup tapi MySQL lambat/error
+    let apiAlive = false;
+    try {
+      const h = await fetch(`${API_BASE}/api/health`, { signal: AbortSignal.timeout(3000) });
+      apiAlive = h.ok;
+    } catch { /* api memang tidak terjangkau */ }
+    const timeout = e instanceof DOMException && e.name === 'TimeoutError';
+    const errMsg = apiAlive
+      ? timeout
+        ? 'API server hidup, tetapi pengujian koneksi ke MySQL melebihi 20 detik. Kemungkinan host MySQL salah/tidak merespons (mis. DB_HOST tidak bisa di-resolve atau firewall memblokir).'
+        : 'API server hidup, tetapi permintaan uji koneksi gagal: ' + ((e as Error)?.message || String(e))
+      : `Tidak dapat menghubungi API server di ${API_BASE}. Pastikan "npm run server" berjalan DAN berada di folder yang sama dengan aplikasi frontend (bukan folder lain yang juga berisi server/index.js). Cek juga apakah port 3001 diblokir/firewall.`;
     return {
-      connected: false, serverReachable: false, latencyMs: null,
+      connected: false, serverReachable: apiAlive, latencyMs: null,
       tables: [], counts: {},
-      error: `Tidak dapat menghubungi API server di ${API_BASE}. Jalankan "npm run server" lebih dulu.`,
+      error: errMsg,
       config: { host: '-', port: 0, user: '-', database: '-' },
     };
   }
   if (!res.ok) {
     const t = await res.text().catch(() => '');
     return {
-      connected: false, serverReachable: false, latencyMs: null,
+      connected: false, serverReachable: true, latencyMs: null,
       tables: [], counts: {}, error: `Respons API tidak valid (HTTP ${res.status}) ${t}`.trim(),
       config: { host: '-', port: 0, user: '-', database: '-' },
     };

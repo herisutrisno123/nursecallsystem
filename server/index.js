@@ -13,6 +13,12 @@ const wrap = (fn) => (req, res) =>
     res.status(500).json({ error: err.message });
   });
 
+// ---- Health check ringan (dipakai frontend untuk membedakan
+//      "API server mati" vs "API hidup tapi MySQL bermasalah") ----
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, service: 'nursecall-lisensi-api', time: new Date().toISOString() });
+});
+
 // ---- Clients ----
 app.get('/api/clients', wrap(async (req, res) => {
   const p = await getPool();
