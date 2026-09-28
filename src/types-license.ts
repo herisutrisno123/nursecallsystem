@@ -18,13 +18,15 @@ export interface Client {
 
 export interface License {
   id: string;
-  licenseKey: string;           // mis. NCM-XXXX-XXXX-XXXX
+  licenseKey: string;           // mis. NCM-XXXX-XXXX-XXXX (dibuat dari rumus, lihat buildLicenseKey)
   clientId: string;             // referensi ke Client
+  customerName: string;         // nama pelanggan saat lisensi dibuat
+  customerId: string;           // ID pelanggan
+  wardCount: number;            // jumlah bangsal
   plan: LicensePlan;
   maxDevices: number;           // jumlah perangkat nurse call yang diizinkan
   maxUsers: number;             // jumlah user akun yang diizinkan
-  issueDate: string;            // ISO date
-  expiryDate: string;           // ISO date
+  issueDate: string;            // ISO date (tanggal terbit lisensi)
   status: LicenseStatus;
   activatedAt?: string;         // tanggal aktivasi pertama
   machineFingerprint?: string;  // fingerprint server klien
@@ -73,23 +75,90 @@ export const MODULE_OPTIONS = [
 
 // ----- Utilitas -----
 
-/** Hitung sisa hari lisensi terhadap tanggal tertentu */
-export function daysUntilExpiry(license: License, from: Date = new Date()): number {
-  const expiry = new Date(license.expiryDate + 'T23:59:59');
-  return Math.ceil((expiry.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
+/** Hash sederhana (FNV-1a 32-bit) -> angka bulat positif, deterministik */
+function fnv1a(str: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h >>> 0;
 }
 
-/** Status efektif (expired otomatis jika tanggal lewat) */
-export function effectiveStatus(license: License): LicenseStatus {
-  if (license.status === 'suspended') return 'suspended';
-  return daysUntilExpiry(license) < 0 ? 'expired' : 'active';
+/** Normalisasi teks: huruf besar, hanya A-Z0-9 */
+const norm = (s: string) => s.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+const ALNUM = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // tanpa 0/O/1/I agar mudah dibaca
+
+/** Ambil 4 karakter (huruf/angka) dari angka hash secara deterministik */
+const blockFrom = (num: number): string => {
+  let n = num >>> 0;
+  let out = '';
+  for (let i = 0; i < 4; i++) {
+    out = ALNUM[n % ALNUM.length] + out;
+    n = Math.floor(n / (ALNUM.length * 7 + i));
+  }
+  return out;
+};
+
+/**
+ * ===== RUMUS LICENSE KEY =====
+ * Input : nama pelanggan, ID pelanggan, jumlah bangsal, kunci rahasia
+ * Output: NCM-XXXX-XXXX-XXXX (deterministik — input sama selalu menghasilkan key sama)
+ *
+ * Blok 1 : hash (nama pelanggan + ID pelanggan)                    (mis. 4K7M)
+ * Blok 2 : kode bangsal W + jumlah bangsal 3 digit                 (mis. W012 untuk 12 bangsal)
+ * Blok 3 : checksum hash (blok 1-2 + kunci rahasia + data gabungan) (mis. K7QX)
+ */
+export function buildLicenseKey(
+  customerName: string,
+  customerId: string,
+  wardCount: number,
+  secretKey: string,
+): string {
+  const nName = norm(customerName);
+  const nId = norm(customerId);
+  const wards = Math.max(0, Math.floor(Number(wardCount) || 0));
+
+  // Blok 1: hash nama + ID -> 4 karakter
+  const b1 = blockFrom(fnv1a(`${nName}#${nId}`));
+
+  // Blok 2: W + jumlah bangsal (maks 999)
+  const b2 = `W${String(Math.min(wards, 999)).padStart(3, '0')}`;
+
+  // Blok 3: checksum dari semua input + kunci rahasia
+  const seed = `${b1}|${b2}|${secretKey.trim()}|${nName}${nId}`;
+  let h = fnv1a(seed);
+  let b3 = '';
+  for (let i = 0; i < 4; i++) {
+    b3 += ALNUM[h % ALNUM.length];
+    h = fnv1a(b3 + secretKey + i);
+  }
+
+  return `NCM-${b1}-${b2}-${b3}`;
+}
+
+/** Baca jumlah bangsal dari blok ke-2 license key (format W###), null bila tidak valid */
+export function wardCountFromKey(key: string): number | null {
+  const m = key.trim().toUpperCase().match(/^NCM-[A-Z0-9]{4}-W(\d{3})-[A-Z0-9]{4}$/);
+  return m ? Number(m[1]) : null;
+}
+
+/** Verifikasi apakah sebuah license key cocok dengan rumus untuk data tertentu */
+export function verifyLicenseKey(
+  key: string,
+  customerName: string,
+  customerId: string,
+  wardCount: number,
+  secretKey: string,
+): boolean {
+  return key.trim().toUpperCase() === buildLicenseKey(customerName, customerId, wardCount, secretKey);
 }
 
 /** Generate license key acak format NCM-XXXX-XXXX-XXXX */
 export function generateLicenseKey(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const block = () =>
-    Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    Array.from({ length: 4 }, () => ALNUM[Math.floor(Math.random() * ALNUM.length)]).join('');
   return `NCM-${block()}-${block()}-${block()}`;
 }
 

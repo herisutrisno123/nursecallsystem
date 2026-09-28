@@ -1,9 +1,11 @@
-# Dependencies
-node_modules/
+# Environment files
+.env
 
-# Build output
+# Build artifacts
 dist/
 
-# Archives
-*.zip
-*.tar.gz
+# Dependency directories
+node_modules/
+
+# Logs and temporary files
+*.log

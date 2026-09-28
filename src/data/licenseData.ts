@@ -1,7 +1,7 @@
 import { Client, License } from '../types-license';
 
 const CLIENTS_KEY = 'ncm_clients_v1';
-const LICENSES_KEY = 'ncm_licenses_v1';
+const LICENSES_KEY = 'ncm_licenses_v3';
 
 // ===== Data awal (seed) =====
 const seedClients: Client[] = [
@@ -48,11 +48,13 @@ const seedLicenses: License[] = [
     id: 'lic-001',
     licenseKey: 'NCM-7KQ2-M4XB-P9RT',
     clientId: 'cli-001',
+    customerName: 'RS Umum Sehat Selalu',
+    customerId: 'CLI-0001',
+    wardCount: 12,
     plan: 'enterprise',
     maxDevices: 250,
     maxUsers: 120,
     issueDate: '2026-01-01',
-    expiryDate: '2026-12-31',
     status: 'active',
     activatedAt: '2026-01-05',
     machineFingerprint: 'SRV-RSS-2026-A1B2C3',
@@ -63,11 +65,13 @@ const seedLicenses: License[] = [
     id: 'lic-002',
     licenseKey: 'NCM-3HG8-TN5D-W2LM',
     clientId: 'cli-002',
+    customerName: 'RSIA Bunda Keluarga',
+    customerId: 'CLI-0002',
+    wardCount: 6,
     plan: 'professional',
     maxDevices: 80,
     maxUsers: 40,
     issueDate: '2025-09-01',
-    expiryDate: '2026-08-31',
     status: 'active',
     activatedAt: '2025-09-10',
     machineFingerprint: 'SRV-RSIA-BGR-9X8Y7Z',
@@ -78,11 +82,13 @@ const seedLicenses: License[] = [
     id: 'lic-003',
     licenseKey: 'NCM-QW41-8ZCV-K6PD',
     clientId: 'cli-003',
+    customerName: 'Klinik Harapan Bangsa',
+    customerId: 'CLI-0003',
+    wardCount: 3,
     plan: 'basic',
     maxDevices: 20,
     maxUsers: 10,
     issueDate: '2025-06-01',
-    expiryDate: '2026-05-31',
     status: 'expired',
     activatedAt: '2025-06-03',
     machineFingerprint: 'SRV-KHB-SBY-11AA22',
@@ -93,11 +99,13 @@ const seedLicenses: License[] = [
     id: 'lic-004',
     licenseKey: 'NCM-B5TR-9XHN-D3JK',
     clientId: 'cli-003',
+    customerName: 'Klinik Harapan Bangsa',
+    customerId: 'CLI-0003',
+    wardCount: 3,
     plan: 'standard',
     maxDevices: 50,
     maxUsers: 25,
     issueDate: '2026-06-15',
-    expiryDate: '2027-06-14',
     status: 'active',
     activatedAt: '2026-06-20',
     machineFingerprint: 'SRV-KHB-SBY-11AA22',
@@ -105,6 +113,86 @@ const seedLicenses: License[] = [
     notes: 'Upgrade dari Basic setelah masa percobaan.',
   },
 ];
+
+// ===== Sinkronisasi MySQL <-> localStorage =====
+const API_BASE = 'http://localhost:3001';
+const API_FLAG_KEY = 'ncm_api_available';
+
+export function apiAvailable(): boolean {
+  return localStorage.getItem(API_FLAG_KEY) === '1';
+}
+
+async function tryApi(path: string, init?: RequestInit): Promise<Response | null> {
+  if (!apiAvailable()) return null;
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(2500),
+      ...init,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res;
+  } catch {
+    localStorage.removeItem(API_FLAG_KEY); // API mati -> kembali ke mode lokal
+    return null;
+  }
+}
+
+/** Cek apakah server API (MySQL) tersedia; panggil sekali saat aplikasi mulai */
+export async function ensureApi(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/api/clients`, { signal: AbortSignal.timeout(2500) });
+    if (res.ok) {
+      localStorage.setItem(API_FLAG_KEY, '1');
+      return true;
+    }
+  } catch {
+    /* server API tidak jalan */
+  }
+  localStorage.removeItem(API_FLAG_KEY);
+  return false;
+}
+
+/** Muat data dari MySQL bila API aktif; hasil selalu disimpan ke cache localStorage */
+export async function fetchClients(): Promise<Client[]> {
+  const res = await tryApi('/api/clients');
+  if (res) {
+    const data = (await res.json()) as Client[];
+    saveClients(data);
+    return data;
+  }
+  return loadClients();
+}
+
+export async function fetchLicenses(): Promise<License[]> {
+  const res = await tryApi('/api/licenses');
+  if (res) {
+    const data = (await res.json()) as License[];
+    saveLicenses(data);
+    return data;
+  }
+  return loadLicenses();
+}
+
+/** Simpan (insert/update) satu klien, lalu kembalikan daftar terbaru */
+export async function upsertClient(client: Client, isNew: boolean): Promise<Client[]> {
+  const res = await tryApi('/api/clients', isNew ? { method: 'POST', body: JSON.stringify(client) } : undefined);
+  if (!res && !isNew) await tryApi(`/api/clients/${client.id}`, { method: 'PUT', body: JSON.stringify(client) });
+  return fetchClients();
+}
+
+/** Simpan (insert/update) satu lisensi, lalu kembalikan daftar terbaru */
+export async function upsertLicense(license: License, isNew: boolean): Promise<License[]> {
+  const res = await tryApi('/api/licenses', isNew ? { method: 'POST', body: JSON.stringify(license) } : undefined);
+  if (!res && !isNew) await tryApi(`/api/licenses/${license.id}`, { method: 'PUT', body: JSON.stringify(license) });
+  return fetchLicenses();
+}
+
+/** Hapus satu record, lalu kembalikan daftar terbaru */
+export async function removeRecord(kind: 'clients' | 'licenses', id: string): Promise<unknown[]> {
+  await tryApi(`/api/${kind}/${id}`, { method: 'DELETE' });
+  return kind === 'clients' ? fetchClients() : fetchLicenses();
+}
 
 // ===== CRUD Helpers (localStorage) =====
 

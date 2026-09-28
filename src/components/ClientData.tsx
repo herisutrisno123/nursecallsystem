@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Client } from '../types-license';
-import { loadClients, saveClients, nextId } from '../data/licenseData';
-import { Building2, Plus, Search, Pencil, Trash2, X, Mail, Phone } from 'lucide-react';
+import { fetchClients, upsertClient, removeRecord, nextId, apiAvailable } from '../data/licenseData';
+import { Building2, Plus, Search, Pencil, Trash2, X, Mail, Phone, Database, RefreshCw } from 'lucide-react';
 
 interface ClientDataProps {
   onNotify: (msg: string, type?: 'success' | 'error') => void;
@@ -19,7 +19,21 @@ const emptyForm = (): Omit<Client, 'id' | 'createdAt'> => ({
 });
 
 export default function ClientData({ onNotify }: ClientDataProps) {
-  const [clients, setClients] = useState<Client[]>(() => loadClients());
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+  const useMysql = apiAvailable();
+
+  // Muat data (MySQL bila API aktif, selain itu localStorage)
+  useEffect(() => {
+    let alive = true;
+    fetchClients().then((data) => {
+      if (alive) {
+        setClients(data);
+        setLoading(false);
+      }
+    });
+    return () => { alive = false; };
+  }, []);
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -29,7 +43,6 @@ export default function ClientData({ onNotify }: ClientDataProps) {
 
   const persist = (next: Client[]) => {
     setClients(next);
-    saveClients(next);
   };
 
   const filtered = useMemo(() => {
@@ -69,23 +82,27 @@ export default function ClientData({ onNotify }: ClientDataProps) {
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (ev: React.FormEvent) => {
+  const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!validate()) return;
     if (editingId) {
-      persist(clients.map(c => (c.id === editingId ? { ...c, ...form } : c)));
-      onNotify('Data klien berhasil diperbarui', 'success');
+      const updated = clients.map(c => (c.id === editingId ? { ...c, ...form } : c));
+      const fresh = await upsertClient(updated.find(c => c.id === editingId)!, false);
+      persist(fresh as Client[]);
+      onNotify(useMysql ? 'Data klien diperbarui ke MySQL' : 'Data klien berhasil diperbarui', 'success');
     } else {
       const newClient: Client = { ...form, id: nextId('cli'), createdAt: new Date().toISOString().slice(0, 10) };
-      persist([newClient, ...clients]);
-      onNotify('Klien baru berhasil ditambahkan', 'success');
+      const fresh = await upsertClient(newClient, true);
+      persist(fresh as Client[]);
+      onNotify(useMysql ? 'Klien baru tersimpan di MySQL' : 'Klien baru berhasil ditambahkan', 'success');
     }
     setShowForm(false);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteTarget) return;
-    persist(clients.filter(c => c.id !== deleteTarget.id));
+    const fresh = await removeRecord('clients', deleteTarget.id);
+    persist(fresh as Client[]);
     onNotify(`Klien "${deleteTarget.name}" dihapus`, 'success');
     setDeleteTarget(null);
   };
@@ -101,7 +118,11 @@ export default function ClientData({ onNotify }: ClientDataProps) {
       errors[name] ? 'border-red-400 bg-red-50' : 'border-gray-300 bg-white'
     }`;
 
-  return (
+  return loading ? (
+    <div className="flex items-center justify-center py-20 text-gray-400 gap-2">
+      <RefreshCw className="w-5 h-5 animate-spin" /> Memuat data klien...
+    </div>
+  ) : (
     <div className="space-y-6">
       {/* Header & aksi */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -112,6 +133,9 @@ export default function ClientData({ onNotify }: ClientDataProps) {
           <p className="text-sm text-gray-500 mt-1">
             Kelola data rumah sakit / klinik pengguna aplikasi Nursecall Monitor.
           </p>
+          <span className={`inline-flex items-center gap-1 mt-2 text-xs font-medium px-2 py-1 rounded-full border ${useMysql ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-100 text-gray-600 border-gray-200'}`}>
+            <Database className="w-3 h-3" /> {useMysql ? 'Tersambung ke MySQL' : 'Mode lokal (localStorage)'}
+          </span>
         </div>
         <button
           onClick={openAdd}
