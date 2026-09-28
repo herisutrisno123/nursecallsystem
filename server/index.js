@@ -77,7 +77,7 @@ app.post('/api/licenses', wrap(async (req, res) => {
   const p = await getPool();
   const l = req.body;
   await p.query(
-    'INSERT INTO licenses (id,license_key,client_id,plan,max_devices,max_users,issue_date,status,activated_at,machine_fingerprint,modules,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+    'INSERT INTO licenses (id,license_key,client_id,customer_name,customer_id,ward_count,plan,max_devices,max_users,issue_date,status,activated_at,machine_fingerprint,modules,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
     licenseToRow(l)
   );
   res.status(201).json(l);
