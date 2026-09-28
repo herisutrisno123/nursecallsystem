@@ -1,11 +1,2 @@
-# Environment files
-.env
-
-# Build artifacts
-dist/
-
-# Dependency directories
-node_modules/
-
-# Logs and temporary files
-*.log
+# Compressed files
+*.zip
