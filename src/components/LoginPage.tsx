@@ -58,8 +58,8 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl shadow-lg mb-4">
             <Bell className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">NurseCall Monitor</h1>
-          <p className="text-gray-600">Sistem Monitoring Nurse Call</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Nursecall Lisensi</h1>
+          <p className="text-gray-600">Sistem Manajemen Lisensi Penggunaan Aplikasi</p>
         </div>
 
         {/* Login Card */}
@@ -184,7 +184,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
 
         {/* Footer */}
         <div className="text-center mt-6 text-sm text-gray-500">
-          <p>© 2026 NurseCall Monitor - RS Sehat Sentosa</p>
+          <p>© 2026 Nursecall Lisensi - RS Sehat Sentosa</p>
         </div>
       </div>
     </div>
