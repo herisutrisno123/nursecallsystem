@@ -135,7 +135,6 @@ const CREATE_TABLES = [
      issue_date DATE NOT NULL,
      status VARCHAR(20) NOT NULL DEFAULT 'active',
      activated_at DATE NULL,
-     modules TEXT NULL,
      notes TEXT NULL,
      INDEX idx_client (client_id),
      CONSTRAINT fk_licenses_client FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
@@ -149,10 +148,10 @@ const SEED_CLIENTS = [
 ];
 
 const SEED_LICENSES = [
-  ['lic-001', 'NCM-7KQ2-M4XB-P9RT', 'cli-001', 'RS Umum Sehat Selalu', 'CLI-0001', 12, 'enterprise', 250, 120, '2026-01-01', 'active', '2026-01-05', JSON.stringify(['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik', 'Integrasi IoT Gateway', 'Notifikasi SMS / WhatsApp', 'Multi-Rumah Sakit', 'API Access']), 'Perpanjangan tahunan, termasuk support prioritas 24/7. [kunci: NURSECALL-MASTER-01]'],
-  ['lic-002', 'NCM-3HG8-TN5D-W2LM', 'cli-002', 'RSIA Bunda Keluarga', 'CLI-0002', 6, 'professional', 80, 40, '2025-09-01', 'active', '2025-09-10', JSON.stringify(['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik', 'Integrasi IoT Gateway']), 'Akan dinegosiasikan untuk upgrade ke Enterprise. [kunci: NURSECALL-MASTER-01]'],
-  ['lic-003', 'NCM-QW41-8ZCV-K6PD', 'cli-003', 'Klinik Harapan Bangsa', 'CLI-0003', 3, 'basic', 20, 10, '2025-06-01', 'expired', '2025-06-03', JSON.stringify(['Dashboard Monitoring', 'Log Panggilan']), 'Lisensi lama sudah kedaluwarsa — diganti lisensi baru. [kunci: NURSECALL-MASTER-01]'],
-  ['lic-004', 'NCM-B5TR-9XHN-D3JK', 'cli-003', 'Klinik Harapan Bangsa', 'CLI-0003', 3, 'standard', 50, 25, '2026-06-15', 'active', '2026-06-20', JSON.stringify(['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan', 'Laporan & Analitik']), 'Upgrade dari Basic setelah masa percobaan. [kunci: NURSECALL-MASTER-01]'],
+  ['lic-001', 'NCM-7KQ2-M4XB-P9RT', 'cli-001', 'RS Umum Sehat Selalu', 'CLI-0001', 12, 'enterprise', 250, 120, '2026-01-01', 'active', '2026-01-05', 'Perpanjangan tahunan, termasuk support prioritas 24/7. [kunci: NURSECALL-MASTER-01]'],
+  ['lic-002', 'NCM-3HG8-TN5D-W2LM', 'cli-002', 'RSIA Bunda Keluarga', 'CLI-0002', 6, 'professional', 80, 40, '2025-09-01', 'active', '2025-09-10', 'Akan dinegosiasikan untuk upgrade ke Enterprise. [kunci: NURSECALL-MASTER-01]'],
+  ['lic-003', 'NCM-QW41-8ZCV-K6PD', 'cli-003', 'Klinik Harapan Bangsa', 'CLI-0003', 3, 'basic', 20, 10, '2025-06-01', 'expired', '2025-06-03', 'Lisensi lama sudah kedaluwarsa — diganti lisensi baru. [kunci: NURSECALL-MASTER-01]'],
+  ['lic-004', 'NCM-B5TR-9XHN-D3JK', 'cli-003', 'Klinik Harapan Bangsa', 'CLI-0003', 3, 'standard', 50, 25, '2026-06-15', 'active', '2026-06-20', 'Upgrade dari Basic setelah masa percobaan. [kunci: NURSECALL-MASTER-01]'],
 ];
 
 
@@ -189,7 +188,7 @@ export async function initDb() {
   const [[{ n: nLicenses }]] = await p.query('SELECT COUNT(*) AS n FROM licenses');
   if (nLicenses === 0) {
     await p.query(
-      'INSERT INTO licenses (id,license_key,client_id,customer_name,customer_id,ward_count,plan,max_devices,max_users,issue_date,status,activated_at,modules,notes) VALUES ?',
+      'INSERT INTO licenses (id,license_key,client_id,customer_name,customer_id,ward_count,plan,max_devices,max_users,issue_date,status,activated_at,notes) VALUES ?',
       [SEED_LICENSES]
     );
   }
@@ -212,8 +211,6 @@ export function rowToClient(r) {
 }
 
 export function rowToLicense(r) {
-  let modules = [];
-  try { modules = r.modules ? JSON.parse(r.modules) : []; } catch { modules = []; }
   return {
     id: r.id,
     licenseKey: r.license_key,
@@ -227,7 +224,6 @@ export function rowToLicense(r) {
     issueDate: r.issue_date ? String(r.issue_date).slice(0, 10) : '',
     status: r.status,
     activatedAt: r.activated_at ? String(r.activated_at).slice(0, 10) : undefined,
-    modules,
     notes: r.notes || undefined,
   };
 }
@@ -239,5 +235,5 @@ export function clientToRow(c) {
 }
 
 export function licenseToRow(l) {
-  return [l.id, l.licenseKey, l.clientId, l.customerName || '', l.customerId || '', l.wardCount || 0, l.plan, l.maxDevices, l.maxUsers, d(l.issueDate), l.status, d(l.activatedAt), JSON.stringify(l.modules || []), l.notes || null];
+  return [l.id, l.licenseKey, l.clientId, l.customerName || '', l.customerId || '', l.wardCount || 0, l.plan, l.maxDevices, l.maxUsers, d(l.issueDate), l.status, d(l.activatedAt), l.notes || null];
 }

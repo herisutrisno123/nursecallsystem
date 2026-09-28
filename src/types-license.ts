@@ -29,7 +29,6 @@ export interface License {
   issueDate: string;            // ISO date (tanggal terbit lisensi)
   status: LicenseStatus;
   activatedAt?: string;         // tanggal aktivasi pertama
-  modules: string[];            // modul yang diaktifkan
   notes?: string;
 }
 
@@ -60,17 +59,6 @@ export const STATUS_COLORS: Record<LicenseStatus, string> = {
   expired: 'bg-red-100 text-red-700 border-red-200',
   suspended: 'bg-amber-100 text-amber-700 border-amber-200',
 };
-
-export const MODULE_OPTIONS = [
-  'Dashboard Monitoring',
-  'Peta Lantai / Ruangan',
-  'Log Panggilan',
-  'Laporan & Analitik',
-  'Integrasi IoT Gateway',
-  'Notifikasi SMS / WhatsApp',
-  'Multi-Rumah Sakit',
-  'API Access',
-] as const;
 
 // ----- Utilitas -----
 

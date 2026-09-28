@@ -7,7 +7,6 @@ import {
   PLAN_COLORS,
   STATUS_LABELS,
   STATUS_COLORS,
-  MODULE_OPTIONS,
   buildLicenseKey,
   verifyLicenseKey,
   formatDateID,
@@ -34,7 +33,6 @@ interface LicenseFormState {
   maxUsers: string;
   issueDate: string;
   status: License['status'];
-  modules: string[];
   notes: string;
 }
 
@@ -52,7 +50,6 @@ const emptyForm = (): LicenseFormState => ({
   maxUsers: '25',
   issueDate: today(),
   status: 'active',
-  modules: ['Dashboard Monitoring', 'Peta Lantai / Ruangan', 'Log Panggilan'],
   notes: '',
 });
 
@@ -162,7 +159,6 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
       maxUsers: String(l.maxUsers),
       issueDate: l.issueDate,
       status: l.status,
-      modules: l.modules,
       // Catatan ditampilkan tanpa penanda [kunci: ...] internal
       notes: stripKeyTag(l.notes || ''),
     });
@@ -231,7 +227,7 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
       maxUsers: Number(form.maxUsers),
       issueDate: form.issueDate,
       status: form.status,
-      modules: form.modules,
+      // Semua modul otomatis berlaku — tidak ada lagi field modules per lisensi
       // Simpan kunci rahasia di dalam catatan (penanda [kunci: ...]) agar bisa ditampilkan kembali saat edit
       notes: withKeyTag(form.notes.trim(), form.secretKey.trim()) || undefined,
     };
@@ -245,12 +241,6 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
     }
     setShowForm(false);
   };
-
-  const toggleModule = (m: string) =>
-    setForm(f => ({
-      ...f,
-      modules: f.modules.includes(m) ? f.modules.filter(x => x !== m) : [...f.modules, m],
-    }));
 
   const changeStatus = async (l: License, status: License['status'], msg: string) => {
     await saveLicense({ ...l, status }, false);
@@ -673,25 +663,6 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Modul yang Diaktifkan</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {MODULE_OPTIONS.map(m => (
-                      <label key={m} className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer text-sm ${
-                        form.modules.includes(m) ? 'border-blue-400 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                      }`}>
-                        <input
-                          type="checkbox"
-                          checked={form.modules.includes(m)}
-                          onChange={() => toggleModule(m)}
-                          className="rounded text-blue-600"
-                        />
-                        {m}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
                   <textarea
                     rows={2}
@@ -790,12 +761,8 @@ export default function LicenseManager({ onNotify }: LicenseManagerProps) {
                 })()}
 
                 <div>
-                  <p className="text-gray-500 text-xs mb-1">Modul Aktif</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {l.modules.map(m => (
-                      <span key={m} className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs border border-blue-200">{m}</span>
-                    ))}
-                  </div>
+                  <p className="text-gray-500 text-xs mb-1">Modul</p>
+                  <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs border border-blue-200">Semua modul aktif (otomatis)</span>
                 </div>
 
                 {stripKeyTag(l.notes || '') && (
