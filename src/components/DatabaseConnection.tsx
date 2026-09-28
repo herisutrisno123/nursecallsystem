@@ -10,7 +10,7 @@ import {
   Loader2,
   Info,
 } from 'lucide-react';
-import { testDbConnection, initDbTables, apiAvailable } from '../data/licenseData';
+import { testDbConnection, apiAvailable } from '../data/licenseData';
 import type { DbTestResult, DbConfigInput } from '../data/licenseData';
 
 interface Props {
@@ -24,7 +24,6 @@ export default function DatabaseConnection({ onNotify }: Props) {
   const [cfg, setCfg] = useState<DbConfigInput>({ host: '', port: '', user: '', password: '', database: '' });
   const [showPass, setShowPass] = useState(false);
   const [testing, setTesting] = useState(false);
-  const [initializing, setInitializing] = useState(false);
   const [result, setResult] = useState<DbTestResult | null>(null);
   const [autoChecking, setAutoChecking] = useState(true);
 
@@ -52,19 +51,6 @@ export default function DatabaseConnection({ onNotify }: Props) {
     setTesting(false);
     if (r.connected) onNotify?.('Koneksi MySQL berhasil — database AKTIF');
     else onNotify?.(r.error || 'Koneksi MySQL gagal', 'error');
-  };
-
-  const runInit = async () => {
-    setInitializing(true);
-    const res = await initDbTables();
-    setInitializing(false);
-    if (res.ok) {
-      onNotify?.('Tabel clients & licenses siap (dibuat bila belum ada)');
-      const r = await testDbConnection(hasOverride ? cfg : undefined);
-      setResult(r);
-    } else {
-      onNotify?.(`Gagal inisialisasi tabel: ${res.error}`, 'error');
-    }
   };
 
   const status: 'ok' | 'warn' | 'down' = result?.connected
@@ -115,7 +101,7 @@ export default function DatabaseConnection({ onNotify }: Props) {
               {status === 'warn' && (
                 <p className="text-xs mt-2">
                   Kemungkinan: nama database pada .env tidak sama dengan yang dibuat di phpMyAdmin, atau user
-                  MySQL tidak memiliki hak akses. Gunakan tombol “Buat / Perbaiki Tabel” setelah database tersedia.
+                  MySQL tidak memiliki hak akses. Pastikan database sudah dibuat di phpMyAdmin dengan nama sama seperti DB_NAME di .env — tabel akan dibuat otomatis oleh server saat menyala.
                 </p>
               )}
             </div>
@@ -173,15 +159,7 @@ export default function DatabaseConnection({ onNotify }: Props) {
               {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
               {testing ? 'Menguji…' : 'Uji Koneksi'}
             </button>
-            <button
-              onClick={runInit}
-              disabled={initializing || status === 'down'}
-              title={status === 'down' ? 'Server/API tidak terjangkau — jalankan npm run server lebih dulu' : 'Jalankan CREATE TABLE IF NOT EXISTS + seed data'}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold transition-colors"
-            >
-              {initializing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Table2 className="w-4 h-4" />}
-              Buat / Perbaiki Tabel
-            </button>
+
           </div>
         </div>
 
@@ -202,7 +180,7 @@ export default function DatabaseConnection({ onNotify }: Props) {
                   <li>Pastikan database dibuat di phpMyAdmin, namanya sama dengan DB_NAME di .env.</li>
                   <li>Jalankan server di folder proyek: <code>npm start</code> — aplikasi &amp; API berada di alamat yang sama (mis. http://localhost:3001). Bila memakai PM2: <code>pm2 start server/index.js --name nursecall-lisensi</code>.</li>
                   <li>Buka aplikasi dari alamat yang ditampilkan server (bukan lewat file .html atau port lain), agar otomatis terhubung ke API.</li>
-                  <li>Tabel <b>clients</b> &amp; <b>licenses</b> dibuat otomatis oleh server / tombol “Buat / Perbaiki Tabel”.</li>
+                  <li>Tabel <b>clients</b> &amp; <b>licenses</b> dibuat otomatis oleh server saat pertama kali menyala.</li>
                 </ul>
               </div>
             </div>
