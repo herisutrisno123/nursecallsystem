@@ -194,6 +194,78 @@ export async function removeRecord(kind: 'clients' | 'licenses', id: string): Pr
   return kind === 'clients' ? fetchClients() : fetchLicenses();
 }
 
+// ===== Menu "Koneksi Database" =====
+export interface DbTestResult {
+  connected: boolean;          // koneksi penuh ke database berhasil
+  serverReachable: boolean;    // server MySQL hidup (walau database belum ada)
+  latencyMs: number | null;
+  version?: string;
+  tables: string[];
+  counts: Record<string, number>;
+  error: string | null;
+  config: { host: string; port: number; user: string; database: string };
+}
+
+export interface DbConfigInput {
+  host?: string;
+  port?: string | number;
+  user?: string;
+  password?: string;
+  database?: string;
+}
+
+/** Uji koneksi MySQL via API server. Body kosong = pakai konfigurasi .env. */
+export async function testDbConnection(input?: DbConfigInput): Promise<DbTestResult> {
+  const body: Record<string, unknown> = {};
+  if (input) {
+    for (const [k, v] of Object.entries(input)) {
+      if (v !== undefined && v !== '') body[k] = v;
+    }
+  }
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/api/db/test`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(15000),
+    });
+  } catch {
+    return {
+      connected: false, serverReachable: false, latencyMs: null,
+      tables: [], counts: {},
+      error: `Tidak dapat menghubungi API server di ${API_BASE}. Jalankan "npm run server" lebih dulu.`,
+      config: { host: '-', port: 0, user: '-', database: '-' },
+    };
+  }
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    return {
+      connected: false, serverReachable: false, latencyMs: null,
+      tables: [], counts: {}, error: `Respons API tidak valid (HTTP ${res.status}) ${t}`.trim(),
+      config: { host: '-', port: 0, user: '-', database: '-' },
+    };
+  }
+  const data = (await res.json()) as DbTestResult;
+  if (data.connected) localStorage.setItem(API_FLAG_KEY, '1');
+  return data;
+}
+
+/** Buat tabel + seed data dari aplikasi (memanggil /api/db/init). */
+export async function initDbTables(): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch(`${API_BASE}/api/db/init`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
 // ===== CRUD Helpers (localStorage) =====
 
 function read<T>(key: string, seed: T[]): T[] {

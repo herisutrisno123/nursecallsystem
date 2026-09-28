@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import ClientData from './components/ClientData';
 import LicenseManager from './components/LicenseManager';
 import LoginPage from './components/LoginPage';
+import DatabaseConnection from './components/DatabaseConnection';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { Building2, KeyRound, User, Menu, X, LogOut, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Building2, KeyRound, User, Menu, X, LogOut, CheckCircle2, AlertCircle, Database } from 'lucide-react';
 
-type Tab = 'clients' | 'licenses';
+type Tab = 'clients' | 'licenses' | 'db';
 
 interface Toast {
   id: number;
@@ -40,6 +41,7 @@ function AppContent() {
   const tabs = [
     { id: 'clients' as Tab, label: 'Data Klien', icon: <Building2 className="w-5 h-5" /> },
     { id: 'licenses' as Tab, label: 'Kelola Lisensi', icon: <KeyRound className="w-5 h-5" /> },
+    { id: 'db' as Tab, label: 'Koneksi Database', icon: <Database className="w-5 h-5" /> },
   ];
 
   // Tampilkan halaman login jika belum login
@@ -183,6 +185,7 @@ function AppContent() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {activeTab === 'clients' && <ClientData onNotify={notify} />}
         {activeTab === 'licenses' && <LicenseManager onNotify={notify} />}
+        {activeTab === 'db' && <DatabaseConnection onNotify={notify} />}
       </main>
 
       {/* Toast Notifications */}

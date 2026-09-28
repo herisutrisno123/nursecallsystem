@@ -18,20 +18,75 @@ function loadEnvFile() {
   }
 }
 
-export async function getPool() {
-  if (pool) return pool;
+/** Baca konfigurasi MySQL dari environment / file .env */
+export function dbConfig() {
   const f = loadEnvFile();
-  const cfg = {
+  return {
     host: process.env.DB_HOST || f.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT || f.DB_PORT || 3306),
     user: process.env.DB_USER || f.DB_USER || 'root',
     password: process.env.DB_PASSWORD ?? f.DB_PASSWORD ?? '',
     database: process.env.DB_NAME || f.DB_NAME || 'nursecall_lisensi',
-    waitForConnections: true,
-    connectionLimit: 10,
   };
-  pool = await mysql.createPool(cfg);
+}
+
+export async function getPool() {
+  if (pool) return pool;
+  pool = await mysql.createPool({ ...dbConfig(), waitForConnections: true, connectionLimit: 10 });
   return pool;
+}
+
+/**
+ * Uji koneksi ke server MySQL TANPA memakai pool yang di-cache —
+ * dipakai oleh endpoint /api/db/test pada menu "Koneksi Database".
+ * connectToServer=true → cek ping ke server MySQL (tanpa memilih database),
+ * sehingga tetap terdeteksi "aktif" walau database belum dibuat.
+ */
+export async function testConnection(opts = {}) {
+  const { connectToServer = false } = opts;
+  const cfg = dbConfig();
+  const t0 = Date.now();
+  const out = { config: { ...cfg, password: undefined }, latencyMs: null, connected: false, serverReachable: false, tables: [], counts: {}, error: null };
+  let conn = null;
+  try {
+    conn = await mysql.createConnection({ ...cfg, connectTimeout: 4000 });
+    out.connected = true;
+    out.serverReachable = true;
+    const [ping] = await conn.query('SELECT VERSION() AS v');
+    out.version = ping[0].v;
+    const [tbls] = await conn.query(
+      'SELECT TABLE_NAME AS t FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME',
+      [cfg.database]
+    );
+    out.tables = tbls.map((r) => r.t);
+    for (const t of ['clients', 'licenses']) {
+      if (out.tables.includes(t)) {
+        const [[row]] = await conn.query(`SELECT COUNT(*) AS n FROM \`${t}\``);
+        out.counts[t] = Number(row.n);
+      }
+    }
+  } catch (err) {
+    out.error = err.message;
+    if (connectToServer && err.code === 'ER_BAD_DB_ERROR') {
+      // Database belum ada, tapi server MySQL-nya hidup — coba ping tanpa database
+      out.serverReachable = true;
+      try {
+        const noDb = { ...cfg, database: undefined };
+        const c2 = await mysql.createConnection({ ...noDb, connectTimeout: 4000 });
+        const [p2] = await c2.query('SELECT VERSION() AS v');
+        out.version = p2[0].v;
+        await c2.end();
+      } catch {
+        /* abaikan */
+      }
+    }
+  } finally {
+    out.latencyMs = Date.now() - t0;
+    if (conn) {
+      try { await conn.end(); } catch { /* abaikan */ }
+    }
+  }
+  return out;
 }
 
 const CREATE_TABLES = [
