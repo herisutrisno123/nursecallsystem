@@ -1,60 +1,66 @@
 // License validation utility
+// Format valid: NCM-ZLB2-W001-FTNK
 // Vendor memberikan kode lisensi unik melalui aplikasi terpisah
 
 export interface LicenseValidation {
   isValid: boolean;
   message: string;
-  licenseData?: {
-    companyName: string;
-    wardCount: number;
-    issuedDate: string;
-  };
 }
 
-// Validasi format kode lisensi
+// Validasi format kode lisensi: XXX-XXXX-XXXX-XXXX
 export function validateLicenseFormat(licenseKey: string): boolean {
-  const pattern = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]$/;
+  // Format: 3 karakter - 4 karakter - 4 karakter - 4 karakter
+  const pattern = /^[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
   return pattern.test(licenseKey);
 }
 
-// Validasi checksum kode lisensi
-function validateChecksum(licenseKey: string): boolean {
-  const parts = licenseKey.split('-');
-  if (parts.length !== 5) return false;
-  
-  const mainPart = parts.slice(0, 4).join('');
-  const checksumChar = parts[4];
-  
-  // Hitung checksum dari main part
-  let checksum = 0;
-  for (let i = 0; i < mainPart.length; i++) {
-    checksum += mainPart.charCodeAt(i);
-  }
-  
-  const expectedChecksum = (checksum % 36).toString(36).toUpperCase();
-  return checksumChar === expectedChecksum;
+// Validasi prefix NCM (NurseCall Monitor)
+function validatePrefix(licenseKey: string): boolean {
+  return licenseKey.startsWith('NCM-');
 }
 
-// Validasi vendor signature (simulasi - di produksi gunakan API vendor)
-function validateVendorSignature(licenseKey: string): boolean {
-  // Di produksi, ini akan memanggil API vendor untuk validasi
-  // Untuk demo, kita validasi berdasarkan pola tertentu
-  
-  // Vendor codes memiliki pola khusus:
-  // - Harus memiliki minimal 2 angka di setiap grup
-  // - Checksum harus valid
-  // - Tidak boleh ada karakter yang sama berurutan 3x
-  
+// Validasi checksum vendor
+function validateVendorChecksum(licenseKey: string): boolean {
   const parts = licenseKey.split('-');
+  if (parts.length !== 4) return false;
   
-  // Cek setiap grup memiliki minimal 2 angka
-  for (let i = 0; i < 4; i++) {
-    const digitCount = (parts[i].match(/[0-9]/g) || []).length;
-    if (digitCount < 2) return false;
+  const [prefix, part2, part3, part4] = parts;
+  
+  // Prefix harus NCM
+  if (prefix !== 'NCM') return false;
+  
+  // Hitung checksum sederhana dari semua karakter
+  const allChars = part2 + part3 + part4.substring(0, 3);
+  let checksum = 0;
+  for (let i = 0; i < allChars.length; i++) {
+    checksum += allChars.charCodeAt(i);
   }
   
-  // Cek tidak ada 3 karakter sama berurutan
-  if (/(.)\1\1/.test(licenseKey)) return false;
+  // Checksum harus match dengan karakter terakhir part4
+  const expectedLastChar = String.fromCharCode(65 + (checksum % 26)); // A-Z
+  const actualLastChar = part4[part4.length - 1];
+  
+  return actualLastChar === expectedLastChar;
+}
+
+// Validasi pola vendor (setiap grup harus memiliki minimal 1 angka kecuali prefix)
+function validateVendorPattern(licenseKey: string): boolean {
+  const parts = licenseKey.split('-');
+  if (parts.length !== 4) return false;
+  
+  const [prefix, part2, part3, part4] = parts;
+  
+  // Prefix harus NCM (huruf semua)
+  if (prefix !== 'NCM') return false;
+  
+  // Part2 harus memiliki minimal 1 angka
+  if (!/[0-9]/.test(part2)) return false;
+  
+  // Part3 harus memiliki minimal 1 angka
+  if (!/[0-9]/.test(part3)) return false;
+  
+  // Part4 harus huruf semua (checksum)
+  if (/[0-9]/.test(part4)) return false;
   
   return true;
 }
@@ -68,30 +74,38 @@ export function validateLicense(licenseKey: string): LicenseValidation {
   if (!validateLicenseFormat(key)) {
     return {
       isValid: false,
-      message: 'Format kode lisensi tidak valid. Format yang benar: XXXX-XXXX-XXXX-XXXX-X',
+      message: 'Format kode lisensi tidak valid. Format yang benar: NCM-XXXX-XXXX-XXXX',
     };
   }
   
-  // Cek checksum
-  if (!validateChecksum(key)) {
+  // Cek prefix NCM
+  if (!validatePrefix(key)) {
     return {
       isValid: false,
-      message: 'Checksum kode lisensi tidak valid. Kode lisensi mungkin rusak atau salah ketik.',
+      message: 'Kode lisensi harus dimulai dengan prefix "NCM". Pastikan kode diperoleh dari vendor resmi NurseCall Monitor.',
     };
   }
   
-  // Cek vendor signature
-  if (!validateVendorSignature(key)) {
+  // Cek pola vendor
+  if (!validateVendorPattern(key)) {
     return {
       isValid: false,
-      message: 'Kode lisensi tidak dikenali oleh sistem vendor. Pastikan kode lisensi diperoleh dari vendor resmi.',
+      message: 'Pola kode lisensi tidak sesuai dengan standar vendor. Grup ke-2 dan ke-3 harus mengandung angka, grup ke-4 harus huruf semua.',
+    };
+  }
+  
+  // Cek checksum vendor
+  if (!validateVendorChecksum(key)) {
+    return {
+      isValid: false,
+      message: 'Checksum kode lisensi tidak valid. Kode lisensi mungkin rusak, salah ketik, atau bukan dari vendor resmi.',
     };
   }
   
   // Jika semua valid
   return {
     isValid: true,
-    message: 'Kode lisensi valid dan terdaftar di sistem vendor.',
+    message: 'Kode lisensi valid dan terdaftar di sistem vendor NurseCall Monitor.',
   };
 }
 
@@ -116,53 +130,46 @@ export function getLicenseStatus(): { isValid: boolean; licenseKey: string | nul
   }
 }
 
-// Simulasi generate kode lisensi vendor (untuk testing)
+// Generate kode lisensi vendor (untuk demo/testing)
+// Format: NCM-XXXX-XXXX-XXXX
 export function generateVendorLicenseKey(companyName: string, wardCount: number): string {
-  // Vendor menggunakan algoritma khusus yang berbeda dari generate biasa
-  const baseString = `VENDOR-${companyName.toUpperCase()}-${wardCount}-${Date.now()}`;
+  // Prefix tetap NCM
+  const prefix = 'NCM';
   
-  let hash = 0;
-  for (let i = 0; i < baseString.length; i++) {
-    const char = baseString.charCodeAt(i);
-    hash = ((hash << 7) - hash) + char;
-    hash = hash & hash;
+  // Generate part2 (4 karakter, minimal 1 angka)
+  const part2Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let part2 = '';
+  for (let i = 0; i < 4; i++) {
+    part2 += part2Chars[Math.floor(Math.random() * part2Chars.length)];
+  }
+  // Pastikan minimal 1 angka
+  if (!/[0-9]/.test(part2)) {
+    part2 = part2.substring(0, 3) + Math.floor(Math.random() * 10);
   }
   
-  const positiveHash = Math.abs(hash);
-  const hashString = positiveHash.toString(36).toUpperCase().padStart(16, '0');
+  // Generate part3 (4 karakter, minimal 1 angka, berdasarkan wardCount)
+  const wardStr = wardCount.toString().padStart(3, '0');
+  let part3 = String.fromCharCode(65 + Math.floor(Math.random() * 26)) + wardStr.substring(0, 3);
   
-  // Pastikan setiap grup memiliki minimal 2 angka
-  let part1 = hashString.substring(0, 4);
-  let part2 = hashString.substring(4, 8);
-  let part3 = hashString.substring(8, 12);
-  let part4 = hashString.substring(12, 16);
+  // Generate 3 karakter pertama part4
+  let part4First3 = '';
+  for (let i = 0; i < 3; i++) {
+    part4First3 += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+  }
   
-  // Inject angka jika perlu
-  const injectDigits = (part: string): string => {
-    const digitCount = (part.match(/[0-9]/g) || []).length;
-    if (digitCount >= 2) return part;
-    
-    let result = part;
-    for (let i = 0; i < 2 - digitCount; i++) {
-      const pos = Math.floor(Math.random() * 4);
-      const digit = Math.floor(Math.random() * 10).toString();
-      result = result.substring(0, pos) + digit + result.substring(pos + 1);
-    }
-    return result;
-  };
-  
-  part1 = injectDigits(part1);
-  part2 = injectDigits(part2);
-  part3 = injectDigits(part3);
-  part4 = injectDigits(part4);
-  
-  // Hitung checksum
-  const mainPart = part1 + part2 + part3 + part4;
+  // Hitung checksum untuk karakter terakhir part4
+  const allChars = part2 + part3 + part4First3;
   let checksum = 0;
-  for (let i = 0; i < mainPart.length; i++) {
-    checksum += mainPart.charCodeAt(i);
+  for (let i = 0; i < allChars.length; i++) {
+    checksum += allChars.charCodeAt(i);
   }
-  const checksumChar = (checksum % 36).toString(36).toUpperCase();
+  const checksumChar = String.fromCharCode(65 + (checksum % 26));
   
-  return `${part1}-${part2}-${part3}-${part4}-${checksumChar}`;
+  const part4 = part4First3 + checksumChar;
+  
+  return `${prefix}-${part2}-${part3}-${part4}`;
 }
+
+// Contoh kode lisensi valid untuk testing:
+// NCM-ZLB2-W001-ABCK (generated dengan algoritma yang sama)
+export const DEMO_LICENSE_KEY = 'NCM-ZLB2-W001-ABCK';

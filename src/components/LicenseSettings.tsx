@@ -264,8 +264,8 @@ export default function LicenseSettings() {
                     className={`flex-1 px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white font-mono ${
                       validationError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                     }`}
-                    placeholder="XXXX-XXXX-XXXX-XXXX-X"
-                    maxLength={21}
+                    placeholder="NCM-XXXX-XXXX-XXXX"
+                    maxLength={18}
                   />
                   <button
                     onClick={handleSaveLicense}
@@ -294,7 +294,7 @@ export default function LicenseSettings() {
                   </div>
                 )}
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Masukkan kode lisensi unik yang diberikan oleh vendor melalui aplikasi khusus.
+                  Masukkan kode lisensi unik dari vendor. Format: NCM-XXXX-XXXX-XXXX
                 </p>
               </div>
             </div>
@@ -435,6 +435,10 @@ export default function LicenseSettings() {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
+            <span>Format kode lisensi: <strong className="font-mono">NCM-XXXX-XXXX-XXXX</strong></span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
             <span>Kode lisensi yang tidak valid akan <strong>memblokir semua menu</strong> kecuali Pengaturan</span>
           </li>
           <li className="flex items-start gap-2">
@@ -463,20 +467,26 @@ export default function LicenseSettings() {
             Di produksi, kode lisensi diperoleh dari vendor melalui aplikasi terpisah. 
             Untuk demo, Anda dapat generate kode lisensi vendor di sini:
           </p>
-          <button
-            onClick={() => {
-              if (companyName && wardCount > 0) {
-                const vendorKey = generateVendorLicenseKey(companyName, wardCount);
-                setNewLicenseKey(vendorKey);
-                alert(`Kode lisensi vendor telah di-generate:\n\n${vendorKey}\n\nSilakan klik tombol "Simpan" untuk mengaktifkan lisensi.`);
-              } else {
-                alert('Silakan isi nama perusahaan dan jumlah bangsal terlebih dahulu di form di atas.');
-              }
-            }}
-            className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors text-sm font-medium"
-          >
-            Generate Kode Vendor
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={() => {
+                if (companyName && wardCount > 0) {
+                  const vendorKey = generateVendorLicenseKey(companyName, wardCount);
+                  setNewLicenseKey(vendorKey);
+                  alert(`Kode lisensi vendor telah di-generate:\n\n${vendorKey}\n\nSilakan klik tombol "Simpan" untuk mengaktifkan lisensi.`);
+                } else {
+                  alert('Silakan isi nama perusahaan dan jumlah bangsal terlebih dahulu di form di atas.');
+                }
+              }}
+              className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors text-sm font-medium"
+            >
+              Generate Kode Vendor
+            </button>
+            <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+              <p className="text-xs text-yellow-800 dark:text-yellow-300 font-medium mb-1">Contoh Kode Valid:</p>
+              <code className="text-sm font-mono text-yellow-900 dark:text-yellow-200">NCM-ZLB2-W001-ABCK</code>
+            </div>
+          </div>
         </div>
       )}
     </div>
