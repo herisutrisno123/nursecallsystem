@@ -25,15 +25,17 @@ Total: 23 karakter (5 blok)
 - **Contoh**: `3A5A`, `1234`, `9876`
 - **Catatan**: Tidak divalidasi (bisa berupa angka atau huruf)
 
-### **Blok 3: XXXX** (4 digit)
+### **Blok 3: Wxxx** (4 digit)
 - **Isi**: **Jumlah bangsal** (encoded)
 - **Arti**: Jumlah bangsal/ward yang dilisensikan
-- **Format**: `W` + 3 digit angka (W001-W999)
+- **Format**: `W` + 3 karakter alfanumerik (W001-W999, WABC, W1A2, dll)
 - **Contoh**: 
   - `W001` = 1 bangsal
   - `W004` = 4 bangsal
   - `W010` = 10 bangsal
   - `W999` = 999 bangsal
+  - `WABC` = encoded value (alfanumerik)
+  - `W1A2` = encoded value (alfanumerik)
 
 ### **Blok 4: XXXX** (4 digit)
 - **Isi**: **Kunci rahasia**
@@ -52,7 +54,7 @@ NCM-PK2K-3A5A-W004-4G3E
 - **Blok 0**: `NCM` = Nurse Control Monitor
 - **Blok 1**: `PK2K` = Signature nama pelanggan
 - **Blok 2**: `3A5A` = ID Pelanggan
-- **Blok 3**: `W004` = 4 bangsal
+- **Blok 3**: `W004` = 4 bangsal (format angka)
 - **Blok 4**: `4G3E` = Kunci rahasia
 
 ### **Contoh 2:**
@@ -62,18 +64,28 @@ NCM-AB12-1234-W010-TEST
 - **Blok 0**: `NCM` = Nurse Control Monitor
 - **Blok 1**: `AB12` = Signature nama pelanggan
 - **Blok 2**: `1234` = ID Pelanggan
-- **Blok 3**: `W010` = 10 bangsal
+- **Blok 3**: `W010` = 10 bangsal (format angka)
 - **Blok 4**: `TEST` = Kunci rahasia
 
 ### **Contoh 3:**
 ```
-NCM-XY99-9876-W001-ZZZZ
+NCM-XY99-9876-WABC-ZZZZ
 ```
 - **Blok 0**: `NCM` = Nurse Control Monitor
 - **Blok 1**: `XY99` = Signature nama pelanggan
 - **Blok 2**: `9876` = ID Pelanggan
-- **Blok 3**: `W001` = 1 bangsal
+- **Blok 3**: `WABC` = encoded value (format alfanumerik)
 - **Blok 4**: `ZZZZ` = Kunci rahasia
+
+### **Contoh 4:**
+```
+NCM-MN3P-5678-W1A2-ABCD
+```
+- **Blok 0**: `NCM` = Nurse Control Monitor
+- **Blok 1**: `MN3P` = Signature nama pelanggan
+- **Blok 2**: `5678` = ID Pelanggan
+- **Blok 3**: `W1A2` = encoded value (format alfanumerik)
+- **Blok 4**: `ABCD` = Kunci rahasia
 
 ---
 
@@ -148,10 +160,20 @@ NCM-QCK2-XXXX-W004-XXXX
 | 4 | 4G3E | Kunci rahasia (tidak divalidasi) |
 
 ### **Decode Blok 3 (Jumlah Bangsal):**
+
+**Format Angka:**
 ```
 W004 → W = Ward, 004 = 4
 Result: 4 bangsal
 ```
+
+**Format Alfanumerik:**
+```
+WABC → W = Ward, ABC = base36 decode
+W1A2 → W = Ward, 1A2 = base36 decode
+```
+
+**Catatan:** Blok 3 sekarang mendukung format Wxxx (W + 3 karakter alfanumerik) untuk fleksibilitas encoding yang lebih besar.
 
 ---
 
