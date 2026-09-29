@@ -1,26 +1,24 @@
 // License validation utility
-// Format valid: NCM-XXXX-XXXX-XXXX
-// Blok 0: NCM (prefix)
-// Blok 1: Hash nama perusahaan + ID pelanggan
-// Blok 2: Jumlah bangsal (encoded)
-// Blok 3: Kunci rahasia (tidak divalidasi)
+// Format valid: NCM-XXXX-XXXX-XXXX-XXXX (5 blok, 23 karakter)
+// Blok 0: NCM (prefix - Nurse Control Monitor)
+// Blok 1: Signature nama pelanggan (4 digit)
+// Blok 2: ID Pelanggan (4 digit)
+// Blok 3: Jumlah bangsal (4 digit, format: W001-W999)
+// Blok 4: Kunci rahasia (4 digit, tidak divalidasi)
 
 export interface LicenseValidation {
   isValid: boolean;
   message: string;
   decodedData?: {
-    companyNameSignature: string;
+    customerNameSignature: string;
     wardCount: number;
   };
 }
 
-// Encode nama perusahaan ke signature 4 karakter (reversible untuk verifikasi)
-function encodeCompanyName(companyName: string): string {
-  const normalized = companyName.trim().toUpperCase();
-  console.log('Encoding company name:', normalized);
-  
-  // Generate 4 karakter signature dari nama perusahaan
-  // Algorithm: Kombinasi dari panjang nama + checksum + karakter khusus
+// Generate signature untuk Blok 1 berdasarkan nama pelanggan
+function generateCustomerNameSignature(customerName: string): string {
+  const normalized = customerName.trim().toUpperCase();
+  console.log('Generating customer name signature:', normalized);
   
   const length = normalized.length;
   const checksum = normalized.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
@@ -32,19 +30,23 @@ function encodeCompanyName(companyName: string): string {
   const char4 = String.fromCharCode(48 + ((length * checksum) % 10)); // 0-9 berdasarkan perkalian
   
   const result = `${char1}${char2}${char3}${char4}`;
-  console.log('Signature result:', result);
-  console.log('  - Panjang nama:', length, '→ char1:', char1);
-  console.log('  - Checksum:', checksum, '→ char2:', char2);
-  console.log('  - Length+Checksum:', length + checksum, '→ char3:', char3);
-  console.log('  - Length*Checksum:', length * checksum, '→ char4:', char4);
+  console.log('Customer Name Signature:', result);
   
   return result;
 }
 
-// Verifikasi nama perusahaan dengan signature
-function verifyCompanyName(signature: string, companyName: string): boolean {
-  const expectedSignature = encodeCompanyName(companyName);
-  console.log('Verifying signature:', signature, 'vs expected:', expectedSignature);
+// Generate ID Pelanggan untuk Blok 2 (4 digit)
+function generateCustomerId(): string {
+  // Generate random 4 digit ID (bisa diganti dengan logic dari database)
+  const id = Math.floor(1000 + Math.random() * 9000);
+  console.log('Generated Customer ID:', id);
+  return id.toString();
+}
+
+// Verifikasi nama pelanggan dengan signature
+function verifyCustomerNameSignature(signature: string, customerName: string): boolean {
+  const expectedSignature = generateCustomerNameSignature(customerName);
+  console.log('Verifying customer name signature:', signature, 'vs expected:', expectedSignature);
   return signature === expectedSignature;
 }
 
@@ -74,76 +76,78 @@ function generateSecretKey(): string {
   return result;
 }
 
-// Generate kode lisensi vendor berdasarkan nama perusahaan dan jumlah bangsal
-export function generateVendorLicenseKey(companyName: string, wardCount: number): string {
-  console.log('=== GENERATE LICENSE KEY ===');
-  console.log('Input Company Name:', companyName);
+// Generate kode lisensi vendor berdasarkan nama pelanggan dan jumlah bangsal
+export function generateVendorLicenseKey(customerName: string, wardCount: number): string {
+  console.log('=== GENERATE LICENSE KEY (5 BLOK) ===');
+  console.log('Input Customer Name:', customerName);
   console.log('Input Ward Count:', wardCount);
   
-  const prefix = 'NCM';
-  const block1 = encodeCompanyName(companyName); // Generate signature dari nama perusahaan
-  const block2 = encodeWardCount(wardCount);
-  const block3 = generateSecretKey(); // Kunci rahasia - tidak divalidasi
+  const block0 = 'NCM'; // Prefix tetap
+  const block1 = generateCustomerNameSignature(customerName); // Signature nama pelanggan
+  const block2 = generateCustomerId(); // ID Pelanggan (4 digit)
+  const block3 = encodeWardCount(wardCount); // Jumlah bangsal (W001-W999)
+  const block4 = generateSecretKey(); // Kunci rahasia - tidak divalidasi
   
-  const licenseKey = `${prefix}-${block1}-${block2}-${block3}`;
+  const licenseKey = `${block0}-${block1}-${block2}-${block3}-${block4}`;
   console.log('Generated License Key:', licenseKey);
-  console.log('  Blok 0 (Prefix):', prefix);
+  console.log('  Blok 0 (Prefix):', block0);
   console.log('  Blok 1 (Signature Nama):', block1);
-  console.log('  Blok 2 (Bangsal):', block2);
-  console.log('  Blok 3 (Kunci Rahasia):', block3);
+  console.log('  Blok 2 (ID Pelanggan):', block2);
+  console.log('  Blok 3 (Bangsal):', block3);
+  console.log('  Blok 4 (Kunci Rahasia):', block4);
   
   return licenseKey;
 }
 
-// Validasi format kode lisensi
+// Validasi format kode lisensi (5 blok)
 export function validateLicenseFormat(licenseKey: string): boolean {
-  const pattern = /^[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+  const pattern = /^[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
   return pattern.test(licenseKey);
 }
 
-// Fungsi utama validasi lisensi
-export function validateLicense(licenseKey: string, storedCompanyName?: string, storedWardCount?: number): LicenseValidation {
+// Fungsi utama validasi lisensi (5 blok)
+export function validateLicense(licenseKey: string, storedCustomerName?: string, storedWardCount?: number): LicenseValidation {
   const key = licenseKey.trim().toUpperCase();
-  // Gunakan format asli (Title Case) tanpa konversi ke uppercase
-  const companyName = storedCompanyName?.trim();
+  const customerName = storedCustomerName?.trim();
   
-  console.log('=== LICENSE VALIDATION DEBUG ===');
+  console.log('=== LICENSE VALIDATION DEBUG (5 BLOK) ===');
   console.log('License Key:', key);
-  console.log('Stored Company:', companyName);
+  console.log('Stored Customer Name:', customerName);
   console.log('Stored Ward Count:', storedWardCount);
   
-  // 1. Cek format
+  // 1. Cek format (5 blok)
   if (!validateLicenseFormat(key)) {
     console.log('❌ Format invalid');
     return {
       isValid: false,
-      message: 'Format kode lisensi tidak valid. Format yang benar: NCM-XXXX-XXXX-XXXX',
+      message: 'Format kode lisensi tidak valid. Format yang benar: NCM-XXXX-XXXX-XXXX-XXXX (5 blok)',
     };
   }
   
   const parts = key.split('-');
-  const [prefix, block1, block2, block3] = parts;
+  const [block0, block1, block2, block3, block4] = parts;
   
-  console.log('Blok 0 (Prefix):', prefix);
-  console.log('Blok 1 (Hash Nama):', block1);
-  console.log('Blok 2 (Bangsal):', block2);
-  console.log('Blok 3 (Kunci Rahasia):', block3);
+  console.log('Blok 0 (Prefix):', block0);
+  console.log('Blok 1 (Signature Nama):', block1);
+  console.log('Blok 2 (ID Pelanggan):', block2);
+  console.log('Blok 3 (Bangsal):', block3);
+  console.log('Blok 4 (Kunci Rahasia):', block4);
   
   // 2. Cek prefix NCM
-  if (prefix !== 'NCM') {
+  if (block0 !== 'NCM') {
     console.log('❌ Prefix invalid');
     return {
       isValid: false,
-      message: 'Kode lisensi harus dimulai dengan prefix "NCM". Pastikan kode diperoleh dari vendor resmi NurseCall Monitor.',
+      message: 'Kode lisensi harus dimulai dengan prefix "NCM". Pastikan kode diperoleh dari vendor resmi Nurse Control Monitor.',
     };
   }
   
-  // 3. Decode blok 2 (jumlah bangsal)
-  const decodedWardCount = decodeWardCount(block2);
+  // 3. Decode blok 3 (jumlah bangsal)
+  const decodedWardCount = decodeWardCount(block3);
   console.log('Decoded Ward Count:', decodedWardCount);
   
   if (decodedWardCount === null) {
-    console.log('❌ Blok 2 invalid');
+    console.log('❌ Blok 3 invalid');
     return {
       isValid: false,
       message: 'Blok jumlah bangsal tidak valid. Kode lisensi rusak atau tidak sesuai standar vendor.',
@@ -151,53 +155,53 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
   }
   
   // 4. Jika ada data tersimpan, verifikasi kesesuaian
-  if (companyName && storedWardCount) {
-    // Verifikasi BLOK 1: Signature nama perusahaan
-    const expectedBlock1 = encodeCompanyName(companyName);
-    console.log('Expected Block 1 (signature dari stored company):', expectedBlock1);
+  if (customerName && storedWardCount) {
+    // Verifikasi BLOK 1: Signature nama pelanggan
+    const expectedBlock1 = generateCustomerNameSignature(customerName);
+    console.log('Expected Block 1 (signature dari stored customer):', expectedBlock1);
     console.log('Actual Block 1 (dari kode lisensi):', block1);
     
     if (block1 !== expectedBlock1) {
-      console.log('❌ Blok 1 tidak cocok - nama perusahaan berbeda');
-      console.log('   Company Name tersimpan:', companyName);
+      console.log('❌ Blok 1 tidak cocok - nama pelanggan berbeda');
+      console.log('   Customer Name tersimpan:', customerName);
       console.log('   Signature yang dihitung:', expectedBlock1);
       console.log('   Signature di kode lisensi:', block1);
       return {
         isValid: false,
-        message: `Kode lisensi tidak sesuai dengan nama perusahaan "${companyName}". Kode lisensi ini diterbitkan untuk perusahaan yang berbeda.`,
+        message: `Kode lisensi tidak sesuai dengan nama pelanggan "${customerName}". Kode lisensi ini diterbitkan untuk pelanggan yang berbeda.`,
         decodedData: {
-          companyNameSignature: block1,
+          customerNameSignature: block1,
           wardCount: decodedWardCount,
         },
       };
     }
     
-    console.log('✅ Blok 1 cocok - nama perusahaan valid');
+    console.log('✅ Blok 1 cocok - nama pelanggan valid');
     
-    // Verifikasi BLOK 2: Jumlah bangsal
+    // Verifikasi BLOK 3: Jumlah bangsal
     console.log('Expected Ward Count (dari stored data):', storedWardCount);
-    console.log('Actual Ward Count (dari blok 2):', decodedWardCount);
+    console.log('Actual Ward Count (dari blok 3):', decodedWardCount);
     
     if (decodedWardCount !== storedWardCount) {
-      console.log('❌ Blok 2 tidak cocok - jumlah bangsal berbeda');
+      console.log('❌ Blok 3 tidak cocok - jumlah bangsal berbeda');
       return {
         isValid: false,
         message: `Kode lisensi tidak sesuai dengan jumlah bangsal. Lisensi ini untuk ${decodedWardCount} bangsal, tetapi sistem terdaftar untuk ${storedWardCount} bangsal.`,
         decodedData: {
-          companyNameSignature: block1,
+          customerNameSignature: block1,
           wardCount: decodedWardCount,
         },
       };
     }
     
-    console.log('✅ Blok 2 cocok - jumlah bangsal valid');
-    console.log('✅ Blok 3 tidak divalidasi (kunci rahasia)');
+    console.log('✅ Blok 3 cocok - jumlah bangsal valid');
+    console.log('✅ Blok 2 (ID Pelanggan) dan Blok 4 (Kunci Rahasia) tidak divalidasi');
     
-    // Blok 3 (kunci rahasia) tidak divalidasi
+    // Blok 2 (ID Pelanggan) dan Blok 4 (Kunci Rahasia) tidak divalidasi
   } else {
     console.log('⚠️ Belum ada data tersimpan, validasi dasar saja');
     // Jika belum ada data tersimpan, validasi dasar saja
-    // Blok 3 (kunci rahasia) tidak divalidasi
+    // Blok 2 dan Blok 4 tidak divalidasi
   }
   
   console.log('✅✅✅ LISNSI VALID ✅✅✅');
@@ -205,9 +209,9 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
   // Semua valid
   return {
     isValid: true,
-    message: 'Kode lisensi valid dan sesuai dengan data perusahaan.',
+    message: 'Kode lisensi valid dan sesuai dengan data pelanggan.',
     decodedData: {
-      companyNameSignature: block1,
+      customerNameSignature: block1,
       wardCount: decodedWardCount,
     },
   };

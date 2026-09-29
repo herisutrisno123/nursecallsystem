@@ -185,8 +185,8 @@ function ActivationForm({ companyName, wardCount }: { companyName: string; wardC
             className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white font-mono ${
               validationError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
-            placeholder="NCM-XXXX-XXXX-XXXX"
-            maxLength={18}
+            placeholder="NCM-XXXX-XXXX-XXXX-XXXX"
+            maxLength={23}
           />
           {validationError && (
             <div className="mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -197,7 +197,7 @@ function ActivationForm({ companyName, wardCount }: { companyName: string; wardC
             </div>
           )}
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Masukkan kode lisensi yang diberikan oleh vendor. Format: NCM-XXXX-XXXX-XXXX
+            Masukkan kode lisensi yang diberikan oleh vendor. Format: NCM-XXXX-XXXX-XXXX-XXXX (5 blok)
           </p>
         </div>
 
@@ -418,20 +418,19 @@ export default function LicenseSettings() {
                   Simpan Kode Lisensi dari Vendor
                 </label>
                 <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newLicenseKey}
-                    onChange={(e) => {
-                      setNewLicenseKey(e.target.value.toUpperCase());
-                      setValidationError('');
-                    }}
-                    className={`flex-1 px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white font-mono ${
-                      validationError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-                    }`}
-                    placeholder="NCM-XXXX-XXXX-XXXX"
-                    maxLength={18}
-                  />
-                  <button
+          <input
+            type="text"
+            value={newLicenseKey}
+            onChange={(e) => {
+              setNewLicenseKey(e.target.value.toUpperCase());
+              setValidationError('');
+            }}
+            className={`flex-1 px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white font-mono ${
+              validationError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+            }`}
+            placeholder="NCM-XXXX-XXXX-XXXX-XXXX"
+            maxLength={23}
+          />                  <button
                     onClick={handleSaveLicense}
                     disabled={!newLicenseKey.trim()}
                     className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -458,7 +457,7 @@ export default function LicenseSettings() {
                   </div>
                 )}
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Masukkan kode lisensi unik dari vendor. Format: NCM-XXXX-XXXX-XXXX
+                  Masukkan kode lisensi unik dari vendor. Format: NCM-XXXX-XXXX-XXXX-XXXX (5 blok)
                 </p>
               </div>
             </div>
@@ -524,7 +523,7 @@ export default function LicenseSettings() {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
-            <span>Format kode lisensi: <strong className="font-mono">NCM-XXXX-XXXX-XXXX</strong></span>
+            <span>Format kode lisensi: <strong className="font-mono">NCM-XXXX-XXXX-XXXX-XXXX</strong> (5 blok)</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
