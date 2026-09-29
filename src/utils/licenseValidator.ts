@@ -9,30 +9,43 @@ export interface LicenseValidation {
   isValid: boolean;
   message: string;
   decodedData?: {
-    companyNameHash: string;
+    companyNameSignature: string;
     wardCount: number;
   };
 }
 
-// Hash function untuk nama perusahaan
-function hashCompanyName(companyName: string): string {
-  // Gunakan format asli (Title Case) sesuai input pengguna
-  const normalized = companyName.trim();
-  console.log('Hashing company name:', normalized);
+// Encode nama perusahaan ke signature 4 karakter (reversible untuk verifikasi)
+function encodeCompanyName(companyName: string): string {
+  const normalized = companyName.trim().toUpperCase();
+  console.log('Encoding company name:', normalized);
   
-  let hash = 0;
-  for (let i = 0; i < normalized.length; i++) {
-    const char = normalized.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
+  // Generate 4 karakter signature dari nama perusahaan
+  // Algorithm: Kombinasi dari panjang nama + checksum + karakter khusus
   
-  const positiveHash = Math.abs(hash);
-  const hashString = positiveHash.toString(36).toUpperCase().padStart(4, '0');
-  const result = hashString.substring(0, 4);
-  console.log('Hash result:', result);
+  const length = normalized.length;
+  const checksum = normalized.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  
+  // Generate 4 karakter signature
+  const char1 = String.fromCharCode(65 + (length % 26)); // A-Z berdasarkan panjang
+  const char2 = String.fromCharCode(65 + (checksum % 26)); // A-Z berdasarkan checksum
+  const char3 = String.fromCharCode(65 + ((length + checksum) % 26)); // A-Z kombinasi
+  const char4 = String.fromCharCode(48 + ((length * checksum) % 10)); // 0-9 berdasarkan perkalian
+  
+  const result = `${char1}${char2}${char3}${char4}`;
+  console.log('Signature result:', result);
+  console.log('  - Panjang nama:', length, '→ char1:', char1);
+  console.log('  - Checksum:', checksum, '→ char2:', char2);
+  console.log('  - Length+Checksum:', length + checksum, '→ char3:', char3);
+  console.log('  - Length*Checksum:', length * checksum, '→ char4:', char4);
   
   return result;
+}
+
+// Verifikasi nama perusahaan dengan signature
+function verifyCompanyName(signature: string, companyName: string): boolean {
+  const expectedSignature = encodeCompanyName(companyName);
+  console.log('Verifying signature:', signature, 'vs expected:', expectedSignature);
+  return signature === expectedSignature;
 }
 
 // Encode jumlah bangsal ke 4 karakter
@@ -68,14 +81,14 @@ export function generateVendorLicenseKey(companyName: string, wardCount: number)
   console.log('Input Ward Count:', wardCount);
   
   const prefix = 'NCM';
-  const block1 = hashCompanyName(companyName); // Sudah di-uppercase di dalam hashCompanyName
+  const block1 = encodeCompanyName(companyName); // Generate signature dari nama perusahaan
   const block2 = encodeWardCount(wardCount);
   const block3 = generateSecretKey(); // Kunci rahasia - tidak divalidasi
   
   const licenseKey = `${prefix}-${block1}-${block2}-${block3}`;
   console.log('Generated License Key:', licenseKey);
   console.log('  Blok 0 (Prefix):', prefix);
-  console.log('  Blok 1 (Hash Nama):', block1);
+  console.log('  Blok 1 (Signature Nama):', block1);
   console.log('  Blok 2 (Bangsal):', block2);
   console.log('  Blok 3 (Kunci Rahasia):', block3);
   
@@ -139,18 +152,21 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
   
   // 4. Jika ada data tersimpan, verifikasi kesesuaian
   if (companyName && storedWardCount) {
-    // Verifikasi BLOK 1: Hash nama perusahaan
-    const expectedBlock1 = hashCompanyName(companyName);
-    console.log('Expected Block 1 (hash dari stored company):', expectedBlock1);
+    // Verifikasi BLOK 1: Signature nama perusahaan
+    const expectedBlock1 = encodeCompanyName(companyName);
+    console.log('Expected Block 1 (signature dari stored company):', expectedBlock1);
     console.log('Actual Block 1 (dari kode lisensi):', block1);
     
     if (block1 !== expectedBlock1) {
       console.log('❌ Blok 1 tidak cocok - nama perusahaan berbeda');
+      console.log('   Company Name tersimpan:', companyName);
+      console.log('   Signature yang dihitung:', expectedBlock1);
+      console.log('   Signature di kode lisensi:', block1);
       return {
         isValid: false,
         message: `Kode lisensi tidak sesuai dengan nama perusahaan "${companyName}". Kode lisensi ini diterbitkan untuk perusahaan yang berbeda.`,
         decodedData: {
-          companyNameHash: block1,
+          companyNameSignature: block1,
           wardCount: decodedWardCount,
         },
       };
@@ -168,7 +184,7 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
         isValid: false,
         message: `Kode lisensi tidak sesuai dengan jumlah bangsal. Lisensi ini untuk ${decodedWardCount} bangsal, tetapi sistem terdaftar untuk ${storedWardCount} bangsal.`,
         decodedData: {
-          companyNameHash: block1,
+          companyNameSignature: block1,
           wardCount: decodedWardCount,
         },
       };
@@ -191,7 +207,7 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
     isValid: true,
     message: 'Kode lisensi valid dan sesuai dengan data perusahaan.',
     decodedData: {
-      companyNameHash: block1,
+      companyNameSignature: block1,
       wardCount: decodedWardCount,
     },
   };
