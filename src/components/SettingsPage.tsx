@@ -71,14 +71,46 @@ export default function SettingsPage() {
 
 function GeneralSettings() {
   const [logo, setLogo] = useState<string | null>(null);
+  const [hospitalName, setHospitalName] = useState('RS Sehat Selalu');
+  const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
+  const [pic, setPic] = useState('');
 
-  // Load logo from localStorage on mount
+  // Load data from localStorage on mount
   useState(() => {
     const savedLogo = localStorage.getItem('companyLogo');
-    if (savedLogo) {
-      setLogo(savedLogo);
-    }
+    const savedName = localStorage.getItem('hospitalName');
+    const savedAddress = localStorage.getItem('hospitalAddress');
+    const savedPhone = localStorage.getItem('hospitalPhone');
+    const savedPic = localStorage.getItem('hospitalPIC');
+    
+    if (savedLogo) setLogo(savedLogo);
+    if (savedName) setHospitalName(savedName);
+    if (savedAddress) setAddress(savedAddress);
+    if (savedPhone) setPhone(savedPhone);
+    if (savedPic) setPic(savedPic);
   });
+
+  const handleSave = () => {
+    localStorage.setItem('hospitalName', hospitalName);
+    localStorage.setItem('hospitalAddress', address);
+    localStorage.setItem('hospitalPhone', phone);
+    localStorage.setItem('hospitalPIC', pic);
+    alert('Pengaturan berhasil disimpan!');
+  };
+
+  const handleReset = () => {
+    if (confirm('Apakah Anda yakin ingin mereset semua pengaturan?')) {
+      setHospitalName('RS Sehat Selalu');
+      setAddress('');
+      setPhone('');
+      setPic('');
+      localStorage.removeItem('hospitalName');
+      localStorage.removeItem('hospitalAddress');
+      localStorage.removeItem('hospitalPhone');
+      localStorage.removeItem('hospitalPIC');
+    }
+  };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -177,10 +209,54 @@ function GeneralSettings() {
           </label>
           <input
             type="text"
-            defaultValue="RS Sehat Selalu"
+            value={hospitalName}
+            onChange={(e) => setHospitalName(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+            placeholder="Contoh: RS Sehat Selalu"
           />
         </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Alamat
+          </label>
+          <textarea
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white resize-none"
+            placeholder="Contoh: Jl. Kesehatan No. 123, Jakarta Pusat, DKI Jakarta 10110"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Nomor Telepon
+            </label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              placeholder="Contoh: (021) 1234-5678"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Penanggung Jawab
+            </label>
+            <input
+              type="text"
+              value={pic}
+              onChange={(e) => setPic(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              placeholder="Contoh: Dr. John Doe"
+            />
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Zona Waktu
@@ -202,11 +278,17 @@ function GeneralSettings() {
           />
         </div>
         <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+          <button 
+            onClick={handleSave}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+          >
             <Save className="w-4 h-4" />
             Simpan Perubahan
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+          <button 
+            onClick={handleReset}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
             <RotateCcw className="w-4 h-4" />
             Reset
           </button>
