@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Key, Building2, Copy, CheckCircle, AlertCircle, Shield, Calendar } from 'lucide-react';
-import { validateLicense } from '../utils/licenseValidator';
+import { validateLicense, generateVendorLicenseKey } from '../utils/licenseValidator';
 import { useLicense } from '../context/LicenseContext';
 
 interface LicenseInfo {
@@ -10,6 +10,137 @@ interface LicenseInfo {
   issuedDate: string;
   expiryDate: string;
   status: 'active' | 'expired' | 'invalid';
+}
+
+// Activation Form Component
+function ActivationForm() {
+  const [companyName, setCompanyName] = useState('');
+  const [wardCount, setWardCount] = useState(1);
+  const [generatedKey, setGeneratedKey] = useState('');
+  const { updateLicenseStatus } = useLicense();
+
+  const handleGenerateKey = () => {
+    if (!companyName.trim()) {
+      alert('Nama perusahaan harus diisi');
+      return;
+    }
+    if (wardCount < 1) {
+      alert('Jumlah bangsal minimal 1');
+      return;
+    }
+
+    // Generate license key based on company name and ward count
+    const key = generateVendorLicenseKey(companyName.trim(), wardCount);
+    setGeneratedKey(key);
+  };
+
+  const handleActivate = () => {
+    if (!generatedKey) {
+      alert('Silakan generate kode lisensi terlebih dahulu');
+      return;
+    }
+
+    // Save license to localStorage
+    const licenseData: LicenseInfo = {
+      companyName: companyName.trim(),
+      wardCount: wardCount,
+      licenseKey: generatedKey,
+      issuedDate: new Date().toISOString(),
+      expiryDate: '', // Lifetime license
+      status: 'active',
+    };
+
+    localStorage.setItem('nurseCallLicense', JSON.stringify(licenseData));
+    updateLicenseStatus();
+    window.location.reload(); // Reload to apply license
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+          <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+            Aktivasi Lisensi
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Isi data perusahaan untuk generate kode lisensi
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Nama Perusahaan <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+            placeholder="Contoh: RS Sehat Sentosa"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Jumlah Bangsal <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="number"
+            value={wardCount}
+            onChange={(e) => setWardCount(parseInt(e.target.value) || 1)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+            min="1"
+            max="999"
+          />
+        </div>
+
+        <button
+          onClick={handleGenerateKey}
+          className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium"
+        >
+          Generate Kode Lisensi
+        </button>
+
+        {generatedKey && (
+          <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <p className="text-sm font-medium text-green-900 dark:text-green-300 mb-2">
+              Kode Lisensi Anda:
+            </p>
+            <code className="text-lg font-mono text-green-900 dark:text-green-200 break-all">
+              {generatedKey}
+            </code>
+            <p className="text-xs text-green-800 dark:text-green-400 mt-2">
+              Simpan kode ini dengan aman. Kode ini mengandung data perusahaan dan jumlah bangsal yang terenkripsi.
+            </p>
+            <button
+              onClick={handleActivate}
+              className="w-full mt-3 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors font-medium"
+            >
+              Aktifkan Lisensi
+            </button>
+          </div>
+        )}
+
+        <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <h4 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-2 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4" />
+            Informasi Penting:
+          </h4>
+          <ul className="list-disc list-inside space-y-1 text-sm text-yellow-800 dark:text-yellow-400">
+            <li>Kode lisensi dibuat berdasarkan nama perusahaan dan jumlah bangsal</li>
+            <li>Kode ini akan divalidasi setiap kali aplikasi dijalankan</li>
+            <li>Jika data perusahaan berubah, kode lisensi baru harus dibuat</li>
+            <li>Format kode: <code className="font-mono bg-yellow-100 dark:bg-yellow-900/30 px-2 py-0.5 rounded">NCM-XXXX-XXXX-XXXX</code></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function LicenseSettings() {
@@ -53,16 +184,20 @@ export default function LicenseSettings() {
       return;
     }
 
-    // Validasi kode lisensi menggunakan vendor validator
-    const validation = validateLicense(newLicenseKey.trim());
-    
-    if (!validation.isValid) {
-      setValidationError(validation.message);
+    if (!licenseInfo) {
+      setValidationError('Tidak ada lisensi aktif untuk diperbarui');
       return;
     }
 
-    if (!licenseInfo) {
-      setValidationError('Tidak ada lisensi aktif untuk diperbarui');
+    // Validasi kode lisensi dengan data perusahaan yang tersimpan
+    const validation = validateLicense(
+      newLicenseKey.trim(),
+      licenseInfo.companyName,
+      licenseInfo.wardCount
+    );
+    
+    if (!validation.isValid) {
+      setValidationError(validation.message);
       return;
     }
 
@@ -231,47 +366,7 @@ export default function LicenseSettings() {
 
       {/* Aktivasi Lisensi - hanya tampil jika BELUM ada lisensi */}
       {!licenseInfo && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                Aktivasi Lisensi
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Masukkan kode lisensi dari vendor untuk mengaktifkan aplikasi
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-              <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4" />
-                Cara Mengaktifkan Lisensi:
-              </h4>
-              <ol className="list-decimal list-inside space-y-2 text-sm text-blue-800 dark:text-blue-400">
-                <li>Hubungi vendor NurseCall Monitor untuk mendapatkan kode lisensi</li>
-                <li>Vendor akan memberikan kode dengan format: <code className="font-mono bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded">NCM-XXXX-XXXX-XXXX</code></li>
-                <li>Masukkan kode tersebut di kolom "Simpan Kode Lisensi dari Vendor" di bawah</li>
-                <li>Klik tombol "Simpan" untuk mengaktifkan lisensi</li>
-              </ol>
-            </div>
-
-            <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-              <h4 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-2 flex items-center gap-2">
-                <Key className="w-4 h-4" />
-                Contoh Kode Lisensi Valid:
-              </h4>
-              <code className="text-lg font-mono text-yellow-900 dark:text-yellow-200">NCM-ZLB2-W001-ABCK</code>
-              <p className="text-xs text-yellow-800 dark:text-yellow-400 mt-2">
-                * Ini adalah contoh untuk demo. Kode asli akan diberikan oleh vendor.
-              </p>
-            </div>
-          </div>
-        </div>
+        <ActivationForm />
       )}
 
       {/* Pesan jika ada lisensi - hubungi developer untuk perbarui */}
