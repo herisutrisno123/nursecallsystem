@@ -420,27 +420,9 @@ export function validateLicense(licenseKey: string, storedCustomerName?: string,
   
   // 4. Jika ada data tersimpan, verifikasi kesesuaian
   if (customerName && storedWardCount) {
-    // Verifikasi BLOK 1: Signature nama pelanggan
-    const expectedBlock1 = generateCustomerNameSignature(customerName);
-    console.log('Expected Block 1 (signature dari stored customer):', expectedBlock1);
-    console.log('Actual Block 1 (dari kode lisensi):', block1);
-    
-    if (block1 !== expectedBlock1) {
-      console.log('❌ Blok 1 tidak cocok - nama pelanggan berbeda');
-      console.log('   Customer Name tersimpan:', customerName);
-      console.log('   Signature yang dihitung:', expectedBlock1);
-      console.log('   Signature di kode lisensi:', block1);
-      return {
-        isValid: false,
-        message: `Kode lisensi tidak sesuai dengan nama pelanggan "${customerName}". Kode lisensi ini diterbitkan untuk pelanggan yang berbeda.`,
-        decodedData: {
-          customerNameSignature: block1,
-          wardCount: decodedWardCount,
-        },
-      };
-    }
-    
-    console.log('✅ Blok 1 cocok - nama pelanggan valid');
+    // BLOK 1 (Signature nama) TIDAK divalidasi karena vendor punya algoritma sendiri
+    console.log('⚠️ Blok 1 (Signature nama) tidak divalidasi - vendor menentukan');
+    console.log('   Signature dari vendor:', block1);
     
     // Verifikasi BLOK 3: Jumlah bangsal
     console.log('Expected Ward Count (dari stored data):', storedWardCount);
@@ -459,13 +441,12 @@ export function validateLicense(licenseKey: string, storedCustomerName?: string,
     }
     
     console.log('✅ Blok 3 cocok - jumlah bangsal valid');
-    console.log('✅ Blok 2 (ID Pelanggan) dan Blok 4 (Kunci Rahasia) tidak divalidasi');
+    console.log('✅ Blok 1 (Signature), Blok 2 (ID), dan Blok 4 (Kunci) tidak divalidasi');
     
-    // Blok 2 (ID Pelanggan) dan Blok 4 (Kunci Rahasia) tidak divalidasi
+    // Blok 1, 2, dan 4 tidak divalidasi
   } else {
     console.log('⚠️ Belum ada data tersimpan, validasi dasar saja');
     // Jika belum ada data tersimpan, validasi dasar saja
-    // Blok 2 dan Blok 4 tidak divalidasi
   }
   
   console.log('✅✅✅ LISNSI VALID ✅✅✅');
