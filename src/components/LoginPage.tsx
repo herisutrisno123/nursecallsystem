@@ -11,6 +11,15 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [companyLogo, setCompanyLogo] = useState<string | null>(null);
+
+  // Load company logo from localStorage
+  useState(() => {
+    const savedLogo = localStorage.getItem('companyLogo');
+    if (savedLogo) {
+      setCompanyLogo(savedLogo);
+    }
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,9 +64,17 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       <div className="relative w-full max-w-md">
         {/* Logo & Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl shadow-lg mb-4">
-            <Bell className="w-10 h-10 text-white" />
-          </div>
+          {companyLogo ? (
+            <img 
+              src={companyLogo} 
+              alt="Logo Perusahaan" 
+              className="inline-block w-20 h-20 object-contain rounded-2xl shadow-lg mb-4 border-2 border-gray-200"
+            />
+          ) : (
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl shadow-lg mb-4">
+              <Bell className="w-10 h-10 text-white" />
+            </div>
+          )}
           <h1 className="text-3xl font-bold text-gray-800 mb-2">NurseCall Monitor</h1>
           <p className="text-gray-600">Sistem Monitoring Nurse Call</p>
         </div>

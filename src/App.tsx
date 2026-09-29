@@ -22,6 +22,15 @@ function AppContent() {
   const [showRoomDetail, setShowRoomDetail] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifications] = useState(5);
+  const [companyLogo, setCompanyLogo] = useState<string | null>(null);
+
+  // Load company logo from localStorage
+  useState(() => {
+    const savedLogo = localStorage.getItem('companyLogo');
+    if (savedLogo) {
+      setCompanyLogo(savedLogo);
+    }
+  });
 
   // Jika lisensi tidak valid, paksa ke tab settings
   if (!isLicenseValid && activeTab !== 'settings') {
@@ -74,9 +83,17 @@ function AppContent() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-blue-500 to-blue-700 p-2 rounded-lg">
-                <Bell className="w-6 h-6 text-white" />
-              </div>
+              {companyLogo ? (
+                <img 
+                  src={companyLogo} 
+                  alt="Logo Perusahaan" 
+                  className="w-10 h-10 object-contain rounded-lg border border-gray-200 dark:border-gray-700"
+                />
+              ) : (
+                <div className="bg-gradient-to-br from-blue-500 to-blue-700 p-2 rounded-lg">
+                  <Bell className="w-6 h-6 text-white" />
+                </div>
+              )}
               <div>
                 <h1 className="text-lg font-bold text-gray-800 dark:text-white">NurseCall Monitor</h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Sistem Monitoring Nurse Call</p>

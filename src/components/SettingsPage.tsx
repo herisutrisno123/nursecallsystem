@@ -100,6 +100,8 @@ function GeneralSettings() {
         const base64 = reader.result as string;
         setLogo(base64);
         localStorage.setItem('companyLogo', base64);
+        // Reload halaman untuk update logo di header
+        setTimeout(() => window.location.reload(), 500);
       };
       reader.readAsDataURL(file);
     }
@@ -108,6 +110,8 @@ function GeneralSettings() {
   const handleRemoveLogo = () => {
     setLogo(null);
     localStorage.removeItem('companyLogo');
+    // Reload halaman untuk update logo di header
+    setTimeout(() => window.location.reload(), 500);
   };
 
   return (
