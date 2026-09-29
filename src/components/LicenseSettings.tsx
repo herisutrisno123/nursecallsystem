@@ -100,9 +100,11 @@ function RegistrationForm({ onRegistered }: { onRegistered: (companyName: string
 }
 
 // Activation Form Component - Step 2: Input License Key from Vendor
-function ActivationForm({ companyName, wardCount }: { companyName: string; wardCount: number }) {
+function ActivationForm({ companyName, wardCount, onBack }: { companyName: string; wardCount: number; onBack: () => void }) {
   const [licenseKey, setLicenseKey] = useState('');
   const [validationError, setValidationError] = useState('');
+  const [showMatchingNames, setShowMatchingNames] = useState(false);
+  const [matchingNames, setMatchingNames] = useState<string[]>([]);
   const { updateLicenseStatus } = useLicense();
 
   const handleActivate = () => {
@@ -208,6 +210,58 @@ function ActivationForm({ companyName, wardCount }: { companyName: string; wardC
         >
           Aktifkan Lisensi
         </button>
+
+        <button
+          onClick={onBack}
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+        >
+          ← Kembali ke Registrasi
+        </button>
+
+        {validationError && validationError.includes('nama pelanggan') && (
+          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4" />
+              Solusi:
+            </h4>
+            <p className="text-sm text-blue-800 dark:text-blue-400 mb-3">
+              Kode lisensi ini dibuat untuk nama pelanggan yang berbeda. Silakan:
+            </p>
+            <ol className="list-decimal list-inside space-y-1 text-sm text-blue-800 dark:text-blue-400 mb-3">
+              <li>Klik "Kembali ke Registrasi"</li>
+              <li>Ubah nama perusahaan sesuai dengan kode lisensi dari vendor</li>
+              <li>Atau hubungi vendor untuk mendapatkan kode lisensi baru</li>
+            </ol>
+            <button
+              onClick={() => {
+                const names = findCustomerNamesBySignature(licenseKey.split('-')[1], 5);
+                setMatchingNames(names);
+                setShowMatchingNames(true);
+              }}
+              className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium"
+            >
+              🔍 Cari Nama yang Cocok dengan Kode Lisensi Ini
+            </button>
+
+            {showMatchingNames && matchingNames.length > 0 && (
+              <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-300 dark:border-blue-700">
+                <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Contoh nama yang cocok dengan signature ini:
+                </p>
+                <ul className="space-y-1">
+                  {matchingNames.map((name, idx) => (
+                    <li key={idx} className="text-xs text-gray-600 dark:text-gray-400 font-mono">
+                      {name}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 italic">
+                  * Gunakan salah satu nama di atas atau hubungi vendor untuk nama yang benar
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
           <h4 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-2 flex items-center gap-2">
@@ -498,6 +552,7 @@ export default function LicenseSettings() {
         <ActivationForm 
           companyName={pendingRegistration.companyName}
           wardCount={pendingRegistration.wardCount}
+          onBack={() => setPendingRegistration(null)}
         />
       )}
 
