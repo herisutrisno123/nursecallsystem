@@ -185,7 +185,7 @@ function ActivationForm({ companyName, wardCount }: { companyName: string; wardC
             className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white font-mono ${
               validationError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
-            placeholder="NCM-XXXX-XXXX-XXXX-XXXX"
+            placeholder="NCM-XXXX-XXXX-BXXX-XXXX"
             maxLength={23}
           />
           {validationError && (
@@ -197,7 +197,7 @@ function ActivationForm({ companyName, wardCount }: { companyName: string; wardC
             </div>
           )}
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Masukkan kode lisensi yang diberikan oleh vendor. Format: NCM-XXXX-XXXX-XXXX-XXXX (5 blok)
+            Masukkan kode lisensi yang diberikan oleh vendor. Format: NCM-XXXX-XXXX-BXXX-XXXX (5 blok)
           </p>
         </div>
 
@@ -428,7 +428,7 @@ export default function LicenseSettings() {
             className={`flex-1 px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white font-mono ${
               validationError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
-            placeholder="NCM-XXXX-XXXX-XXXX-XXXX"
+            placeholder="NCM-XXXX-XXXX-BXXX-XXXX"
             maxLength={23}
           />                  <button
                     onClick={handleSaveLicense}
@@ -457,7 +457,7 @@ export default function LicenseSettings() {
                   </div>
                 )}
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Masukkan kode lisensi unik dari vendor. Format: NCM-XXXX-XXXX-XXXX-XXXX (5 blok)
+                  Masukkan kode lisensi unik dari vendor. Format: NCM-XXXX-XXXX-BXXX-XXXX (5 blok)
                 </p>
               </div>
             </div>
@@ -523,7 +523,7 @@ export default function LicenseSettings() {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>
-            <span>Format kode lisensi: <strong className="font-mono">NCM-XXXX-XXXX-XXXX-XXXX</strong> (5 blok)</span>
+            <span>Format kode lisensi: <strong className="font-mono">NCM-XXXX-XXXX-BXXX-XXXX</strong> (5 blok)</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 dark:text-blue-500 mt-1">•</span>

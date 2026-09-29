@@ -3,7 +3,7 @@
 // Blok 0: NCM (prefix - Nurse Control Monitor)
 // Blok 1: Signature nama pelanggan (4 digit)
 // Blok 2: ID Pelanggan (4 digit)
-// Blok 3: Jumlah bangsal (4 digit, format: Wxxx - W + 3 karakter alfanumerik)
+// Blok 3: Jumlah bangsal (4 digit, format: Bxxx - B + 3 karakter alfanumerik)
 // Blok 4: Kunci rahasia (4 digit, tidak divalidasi)
 
 export interface LicenseValidation {
@@ -51,16 +51,16 @@ function verifyCustomerNameSignature(signature: string, customerName: string): b
 }
 
 // Encode jumlah bangsal ke 4 karakter
-// Format: W + 3 karakter alfanumerik (W001, W010, W100, WABC, dll)
+// Format: B + 3 karakter alfanumerik (B001, B010, B100, BABC, dll)
 function encodeWardCount(wardCount: number): string {
   const count = Math.max(1, Math.min(999, wardCount));
-  return 'W' + count.toString().padStart(3, '0');
+  return 'B' + count.toString().padStart(3, '0');
 }
 
-// Decode jumlah bangsal dari 4 karakter (format Wxxx)
+// Decode jumlah bangsal dari 4 karakter (format Bxxx)
 function decodeWardCount(encoded: string): number | null {
-  if (!encoded.startsWith('W')) return null;
-  const code = encoded.substring(1); // 3 karakter setelah W
+  if (!encoded.startsWith('B')) return null;
+  const code = encoded.substring(1); // 3 karakter setelah B
   
   // Jika 3 digit angka, decode langsung
   if (/^\d{3}$/.test(code)) {
@@ -108,9 +108,9 @@ export function generateVendorLicenseKey(customerName: string, wardCount: number
 }
 
 // Validasi format kode lisensi (5 blok)
-// Blok 3 harus dimulai dengan W diikuti 3 karakter alfanumerik
+// Blok 3 harus dimulai dengan B diikuti 3 karakter alfanumerik
 export function validateLicenseFormat(licenseKey: string): boolean {
-  const pattern = /^[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{4}-W[A-Z0-9]{3}-[A-Z0-9]{4}$/;
+  const pattern = /^[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{4}-B[A-Z0-9]{3}-[A-Z0-9]{4}$/;
   return pattern.test(licenseKey);
 }
 
