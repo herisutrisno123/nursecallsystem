@@ -219,6 +219,11 @@ export function findCustomerNamesBySignature(targetSignature: string, maxResults
   return results.slice(0, maxResults);
 }
 
+// Hitung signature untuk nama pelanggan tertentu
+export function calculateSignatureForName(customerName: string): string {
+  return generateCustomerNameSignature(customerName);
+}
+
 // Generate contoh nama pelanggan dengan panjang dan checksum tertentu
 function generateExampleNamesForSignature(targetLength: number, targetChecksum: number): string[] {
   const examples: string[] = [];

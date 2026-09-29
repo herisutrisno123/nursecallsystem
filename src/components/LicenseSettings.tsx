@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Key, Building2, Copy, CheckCircle, AlertCircle, Shield, Calendar } from 'lucide-react';
-import { validateLicense } from '../utils/licenseValidator';
+import { validateLicense, findCustomerNamesBySignature, calculateSignatureForName } from '../utils/licenseValidator';
 import { useLicense } from '../context/LicenseContext';
 
 interface LicenseInfo {
@@ -266,6 +266,25 @@ export default function LicenseSettings() {
     }
   }, []);
 
+  // Fungsi untuk mencari nama pelanggan yang cocok dengan signature
+  const handleFindMatchingNames = () => {
+    console.log('=== MENCARI NAMA PELANGGAN YANG COCOK ===');
+    
+    // Hitung signature untuk "RS Sehat Selalu"
+    const signatureRS = calculateSignatureForName('RS Sehat Selalu');
+    console.log('Signature untuk "RS Sehat Selalu":', signatureRS);
+    
+    // Cari nama yang cocok dengan signature PK2K
+    const matchingNames = findCustomerNamesBySignature('PK2K', 10);
+    console.log('\n=== NAMA PELANGGAN YANG COCOK DENGAN SIGNATURE PK2K ===');
+    matchingNames.forEach((name: string, index: number) => {
+      const sig = calculateSignatureForName(name);
+      console.log(`${index + 1}. "${name}" → Signature: ${sig}`);
+    });
+    
+    alert(`Signature untuk "RS Sehat Selalu": ${signatureRS}\n\nKode lisensi Anda menggunakan signature: PK2K\n\nSilakan buka Console (F12) untuk melihat daftar nama pelanggan yang cocok dengan signature PK2K.\n\nAtau hubungi vendor untuk mendapatkan nama pelanggan yang benar.`);
+  };
+
 
 
 
@@ -496,12 +515,18 @@ export default function LicenseSettings() {
               Untuk memperbarui data perusahaan atau jumlah bangsal, silakan hubungi developer aplikasi. 
               Developer akan membantu proses perbaruan lisensi sesuai kebutuhan perusahaan Anda.
             </p>
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg mb-4">
               <AlertCircle className="w-4 h-4 text-gray-500" />
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 Lisensi aktif - hubungi developer untuk perbarui data lisensi
               </span>
             </div>
+            <button
+              onClick={handleFindMatchingNames}
+              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium"
+            >
+              🔍 Cari Nama Pelanggan yang Cocok
+            </button>
           </div>
         </div>
       )}
