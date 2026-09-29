@@ -184,7 +184,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
 
         {/* Footer */}
         <div className="text-center mt-6 text-sm text-gray-500">
-          <p>© 2026 NurseCall Monitor - RS Sehat Sentosa</p>
+          <p>© 2026 NurseCall Monitor - RS Sehat Selalu</p>
         </div>
       </div>
     </div>

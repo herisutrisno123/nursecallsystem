@@ -91,7 +91,7 @@ function ActivationForm() {
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-            placeholder="Contoh: RS Sehat Sentosa"
+            placeholder="Contoh: RS Sehat Selalu"
           />
         </div>
 
