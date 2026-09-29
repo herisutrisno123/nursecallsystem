@@ -146,18 +146,26 @@ function ActivationForm({ companyName, wardCount, onBack }: { companyName: strin
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-          <Key className="w-5 h-5 text-green-600 dark:text-green-400" />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+            <Key className="w-5 h-5 text-green-600 dark:text-green-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+              Aktivasi Lisensi
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Langkah 2: Masukkan kode lisensi dari vendor
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Aktivasi Lisensi
-          </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Langkah 2: Masukkan kode lisensi dari vendor
-          </p>
-        </div>
+        <button
+          onClick={onBack}
+          className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+        >
+          ← Kembali
+        </button>
       </div>
 
       <div className="space-y-4">
@@ -171,6 +179,12 @@ function ActivationForm({ companyName, wardCount, onBack }: { companyName: strin
               <span className="font-medium">Jumlah Bangsal:</span> {wardCount} bangsal
             </p>
           </div>
+          <button
+            onClick={onBack}
+            className="mt-3 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            ✏️ Ubah data perusahaan
+          </button>
         </div>
 
         <div>
@@ -209,13 +223,6 @@ function ActivationForm({ companyName, wardCount, onBack }: { companyName: strin
           className="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Aktifkan Lisensi
-        </button>
-
-        <button
-          onClick={onBack}
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
-        >
-          ← Kembali ke Registrasi
         </button>
 
         {validationError && validationError.includes('nama pelanggan') && (
