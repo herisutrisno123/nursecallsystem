@@ -91,10 +91,13 @@ export function validateLicenseFormat(licenseKey: string): boolean {
 // Fungsi utama validasi lisensi
 export function validateLicense(licenseKey: string, storedCompanyName?: string, storedWardCount?: number): LicenseValidation {
   const key = licenseKey.trim().toUpperCase();
+  // Normalisasi storedCompanyName ke uppercase untuk konsistensi
+  const normalizedCompanyName = storedCompanyName?.trim().toUpperCase();
   
   console.log('=== LICENSE VALIDATION DEBUG ===');
   console.log('License Key:', key);
-  console.log('Stored Company:', storedCompanyName);
+  console.log('Stored Company (original):', storedCompanyName);
+  console.log('Stored Company (normalized):', normalizedCompanyName);
   console.log('Stored Ward Count:', storedWardCount);
   
   // 1. Cek format
@@ -136,9 +139,9 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
   }
   
   // 4. Jika ada data tersimpan, verifikasi kesesuaian
-  if (storedCompanyName && storedWardCount) {
+  if (normalizedCompanyName && storedWardCount) {
     // Verifikasi BLOK 1: Hash nama perusahaan
-    const expectedBlock1 = hashCompanyName(storedCompanyName);
+    const expectedBlock1 = hashCompanyName(normalizedCompanyName);
     console.log('Expected Block 1 (hash dari stored company):', expectedBlock1);
     console.log('Actual Block 1 (dari kode lisensi):', block1);
     
@@ -146,7 +149,7 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
       console.log('❌ Blok 1 tidak cocok - nama perusahaan berbeda');
       return {
         isValid: false,
-        message: `Kode lisensi tidak sesuai dengan nama perusahaan "${storedCompanyName}". Kode lisensi ini diterbitkan untuk perusahaan yang berbeda.`,
+        message: `Kode lisensi tidak sesuai dengan nama perusahaan "${normalizedCompanyName}". Kode lisensi ini diterbitkan untuk perusahaan yang berbeda.`,
         decodedData: {
           companyNameHash: block1,
           wardCount: decodedWardCount,

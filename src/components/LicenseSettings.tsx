@@ -167,7 +167,16 @@ export default function LicenseSettings() {
     if (savedLicense) {
       try {
         const parsed = JSON.parse(savedLicense);
-        setLicenseInfo(parsed);
+        // Normalisasi data ke uppercase untuk konsistensi
+        const normalizedData = {
+          ...parsed,
+          companyName: parsed.companyName?.toUpperCase() || '',
+          licenseKey: parsed.licenseKey?.toUpperCase() || '',
+        };
+        console.log('Loaded license from localStorage:', normalizedData);
+        setLicenseInfo(normalizedData);
+        // Update localStorage dengan data yang sudah dinormalisasi
+        localStorage.setItem('nurseCallLicense', JSON.stringify(normalizedData));
       } catch (e) {
         console.error('Failed to parse license:', e);
       }
@@ -201,7 +210,7 @@ export default function LicenseSettings() {
 
     // Validasi kode lisensi dengan data perusahaan yang tersimpan
     const validation = validateLicense(
-      newLicenseKey.trim(),
+      newLicenseKey.trim().toUpperCase(),
       licenseInfo.companyName,
       licenseInfo.wardCount
     );
