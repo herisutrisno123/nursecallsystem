@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Key, Building2, Copy, CheckCircle, AlertCircle, Shield, Calendar } from 'lucide-react';
-import { validateLicense, findCustomerNamesBySignature, calculateSignatureForName } from '../utils/licenseValidator';
+import { validateLicense } from '../utils/licenseValidator';
 import { useLicense } from '../context/LicenseContext';
 
 interface LicenseInfo {
@@ -103,8 +103,6 @@ function RegistrationForm({ onRegistered }: { onRegistered: (companyName: string
 function ActivationForm({ companyName, wardCount, onBack }: { companyName: string; wardCount: number; onBack: () => void }) {
   const [licenseKey, setLicenseKey] = useState('');
   const [validationError, setValidationError] = useState('');
-  const [showMatchingNames, setShowMatchingNames] = useState(false);
-  const [matchingNames, setMatchingNames] = useState<string[]>([]);
   const { updateLicenseStatus } = useLicense();
 
   const handleActivate = () => {
@@ -234,34 +232,6 @@ function ActivationForm({ companyName, wardCount, onBack }: { companyName: strin
               <li>Ubah nama perusahaan sesuai dengan kode lisensi dari vendor</li>
               <li>Atau hubungi vendor untuk mendapatkan kode lisensi baru</li>
             </ol>
-            <button
-              onClick={() => {
-                const names = findCustomerNamesBySignature(licenseKey.split('-')[1], 5);
-                setMatchingNames(names);
-                setShowMatchingNames(true);
-              }}
-              className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium"
-            >
-              🔍 Cari Nama yang Cocok dengan Kode Lisensi Ini
-            </button>
-
-            {showMatchingNames && matchingNames.length > 0 && (
-              <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-300 dark:border-blue-700">
-                <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Contoh nama yang cocok dengan signature ini:
-                </p>
-                <ul className="space-y-1">
-                  {matchingNames.map((name, idx) => (
-                    <li key={idx} className="text-xs text-gray-600 dark:text-gray-400 font-mono">
-                      {name}
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 italic">
-                  * Gunakan salah satu nama di atas atau hubungi vendor untuk nama yang benar
-                </p>
-              </div>
-            )}
           </div>
         )}
 
@@ -323,23 +293,7 @@ export default function LicenseSettings() {
   }, []);
 
   // Fungsi untuk mencari nama pelanggan yang cocok dengan signature
-  const handleFindMatchingNames = () => {
-    console.log('=== MENCARI NAMA PELANGGAN YANG COCOK ===');
-    
-    // Hitung signature untuk "RS Sehat Selalu"
-    const signatureRS = calculateSignatureForName('RS Sehat Selalu');
-    console.log('Signature untuk "RS Sehat Selalu":', signatureRS);
-    
-    // Cari nama yang cocok dengan signature PK2K
-    const matchingNames = findCustomerNamesBySignature('PK2K', 10);
-    console.log('\n=== NAMA PELANGGAN YANG COCOK DENGAN SIGNATURE PK2K ===');
-    matchingNames.forEach((name: string, index: number) => {
-      const sig = calculateSignatureForName(name);
-      console.log(`${index + 1}. "${name}" → Signature: ${sig}`);
-    });
-    
-    alert(`Signature untuk "RS Sehat Selalu": ${signatureRS}\n\nKode lisensi Anda menggunakan signature: PK2K\n\nSilakan buka Console (F12) untuk melihat daftar nama pelanggan yang cocok dengan signature PK2K.\n\nAtau hubungi vendor untuk mendapatkan nama pelanggan yang benar.`);
-  };
+
 
 
 
@@ -589,12 +543,6 @@ export default function LicenseSettings() {
                 className="w-full px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors font-bold text-base shadow-md"
               >
                 🔄 RESET & AKTIVASI ULANG LISENSI
-              </button>
-              <button
-                onClick={handleFindMatchingNames}
-                className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium"
-              >
-                🔍 Cari Nama Pelanggan yang Cocok
               </button>
             </div>
           </div>
