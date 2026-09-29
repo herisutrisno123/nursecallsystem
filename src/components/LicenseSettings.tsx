@@ -30,8 +30,8 @@ function ActivationForm() {
     }
 
     // Generate license key based on company name and ward count
-    // Gunakan uppercase untuk konsistensi dengan data yang disimpan
-    const key = generateVendorLicenseKey(companyName.trim().toUpperCase(), wardCount);
+    // Gunakan format asli (Title Case) sesuai input pengguna
+    const key = generateVendorLicenseKey(companyName.trim(), wardCount);
     console.log('Generated License Key:', key);
     setGeneratedKey(key);
   };

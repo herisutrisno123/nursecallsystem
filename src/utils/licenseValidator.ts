@@ -16,8 +16,8 @@ export interface LicenseValidation {
 
 // Hash function untuk nama perusahaan
 function hashCompanyName(companyName: string): string {
-  // Normalisasi: trim dan uppercase untuk konsistensi
-  const normalized = companyName.trim().toUpperCase();
+  // Gunakan format asli (Title Case) sesuai input pengguna
+  const normalized = companyName.trim();
   console.log('Hashing company name:', normalized);
   
   let hash = 0;
