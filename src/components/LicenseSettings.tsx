@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Key, Building2, Copy, CheckCircle, AlertCircle, RefreshCw, Shield, Calendar } from 'lucide-react';
-import { validateLicense, generateVendorLicenseKey } from '../utils/licenseValidator';
+import { Key, Building2, Copy, CheckCircle, AlertCircle, Shield, Calendar } from 'lucide-react';
+import { validateLicense } from '../utils/licenseValidator';
 import { useLicense } from '../context/LicenseContext';
 
 interface LicenseInfo {
@@ -13,11 +13,8 @@ interface LicenseInfo {
 }
 
 export default function LicenseSettings() {
-  const [companyName, setCompanyName] = useState('');
-  const [wardCount, setWardCount] = useState(1);
   const [licenseInfo, setLicenseInfo] = useState<LicenseInfo | null>(null);
   const [copied, setCopied] = useState(false);
-  const [generating, setGenerating] = useState(false);
   const [newLicenseKey, setNewLicenseKey] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [validationError, setValidationError] = useState('');
@@ -30,85 +27,15 @@ export default function LicenseSettings() {
       try {
         const parsed = JSON.parse(savedLicense);
         setLicenseInfo(parsed);
-        setCompanyName(parsed.companyName);
-        setWardCount(parsed.wardCount);
       } catch (e) {
         console.error('Failed to parse license:', e);
       }
     }
   }, []);
 
-  // Generate unique license key
-  const generateLicenseKey = (companyName: string, wardCount: number): string => {
-    // Create base string from company name and ward count
-    const baseString = `${companyName.toUpperCase()}-${wardCount}-${Date.now()}`;
-    
-    // Simple hash function
-    let hash = 0;
-    for (let i = 0; i < baseString.length; i++) {
-      const char = baseString.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    
-    // Convert to positive number and use base36
-    const positiveHash = Math.abs(hash);
-    const hashString = positiveHash.toString(36).toUpperCase().padStart(16, '0');
-    
-    // Add checksum
-    let checksum = 0;
-    for (let i = 0; i < hashString.length; i++) {
-      checksum += hashString.charCodeAt(i);
-    }
-    const checksumChar = (checksum % 36).toString(36).toUpperCase();
-    
-    // Format as XXXX-XXXX-XXXX-XXXX-X
-    const part1 = hashString.substring(0, 4);
-    const part2 = hashString.substring(4, 8);
-    const part3 = hashString.substring(8, 12);
-    const part4 = hashString.substring(12, 16);
-    
-    return `${part1}-${part2}-${part3}-${part4}-${checksumChar}`;
-  };
 
-  // Validate license key format
-  const validateLicenseKey = (key: string): boolean => {
-    const pattern = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]$/;
-    return pattern.test(key);
-  };
 
-  // Generate new license (only for first time)
-  const handleGenerateLicense = () => {
-    if (!companyName.trim()) {
-      alert('Nama perusahaan harus diisi');
-      return;
-    }
-    if (wardCount < 1) {
-      alert('Jumlah bangsal minimal 1');
-      return;
-    }
 
-    setGenerating(true);
-    
-    // Simulate generation delay
-    setTimeout(() => {
-      const licenseKey = generateLicenseKey(companyName, wardCount);
-      const issuedDate = new Date();
-
-      const newLicense: LicenseInfo = {
-        companyName: companyName.trim(),
-        wardCount,
-        licenseKey,
-        issuedDate: issuedDate.toISOString(),
-        expiryDate: '', // Lifetime license - no expiry
-        status: 'active',
-      };
-
-      setLicenseInfo(newLicense);
-      localStorage.setItem('nurseCallLicense', JSON.stringify(newLicense));
-      setGenerating(false);
-    }, 1000);
-  };
 
   // Copy license key to clipboard
   const handleCopyLicense = () => {
@@ -302,93 +229,46 @@ export default function LicenseSettings() {
         </div>
       )}
 
-      {/* Generate New License - hanya tampil jika BELUM ada lisensi */}
+      {/* Aktivasi Lisensi - hanya tampil jika BELUM ada lisensi */}
       {!licenseInfo && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <Key className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                Generate Lisensi Baru
+                Aktivasi Lisensi
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Buat kode lisensi unik untuk aplikasi ini
+                Masukkan kode lisensi dari vendor untuk mengaktifkan aplikasi
               </p>
             </div>
           </div>
 
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nama Perusahaan <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                placeholder="Contoh: RS Sehat Sentosa"
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Nama perusahaan atau rumah sakit yang akan tertera di lisensi
-              </p>
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" />
+                Cara Mengaktifkan Lisensi:
+              </h4>
+              <ol className="list-decimal list-inside space-y-2 text-sm text-blue-800 dark:text-blue-400">
+                <li>Hubungi vendor NurseCall Monitor untuk mendapatkan kode lisensi</li>
+                <li>Vendor akan memberikan kode dengan format: <code className="font-mono bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded">NCM-XXXX-XXXX-XXXX</code></li>
+                <li>Masukkan kode tersebut di kolom "Simpan Kode Lisensi dari Vendor" di bawah</li>
+                <li>Klik tombol "Simpan" untuk mengaktifkan lisensi</li>
+              </ol>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Jumlah Bangsal <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                value={wardCount}
-                onChange={(e) => setWardCount(parseInt(e.target.value) || 1)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                min="1"
-                max="100"
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Jumlah bangsal/ward yang akan dikelola oleh aplikasi (1-100)
+            <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+              <h4 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-2 flex items-center gap-2">
+                <Key className="w-4 h-4" />
+                Contoh Kode Lisensi Valid:
+              </h4>
+              <code className="text-lg font-mono text-yellow-900 dark:text-yellow-200">NCM-ZLB2-W001-ABCK</code>
+              <p className="text-xs text-yellow-800 dark:text-yellow-400 mt-2">
+                * Ini adalah contoh untuk demo. Kode asli akan diberikan oleh vendor.
               </p>
-            </div>
-
-            {/* License Preview */}
-            {companyName && wardCount > 0 && (
-              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview Lisensi:</p>
-                <div className="space-y-1 text-sm">
-                  <p className="text-gray-800 dark:text-white">
-                    <span className="font-medium">Perusahaan:</span> {companyName}
-                  </p>
-                  <p className="text-gray-800 dark:text-white">
-                    <span className="font-medium">Bangsal:</span> {wardCount} bangsal
-                  </p>
-                  <p className="text-gray-800 dark:text-white">
-                    <span className="font-medium">Masa Berlaku:</span> Lifetime (Tidak Terbatas)
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={handleGenerateLicense}
-                disabled={generating || !companyName.trim() || wardCount < 1}
-                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {generating ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Key className="w-4 h-4" />
-                    Generate Lisensi
-                  </>
-                )}
-              </button>
             </div>
           </div>
         </div>
@@ -456,39 +336,7 @@ export default function LicenseSettings() {
         </ul>
       </div>
 
-      {/* Demo: Generate Vendor License Key */}
-      {!licenseInfo && (
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-6">
-          <h4 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-3 flex items-center gap-2">
-            <Key className="w-5 h-5" />
-            Demo: Generate Kode Lisensi Vendor
-          </h4>
-          <p className="text-sm text-yellow-800 dark:text-yellow-400 mb-4">
-            Di produksi, kode lisensi diperoleh dari vendor melalui aplikasi terpisah. 
-            Untuk demo, Anda dapat generate kode lisensi vendor di sini:
-          </p>
-          <div className="space-y-3">
-            <button
-              onClick={() => {
-                if (companyName && wardCount > 0) {
-                  const vendorKey = generateVendorLicenseKey(companyName, wardCount);
-                  setNewLicenseKey(vendorKey);
-                  alert(`Kode lisensi vendor telah di-generate:\n\n${vendorKey}\n\nSilakan klik tombol "Simpan" untuk mengaktifkan lisensi.`);
-                } else {
-                  alert('Silakan isi nama perusahaan dan jumlah bangsal terlebih dahulu di form di atas.');
-                }
-              }}
-              className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors text-sm font-medium"
-            >
-              Generate Kode Vendor
-            </button>
-            <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-              <p className="text-xs text-yellow-800 dark:text-yellow-300 font-medium mb-1">Contoh Kode Valid:</p>
-              <code className="text-sm font-mono text-yellow-900 dark:text-yellow-200">NCM-ZLB2-W001-ABCK</code>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }
