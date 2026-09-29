@@ -16,7 +16,10 @@ export interface LicenseValidation {
 
 // Hash function untuk nama perusahaan
 function hashCompanyName(companyName: string): string {
+  // Normalisasi: trim dan uppercase untuk konsistensi
   const normalized = companyName.trim().toUpperCase();
+  console.log('Hashing company name:', normalized);
+  
   let hash = 0;
   for (let i = 0; i < normalized.length; i++) {
     const char = normalized.charCodeAt(i);
@@ -26,7 +29,10 @@ function hashCompanyName(companyName: string): string {
   
   const positiveHash = Math.abs(hash);
   const hashString = positiveHash.toString(36).toUpperCase().padStart(4, '0');
-  return hashString.substring(0, 4);
+  const result = hashString.substring(0, 4);
+  console.log('Hash result:', result);
+  
+  return result;
 }
 
 // Encode jumlah bangsal ke 4 karakter
@@ -57,12 +63,23 @@ function generateSecretKey(): string {
 
 // Generate kode lisensi vendor berdasarkan nama perusahaan dan jumlah bangsal
 export function generateVendorLicenseKey(companyName: string, wardCount: number): string {
+  console.log('=== GENERATE LICENSE KEY ===');
+  console.log('Input Company Name:', companyName);
+  console.log('Input Ward Count:', wardCount);
+  
   const prefix = 'NCM';
-  const block1 = hashCompanyName(companyName);
+  const block1 = hashCompanyName(companyName); // Sudah di-uppercase di dalam hashCompanyName
   const block2 = encodeWardCount(wardCount);
   const block3 = generateSecretKey(); // Kunci rahasia - tidak divalidasi
   
-  return `${prefix}-${block1}-${block2}-${block3}`;
+  const licenseKey = `${prefix}-${block1}-${block2}-${block3}`;
+  console.log('Generated License Key:', licenseKey);
+  console.log('  Blok 0 (Prefix):', prefix);
+  console.log('  Blok 1 (Hash Nama):', block1);
+  console.log('  Blok 2 (Bangsal):', block2);
+  console.log('  Blok 3 (Kunci Rahasia):', block3);
+  
+  return licenseKey;
 }
 
 // Validasi format kode lisensi
@@ -75,8 +92,14 @@ export function validateLicenseFormat(licenseKey: string): boolean {
 export function validateLicense(licenseKey: string, storedCompanyName?: string, storedWardCount?: number): LicenseValidation {
   const key = licenseKey.trim().toUpperCase();
   
+  console.log('=== LICENSE VALIDATION DEBUG ===');
+  console.log('License Key:', key);
+  console.log('Stored Company:', storedCompanyName);
+  console.log('Stored Ward Count:', storedWardCount);
+  
   // 1. Cek format
   if (!validateLicenseFormat(key)) {
+    console.log('❌ Format invalid');
     return {
       isValid: false,
       message: 'Format kode lisensi tidak valid. Format yang benar: NCM-XXXX-XXXX-XXXX',
@@ -86,8 +109,14 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
   const parts = key.split('-');
   const [prefix, block1, block2, block3] = parts;
   
+  console.log('Blok 0 (Prefix):', prefix);
+  console.log('Blok 1 (Hash Nama):', block1);
+  console.log('Blok 2 (Bangsal):', block2);
+  console.log('Blok 3 (Kunci Rahasia):', block3);
+  
   // 2. Cek prefix NCM
   if (prefix !== 'NCM') {
+    console.log('❌ Prefix invalid');
     return {
       isValid: false,
       message: 'Kode lisensi harus dimulai dengan prefix "NCM". Pastikan kode diperoleh dari vendor resmi NurseCall Monitor.',
@@ -96,7 +125,10 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
   
   // 3. Decode blok 2 (jumlah bangsal)
   const decodedWardCount = decodeWardCount(block2);
+  console.log('Decoded Ward Count:', decodedWardCount);
+  
   if (decodedWardCount === null) {
+    console.log('❌ Blok 2 invalid');
     return {
       isValid: false,
       message: 'Blok jumlah bangsal tidak valid. Kode lisensi rusak atau tidak sesuai standar vendor.',
@@ -105,9 +137,13 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
   
   // 4. Jika ada data tersimpan, verifikasi kesesuaian
   if (storedCompanyName && storedWardCount) {
-    // Verifikasi hash nama perusahaan
+    // Verifikasi BLOK 1: Hash nama perusahaan
     const expectedBlock1 = hashCompanyName(storedCompanyName);
+    console.log('Expected Block 1 (hash dari stored company):', expectedBlock1);
+    console.log('Actual Block 1 (dari kode lisensi):', block1);
+    
     if (block1 !== expectedBlock1) {
+      console.log('❌ Blok 1 tidak cocok - nama perusahaan berbeda');
       return {
         isValid: false,
         message: `Kode lisensi tidak sesuai dengan nama perusahaan "${storedCompanyName}". Kode lisensi ini diterbitkan untuk perusahaan yang berbeda.`,
@@ -118,8 +154,14 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
       };
     }
     
-    // Verifikasi jumlah bangsal
+    console.log('✅ Blok 1 cocok - nama perusahaan valid');
+    
+    // Verifikasi BLOK 2: Jumlah bangsal
+    console.log('Expected Ward Count (dari stored data):', storedWardCount);
+    console.log('Actual Ward Count (dari blok 2):', decodedWardCount);
+    
     if (decodedWardCount !== storedWardCount) {
+      console.log('❌ Blok 2 tidak cocok - jumlah bangsal berbeda');
       return {
         isValid: false,
         message: `Kode lisensi tidak sesuai dengan jumlah bangsal. Lisensi ini untuk ${decodedWardCount} bangsal, tetapi sistem terdaftar untuk ${storedWardCount} bangsal.`,
@@ -130,11 +172,17 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
       };
     }
     
+    console.log('✅ Blok 2 cocok - jumlah bangsal valid');
+    console.log('✅ Blok 3 tidak divalidasi (kunci rahasia)');
+    
     // Blok 3 (kunci rahasia) tidak divalidasi
   } else {
+    console.log('⚠️ Belum ada data tersimpan, validasi dasar saja');
     // Jika belum ada data tersimpan, validasi dasar saja
     // Blok 3 (kunci rahasia) tidak divalidasi
   }
+  
+  console.log('✅✅✅ LISNSI VALID ✅✅✅');
   
   // Semua valid
   return {
@@ -151,21 +199,40 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
 export function getLicenseStatus(): { isValid: boolean; licenseKey: string | null; companyName?: string; wardCount?: number } {
   const savedLicense = localStorage.getItem('nurseCallLicense');
   
+  console.log('=== GET LICENSE STATUS ===');
+  console.log('Raw localStorage:', savedLicense);
+  
   if (!savedLicense) {
+    console.log('No license found in localStorage');
     return { isValid: false, licenseKey: null };
   }
   
   try {
     const parsed = JSON.parse(savedLicense);
-    const validation = validateLicense(parsed.licenseKey, parsed.companyName, parsed.wardCount);
+    console.log('Parsed license data:', parsed);
+    
+    // Pastikan data dalam uppercase untuk konsistensi
+    const companyName = parsed.companyName?.toUpperCase();
+    const wardCount = parsed.wardCount;
+    const licenseKey = parsed.licenseKey?.toUpperCase();
+    
+    console.log('Normalized data for validation:');
+    console.log('  Company Name:', companyName);
+    console.log('  Ward Count:', wardCount);
+    console.log('  License Key:', licenseKey);
+    
+    const validation = validateLicense(licenseKey, companyName, wardCount);
+    
+    console.log('Validation result:', validation);
     
     return {
       isValid: validation.isValid,
-      licenseKey: parsed.licenseKey,
-      companyName: parsed.companyName,
-      wardCount: parsed.wardCount,
+      licenseKey: licenseKey,
+      companyName: companyName,
+      wardCount: wardCount,
     };
   } catch (e) {
+    console.error('Error parsing license:', e);
     return { isValid: false, licenseKey: null };
   }
 }

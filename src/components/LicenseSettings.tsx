@@ -30,7 +30,9 @@ function ActivationForm() {
     }
 
     // Generate license key based on company name and ward count
-    const key = generateVendorLicenseKey(companyName.trim(), wardCount);
+    // Gunakan uppercase untuk konsistensi dengan data yang disimpan
+    const key = generateVendorLicenseKey(companyName.trim().toUpperCase(), wardCount);
+    console.log('Generated License Key:', key);
     setGeneratedKey(key);
   };
 
@@ -40,17 +42,25 @@ function ActivationForm() {
       return;
     }
 
+    console.log('=== ACTIVATION DEBUG ===');
+    console.log('Company Name:', companyName.trim());
+    console.log('Ward Count:', wardCount);
+    console.log('Generated Key:', generatedKey);
+
     // Save license to localStorage
     const licenseData: LicenseInfo = {
-      companyName: companyName.trim(),
+      companyName: companyName.trim().toUpperCase(), // Simpan dalam uppercase untuk konsistensi
       wardCount: wardCount,
-      licenseKey: generatedKey,
+      licenseKey: generatedKey.toUpperCase(),
       issuedDate: new Date().toISOString(),
       expiryDate: '', // Lifetime license
       status: 'active',
     };
 
+    console.log('Saving to localStorage:', licenseData);
     localStorage.setItem('nurseCallLicense', JSON.stringify(licenseData));
+    
+    console.log('License saved successfully. Reloading...');
     updateLicenseStatus();
     window.location.reload(); // Reload to apply license
   };
