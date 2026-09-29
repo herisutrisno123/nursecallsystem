@@ -49,7 +49,7 @@ function ActivationForm() {
 
     // Save license to localStorage
     const licenseData: LicenseInfo = {
-      companyName: companyName.trim().toUpperCase(), // Simpan dalam uppercase untuk konsistensi
+      companyName: companyName.trim(), // Simpan dalam format asli (Title Case)
       wardCount: wardCount,
       licenseKey: generatedKey.toUpperCase(),
       issuedDate: new Date().toISOString(),
@@ -167,16 +167,14 @@ export default function LicenseSettings() {
     if (savedLicense) {
       try {
         const parsed = JSON.parse(savedLicense);
-        // Normalisasi data ke uppercase untuk konsistensi
-        const normalizedData = {
+        // Simpan data dalam format asli (Title Case)
+        const licenseData = {
           ...parsed,
-          companyName: parsed.companyName?.toUpperCase() || '',
+          companyName: parsed.companyName || '',
           licenseKey: parsed.licenseKey?.toUpperCase() || '',
         };
-        console.log('Loaded license from localStorage:', normalizedData);
-        setLicenseInfo(normalizedData);
-        // Update localStorage dengan data yang sudah dinormalisasi
-        localStorage.setItem('nurseCallLicense', JSON.stringify(normalizedData));
+        console.log('Loaded license from localStorage:', licenseData);
+        setLicenseInfo(licenseData);
       } catch (e) {
         console.error('Failed to parse license:', e);
       }

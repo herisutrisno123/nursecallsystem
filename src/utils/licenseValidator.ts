@@ -214,24 +214,27 @@ export function getLicenseStatus(): { isValid: boolean; licenseKey: string | nul
     const parsed = JSON.parse(savedLicense);
     console.log('Parsed license data:', parsed);
     
-    // Pastikan data dalam uppercase untuk konsistensi
-    const companyName = parsed.companyName?.toUpperCase();
+    // Simpan nama perusahaan dalam format asli (Title Case) untuk tampilan
+    const originalCompanyName = parsed.companyName || '';
+    // Gunakan uppercase hanya untuk validasi
+    const companyNameForValidation = originalCompanyName.toUpperCase();
     const wardCount = parsed.wardCount;
     const licenseKey = parsed.licenseKey?.toUpperCase();
     
-    console.log('Normalized data for validation:');
-    console.log('  Company Name:', companyName);
+    console.log('Data for display and validation:');
+    console.log('  Company Name (original):', originalCompanyName);
+    console.log('  Company Name (for validation):', companyNameForValidation);
     console.log('  Ward Count:', wardCount);
     console.log('  License Key:', licenseKey);
     
-    const validation = validateLicense(licenseKey, companyName, wardCount);
+    const validation = validateLicense(licenseKey, companyNameForValidation, wardCount);
     
     console.log('Validation result:', validation);
     
     return {
       isValid: validation.isValid,
       licenseKey: licenseKey,
-      companyName: companyName,
+      companyName: originalCompanyName, // Return format asli untuk tampilan
       wardCount: wardCount,
     };
   } catch (e) {
