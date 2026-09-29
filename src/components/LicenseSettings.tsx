@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Key, Building2, Copy, CheckCircle, AlertCircle, Shield, Calendar } from 'lucide-react';
-import { validateLicense, generateVendorLicenseKey } from '../utils/licenseValidator';
+import { validateLicense } from '../utils/licenseValidator';
 import { useLicense } from '../context/LicenseContext';
 
 interface LicenseInfo {
@@ -12,14 +12,12 @@ interface LicenseInfo {
   status: 'active' | 'expired' | 'invalid';
 }
 
-// Activation Form Component
-function ActivationForm() {
+// Registration Form Component - Step 1: Register Company Data
+function RegistrationForm({ onRegistered }: { onRegistered: (companyName: string, wardCount: number) => void }) {
   const [companyName, setCompanyName] = useState('');
   const [wardCount, setWardCount] = useState(1);
-  const [generatedKey, setGeneratedKey] = useState('');
-  const { updateLicenseStatus } = useLicense();
 
-  const handleGenerateKey = () => {
+  const handleRegister = () => {
     if (!companyName.trim()) {
       alert('Nama perusahaan harus diisi');
       return;
@@ -29,54 +27,21 @@ function ActivationForm() {
       return;
     }
 
-    // Generate license key based on company name and ward count
-    // Gunakan format asli (Title Case) sesuai input pengguna
-    const key = generateVendorLicenseKey(companyName.trim(), wardCount);
-    console.log('Generated License Key:', key);
-    setGeneratedKey(key);
-  };
-
-  const handleActivate = () => {
-    if (!generatedKey) {
-      alert('Silakan generate kode lisensi terlebih dahulu');
-      return;
-    }
-
-    console.log('=== ACTIVATION DEBUG ===');
-    console.log('Company Name:', companyName.trim());
-    console.log('Ward Count:', wardCount);
-    console.log('Generated Key:', generatedKey);
-
-    // Save license to localStorage
-    const licenseData: LicenseInfo = {
-      companyName: companyName.trim(), // Simpan dalam format asli (Title Case)
-      wardCount: wardCount,
-      licenseKey: generatedKey.toUpperCase(),
-      issuedDate: new Date().toISOString(),
-      expiryDate: '', // Lifetime license
-      status: 'active',
-    };
-
-    console.log('Saving to localStorage:', licenseData);
-    localStorage.setItem('nurseCallLicense', JSON.stringify(licenseData));
-    
-    console.log('License saved successfully. Reloading...');
-    updateLicenseStatus();
-    window.location.reload(); // Reload to apply license
+    onRegistered(companyName.trim(), wardCount);
   };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-          <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Aktivasi Lisensi
+            Registrasi Data Perusahaan
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Isi data perusahaan untuk generate kode lisensi
+            Langkah 1: Daftarkan data perusahaan Anda
           </p>
         </div>
       </div>
@@ -110,42 +75,150 @@ function ActivationForm() {
         </div>
 
         <button
-          onClick={handleGenerateKey}
+          onClick={handleRegister}
           className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium"
         >
-          Generate Kode Lisensi
+          Daftar Perusahaan
         </button>
 
-        {generatedKey && (
-          <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-            <p className="text-sm font-medium text-green-900 dark:text-green-300 mb-2">
-              Kode Lisensi Anda:
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4" />
+            Langkah Selanjutnya:
+          </h4>
+          <ol className="list-decimal list-inside space-y-1 text-sm text-blue-800 dark:text-blue-400">
+            <li>Daftarkan data perusahaan Anda di atas</li>
+            <li>Hubungi vendor NurseCall Monitor</li>
+            <li>Berikan data perusahaan kepada vendor</li>
+            <li>Vendor akan memberikan kode lisensi</li>
+            <li>Masukkan kode lisensi dari vendor untuk aktivasi</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Activation Form Component - Step 2: Input License Key from Vendor
+function ActivationForm({ companyName, wardCount }: { companyName: string; wardCount: number }) {
+  const [licenseKey, setLicenseKey] = useState('');
+  const [validationError, setValidationError] = useState('');
+  const { updateLicenseStatus } = useLicense();
+
+  const handleActivate = () => {
+    if (!licenseKey.trim()) {
+      setValidationError('Kode lisensi harus diisi');
+      return;
+    }
+
+    // Validasi kode lisensi dengan data perusahaan yang terdaftar
+    const validation = validateLicense(licenseKey.trim(), companyName, wardCount);
+    
+    if (!validation.isValid) {
+      setValidationError(validation.message);
+      return;
+    }
+
+    console.log('=== ACTIVATION SUCCESS ===');
+    console.log('Company Name:', companyName);
+    console.log('Ward Count:', wardCount);
+    console.log('License Key:', licenseKey);
+
+    // Save license to localStorage
+    const licenseData: LicenseInfo = {
+      companyName: companyName,
+      wardCount: wardCount,
+      licenseKey: licenseKey.trim().toUpperCase(),
+      issuedDate: new Date().toISOString(),
+      expiryDate: '', // Lifetime license
+      status: 'active',
+    };
+
+    console.log('Saving to localStorage:', licenseData);
+    localStorage.setItem('nurseCallLicense', JSON.stringify(licenseData));
+    
+    console.log('License activated successfully. Reloading...');
+    updateLicenseStatus();
+    window.location.reload();
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+          <Key className="w-5 h-5 text-green-600 dark:text-green-400" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+            Aktivasi Lisensi
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Langkah 2: Masukkan kode lisensi dari vendor
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data Perusahaan Terdaftar:</p>
+          <div className="space-y-1 text-sm">
+            <p className="text-gray-800 dark:text-white">
+              <span className="font-medium">Nama Perusahaan:</span> {companyName}
             </p>
-            <code className="text-lg font-mono text-green-900 dark:text-green-200 break-all">
-              {generatedKey}
-            </code>
-            <p className="text-xs text-green-800 dark:text-green-400 mt-2">
-              Simpan kode ini dengan aman. Kode ini mengandung data perusahaan dan jumlah bangsal yang terenkripsi.
+            <p className="text-gray-800 dark:text-white">
+              <span className="font-medium">Jumlah Bangsal:</span> {wardCount} bangsal
             </p>
-            <button
-              onClick={handleActivate}
-              className="w-full mt-3 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors font-medium"
-            >
-              Aktifkan Lisensi
-            </button>
           </div>
-        )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Kode Lisensi dari Vendor <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={licenseKey}
+            onChange={(e) => {
+              setLicenseKey(e.target.value.toUpperCase());
+              setValidationError('');
+            }}
+            className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white font-mono ${
+              validationError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+            }`}
+            placeholder="NCM-XXXX-XXXX-XXXX"
+            maxLength={18}
+          />
+          {validationError && (
+            <div className="mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-sm text-red-700 dark:text-red-400 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>{validationError}</span>
+              </p>
+            </div>
+          )}
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Masukkan kode lisensi yang diberikan oleh vendor. Format: NCM-XXXX-XXXX-XXXX
+          </p>
+        </div>
+
+        <button
+          onClick={handleActivate}
+          disabled={!licenseKey.trim()}
+          className="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Aktifkan Lisensi
+        </button>
 
         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
           <h4 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-2 flex items-center gap-2">
             <AlertCircle className="w-4 h-4" />
-            Informasi Penting:
+            Penting:
           </h4>
           <ul className="list-disc list-inside space-y-1 text-sm text-yellow-800 dark:text-yellow-400">
-            <li>Kode lisensi dibuat berdasarkan nama perusahaan dan jumlah bangsal</li>
-            <li>Kode ini akan divalidasi setiap kali aplikasi dijalankan</li>
-            <li>Jika data perusahaan berubah, kode lisensi baru harus dibuat</li>
-            <li>Format kode: <code className="font-mono bg-yellow-100 dark:bg-yellow-900/30 px-2 py-0.5 rounded">NCM-XXXX-XXXX-XXXX</code></li>
+            <li>Kode lisensi <strong>hanya diperoleh dari vendor resmi</strong></li>
+            <li>Kode lisensi harus sesuai dengan data perusahaan yang terdaftar</li>
+            <li>Aplikasi akan memvalidasi kode lisensi dengan data perusahaan</li>
+            <li>Jika kode tidak valid, hubungi vendor untuk mendapatkan kode yang benar</li>
           </ul>
         </div>
       </div>
@@ -155,6 +228,7 @@ function ActivationForm() {
 
 export default function LicenseSettings() {
   const [licenseInfo, setLicenseInfo] = useState<LicenseInfo | null>(null);
+  const [pendingRegistration, setPendingRegistration] = useState<{ companyName: string; wardCount: number } | null>(null);
   const [copied, setCopied] = useState(false);
   const [newLicenseKey, setNewLicenseKey] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -392,9 +466,21 @@ export default function LicenseSettings() {
         </div>
       )}
 
-      {/* Aktivasi Lisensi - hanya tampil jika BELUM ada lisensi */}
-      {!licenseInfo && (
-        <ActivationForm />
+      {/* Registrasi Data Perusahaan - tampil jika BELUM ada data perusahaan */}
+      {!licenseInfo && !pendingRegistration && (
+        <RegistrationForm 
+          onRegistered={(companyName, wardCount) => {
+            setPendingRegistration({ companyName, wardCount });
+          }} 
+        />
+      )}
+
+      {/* Aktivasi Lisensi - tampil jika sudah ada data perusahaan tapi BELUM ada lisensi */}
+      {!licenseInfo && pendingRegistration && (
+        <ActivationForm 
+          companyName={pendingRegistration.companyName}
+          wardCount={pendingRegistration.wardCount}
+        />
       )}
 
       {/* Pesan jika ada lisensi - hubungi developer untuk perbarui */}
