@@ -3,7 +3,7 @@
 // Blok 0: NCM (prefix)
 // Blok 1: Hash nama perusahaan + ID pelanggan
 // Blok 2: Jumlah bangsal (encoded)
-// Blok 3: Checksum
+// Blok 3: Kunci rahasia (tidak divalidasi)
 
 export interface LicenseValidation {
   isValid: boolean;
@@ -45,16 +45,14 @@ function decodeWardCount(encoded: string): number | null {
   return num;
 }
 
-// Generate checksum dari blok 1 + blok 2 + nama perusahaan
-function generateChecksum(block1: string, block2: string, companyName: string): string {
-  const combined = block1 + block2 + companyName.trim().toUpperCase();
-  let checksum = 0;
-  for (let i = 0; i < combined.length; i++) {
-    checksum += combined.charCodeAt(i) * (i + 1);
+// Generate blok 3 (kunci rahasia - tidak divalidasi)
+function generateSecretKey(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 4; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  
-  const checksumStr = checksum.toString(36).toUpperCase().padStart(4, '0');
-  return checksumStr.substring(0, 4);
+  return result;
 }
 
 // Generate kode lisensi vendor berdasarkan nama perusahaan dan jumlah bangsal
@@ -62,7 +60,7 @@ export function generateVendorLicenseKey(companyName: string, wardCount: number)
   const prefix = 'NCM';
   const block1 = hashCompanyName(companyName);
   const block2 = encodeWardCount(wardCount);
-  const block3 = generateChecksum(block1, block2, companyName);
+  const block3 = generateSecretKey(); // Kunci rahasia - tidak divalidasi
   
   return `${prefix}-${block1}-${block2}-${block3}`;
 }
@@ -132,32 +130,10 @@ export function validateLicense(licenseKey: string, storedCompanyName?: string, 
       };
     }
     
-    // Verifikasi checksum
-    const expectedChecksum = generateChecksum(block1, block2, storedCompanyName);
-    if (block3 !== expectedChecksum) {
-      return {
-        isValid: false,
-        message: 'Checksum kode lisensi tidak valid. Kode lisensi mungkin rusak atau telah dimodifikasi.',
-        decodedData: {
-          companyNameHash: block1,
-          wardCount: decodedWardCount,
-        },
-      };
-    }
+    // Blok 3 (kunci rahasia) tidak divalidasi
   } else {
-    // Jika belum ada data tersimpan, hanya verifikasi checksum dasar
-    // Gunakan block1 sebagai proxy untuk nama perusahaan
-    const expectedChecksum = generateChecksum(block1, block2, block1);
-    if (block3 !== expectedChecksum) {
-      return {
-        isValid: false,
-        message: 'Checksum kode lisensi tidak valid. Kode lisensi mungkin rusak atau bukan dari vendor resmi.',
-        decodedData: {
-          companyNameHash: block1,
-          wardCount: decodedWardCount,
-        },
-      };
-    }
+    // Jika belum ada data tersimpan, validasi dasar saja
+    // Blok 3 (kunci rahasia) tidak divalidasi
   }
   
   // Semua valid
