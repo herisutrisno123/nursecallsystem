@@ -213,8 +213,15 @@ export function getLicenseStatus(): { isValid: boolean; licenseKey: string | nul
     const parsed = JSON.parse(savedLicense);
     console.log('Parsed license data:', parsed);
     
-    // Gunakan format asli (Title Case) tanpa konversi ke uppercase
+    // Deteksi jika companyName masih uppercase (data lama)
     const companyName = parsed.companyName || '';
+    if (companyName === companyName.toUpperCase() && companyName.length > 0) {
+      // Hapus data lama dan minta user aktivasi ulang
+      console.warn('Detected old license data with uppercase company name. Clearing localStorage...');
+      localStorage.removeItem('nurseCallLicense');
+      return { isValid: false, licenseKey: null };
+    }
+    
     const wardCount = parsed.wardCount;
     const licenseKey = parsed.licenseKey?.toUpperCase();
     

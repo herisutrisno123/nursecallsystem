@@ -167,10 +167,21 @@ export default function LicenseSettings() {
     if (savedLicense) {
       try {
         const parsed = JSON.parse(savedLicense);
-        // Simpan data dalam format asli (Title Case)
+        
+        // Deteksi jika companyName masih uppercase (data lama)
+        const companyName = parsed.companyName || '';
+        if (companyName === companyName.toUpperCase() && companyName.length > 0) {
+          // Hapus data lama dan minta user aktivasi ulang
+          console.warn('Detected old license data with uppercase company name. Clearing localStorage...');
+          localStorage.removeItem('nurseCallLicense');
+          alert('Data lisensi lama terdeteksi. Silakan aktivasi ulang dengan nama perusahaan yang benar (contoh: "RS Sehat Selalu").');
+          window.location.reload();
+          return;
+        }
+        
         const licenseData = {
           ...parsed,
-          companyName: parsed.companyName || '',
+          companyName: companyName,
           licenseKey: parsed.licenseKey?.toUpperCase() || '',
         };
         console.log('Loaded license from localStorage:', licenseData);
