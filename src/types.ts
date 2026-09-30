@@ -17,6 +17,7 @@ export interface Room {
   number: string;
   floor: number;
   wing: string;
+  ward: string;
   bedCount: number;
   status: RoomStatus;
   patient?: Patient;

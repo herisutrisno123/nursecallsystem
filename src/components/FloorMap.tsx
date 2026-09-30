@@ -35,8 +35,17 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [hoveredRoom, setHoveredRoom] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<RoomStatus | 'all'>('all');
+  const [selectedWard, setSelectedWard] = useState<string>('all');
 
-  const filteredRooms = filterStatus === 'all' ? rooms : rooms.filter(r => r.status === filterStatus);
+  // Get unique wards
+  const wards = Array.from(new Set(rooms.map(r => r.ward)));
+  
+  // Filter rooms by ward and status
+  const filteredRooms = rooms.filter(r => {
+    const wardMatch = selectedWard === 'all' || r.ward === selectedWard;
+    const statusMatch = filterStatus === 'all' || r.status === filterStatus;
+    return wardMatch && statusMatch;
+  });
 
   const statusCounts = {
     normal: rooms.filter(r => r.status === 'normal').length,
@@ -46,19 +55,100 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
     offline: rooms.filter(r => r.status === 'offline').length,
   };
 
+  // Ward statistics
+  const wardStats = wards.map(ward => {
+    const wardRooms = rooms.filter(r => r.ward === ward);
+    return {
+      name: ward,
+      totalRooms: wardRooms.length,
+      totalBeds: wardRooms.reduce((sum, r) => sum + r.bedCount, 0),
+      occupiedBeds: wardRooms.filter(r => r.patient).reduce((sum, r) => sum + r.bedCount, 0),
+      calling: wardRooms.filter(r => r.status === 'calling').length,
+      emergency: wardRooms.filter(r => r.status === 'emergency').length,
+    };
+  });
+
   return (
     <div className="space-y-4">
-      {/* Filter & Legend */}
+      {/* Ward Filter */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <MapPin className="w-5 h-5 text-purple-500" />
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Filter Bangsal</h3>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <FilterButton
+            label="Semua Bangsal"
+            count={rooms.length}
+            active={selectedWard === 'all'}
+            onClick={() => setSelectedWard('all')}
+            color="bg-purple-500"
+          />
+          {wards.map(ward => {
+            const wardRooms = rooms.filter(r => r.ward === ward);
+            const wardCalling = wardRooms.filter(r => r.status === 'calling').length;
+            const wardEmergency = wardRooms.filter(r => r.status === 'emergency').length;
+            return (
+              <FilterButton
+                key={ward}
+                label={`Bangsal ${ward}`}
+                count={wardRooms.length}
+                active={selectedWard === ward}
+                onClick={() => setSelectedWard(ward)}
+                color="bg-purple-500"
+                subtitle={wardCalling > 0 || wardEmergency > 0 ? `🔔${wardCalling} 🚨${wardEmergency}` : undefined}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Ward Statistics */}
+      {selectedWard === 'all' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {wardStats.map(stat => (
+            <div key={stat.name} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <h4 className="font-semibold text-gray-800 dark:text-white mb-2">Bangsal {stat.name}</h4>
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Total Kamar:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{stat.totalRooms}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Total Bed:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{stat.totalBeds}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Terisi:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{stat.occupiedBeds}/{stat.totalBeds}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Panggilan Aktif:</span>
+                  <span className="font-medium text-yellow-600 dark:text-yellow-400">{stat.calling}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Emergency:</span>
+                  <span className="font-medium text-red-600 dark:text-red-400">{stat.emergency}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Status Filter */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-blue-500" />
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Peta Lantai 1 - Rawat Inap</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+              {selectedWard === 'all' ? 'Peta Lantai 1 - Semua Bangsal' : `Peta Lantai 1 - Bangsal ${selectedWard}`}
+            </h3>
           </div>
           <div className="flex flex-wrap gap-2">
             <FilterButton
               label="Semua"
-              count={rooms.length}
+              count={filteredRooms.length}
               active={filterStatus === 'all'}
               onClick={() => setFilterStatus('all')}
               color="bg-gray-500"
@@ -209,14 +299,17 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
               const tooltipY = room.position.y;
               return (
                 <g>
-                  <rect x={tooltipX} y={tooltipY} width="120" height="50" fill="#1f2937" rx="6" opacity="0.95" />
+                  <rect x={tooltipX} y={tooltipY} width="140" height="65" fill="#1f2937" rx="6" opacity="0.95" />
                   <text x={tooltipX + 8} y={tooltipY + 16} fill="#fff" fontSize="10" fontWeight="bold">
-                    Kamar {room.number}
+                    Kamar {room.number} - Bangsal {room.ward}
                   </text>
                   <text x={tooltipX + 8} y={tooltipY + 30} fill="#d1d5db" fontSize="9">
                     {room.patient?.name || 'Kosong'}
                   </text>
-                  <text x={tooltipX + 8} y={tooltipY + 43} fill={
+                  <text x={tooltipX + 8} y={tooltipY + 43} fill="#d1d5db" fontSize="9">
+                    {room.bedCount} Bed
+                  </text>
+                  <text x={tooltipX + 8} y={tooltipY + 56} fill={
                     room.status === 'emergency' ? '#ef4444' :
                     room.status === 'calling' ? '#f59e0b' :
                     room.status === 'answered' ? '#3b82f6' :
@@ -291,12 +384,13 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
   );
 }
 
-function FilterButton({ label, count, active, onClick, color }: {
+function FilterButton({ label, count, active, onClick, color, subtitle }: {
   label: string;
   count: number;
   active: boolean;
   onClick: () => void;
   color: string;
+  subtitle?: string;
 }) {
   return (
     <button
@@ -311,6 +405,9 @@ function FilterButton({ label, count, active, onClick, color }: {
       <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${active ? 'bg-white/20' : 'bg-gray-200 dark:bg-gray-600'}`}>
         {count}
       </span>
+      {subtitle && (
+        <span className="text-[10px] opacity-75">{subtitle}</span>
+      )}
     </button>
   );
 }

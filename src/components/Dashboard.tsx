@@ -1,13 +1,28 @@
 import type { ReactNode } from 'react';
-import { dashboardStats, hourlyCallData, callTypeData, responseTimeData, nurseCalls } from '../data/mockData';
+import { dashboardStats, hourlyCallData, callTypeData, responseTimeData, nurseCalls, rooms } from '../data/mockData';
 import { AreaChart, PieChart, LineChart } from './Charts';
 import { useAuth } from '../context/AuthContext';
-import { Activity, Phone, Clock, AlertTriangle, CheckCircle, XCircle, TrendingUp, Users, Lock } from 'lucide-react';
+import { Activity, Phone, Clock, AlertTriangle, CheckCircle, XCircle, TrendingUp, Users, Lock, Home } from 'lucide-react';
 
 export default function Dashboard() {
   const { checkPermission } = useAuth();
   const stats = dashboardStats;
   const activeCalls = nurseCalls.filter(c => c.status === 'active');
+
+  // Ward statistics
+  const wards = Array.from(new Set(rooms.map(r => r.ward)));
+  const wardStats = wards.map(ward => {
+    const wardRooms = rooms.filter(r => r.ward === ward);
+    return {
+      name: ward,
+      totalRooms: wardRooms.length,
+      totalBeds: wardRooms.reduce((sum, r) => sum + r.bedCount, 0),
+      occupiedBeds: wardRooms.filter(r => r.patient).reduce((sum, r) => sum + r.bedCount, 0),
+      calling: wardRooms.filter(r => r.status === 'calling').length,
+      emergency: wardRooms.filter(r => r.status === 'emergency').length,
+      normal: wardRooms.filter(r => r.status === 'normal').length,
+    };
+  });
 
   // Transform data for custom charts
   const hourlyChartData = hourlyCallData.map(d => ({
@@ -88,6 +103,48 @@ export default function Dashboard() {
           icon={<Users className="w-6 h-6" />}
           color="bg-indigo-500"
         />
+      </div>
+
+      {/* Ward Summary */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Home className="w-5 h-5 text-purple-500" />
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Ringkasan Per Bangsal</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {wardStats.map(stat => (
+            <div key={stat.name} className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+              <h4 className="font-semibold text-purple-900 dark:text-purple-200 mb-3 flex items-center gap-2">
+                <Home className="w-4 h-4" />
+                Bangsal {stat.name}
+              </h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 dark:text-gray-400">Kamar:</span>
+                  <span className="font-semibold text-gray-800 dark:text-white">{stat.totalRooms}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 dark:text-gray-400">Bed Terisi:</span>
+                  <span className="font-semibold text-gray-800 dark:text-white">{stat.occupiedBeds}/{stat.totalBeds}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 dark:text-gray-400">Panggilan Aktif:</span>
+                  <span className="font-semibold text-yellow-600 dark:text-yellow-400">{stat.calling}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 dark:text-gray-400">Emergency:</span>
+                  <span className="font-semibold text-red-600 dark:text-red-400">{stat.emergency}</span>
+                </div>
+                <div className="pt-2 border-t border-purple-200 dark:border-purple-700">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600 dark:text-gray-400">Status Normal:</span>
+                    <span className="font-semibold text-green-600 dark:text-green-400">{stat.normal}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Charts Row */}
