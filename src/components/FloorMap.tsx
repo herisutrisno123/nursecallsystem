@@ -231,6 +231,7 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
                 onMouseLeave={() => setHoveredRoom(null)}
                 className="cursor-pointer"
               >
+                {/* Room Background */}
                 <rect
                   x={room.position.x}
                   y={room.position.y}
@@ -245,39 +246,129 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
                     transformOrigin: `${room.position.x + room.size.width / 2}px ${room.position.y + room.size.height / 2}px`,
                   }}
                 />
+                
                 {/* Room Number */}
                 <text
                   x={room.position.x + room.size.width / 2}
-                  y={room.position.y + 18}
+                  y={room.position.y + 15}
                   textAnchor="middle"
                   fill="#1f2937"
-                  fontSize="12"
+                  fontSize="11"
                   fontWeight="bold"
                 >
                   {room.number}
                 </text>
-                {/* Patient Name */}
+                
+                {/* Ward Name */}
+                <text
+                  x={room.position.x + room.size.width / 2}
+                  y={room.position.y + 25}
+                  textAnchor="middle"
+                  fill="#6b7280"
+                  fontSize="7"
+                >
+                  {room.ward}
+                </text>
+                
+                {/* Bed Icons */}
+                {Array.from({ length: room.bedCount }).map((_, idx) => {
+                  const bedX = room.position.x + 10 + (idx * 20);
+                  const bedY = room.position.y + 35;
+                  return (
+                    <g key={idx}>
+                      {/* Bed Frame */}
+                      <rect
+                        x={bedX}
+                        y={bedY}
+                        width="16"
+                        height="10"
+                        fill="#8b5cf6"
+                        stroke="#6d28d9"
+                        strokeWidth="0.5"
+                        rx="1"
+                      />
+                      {/* Pillow */}
+                      <rect
+                        x={bedX + 1}
+                        y={bedY + 1}
+                        width="4"
+                        height="3"
+                        fill="#e9d5ff"
+                        rx="0.5"
+                      />
+                      {/* Blanket */}
+                      <rect
+                        x={bedX + 6}
+                        y={bedY + 1}
+                        width="9"
+                        height="8"
+                        fill="#c4b5fd"
+                        rx="0.5"
+                      />
+                    </g>
+                  );
+                })}
+                
+                {/* Bathroom Icon */}
+                <g>
+                  <rect
+                    x={room.position.x + room.size.width - 20}
+                    y={room.position.y + 35}
+                    width="14"
+                    height="14"
+                    fill="#06b6d4"
+                    stroke="#0891b2"
+                    strokeWidth="0.5"
+                    rx="2"
+                  />
+                  {/* Shower Head */}
+                  <circle
+                    cx={room.position.x + room.size.width - 13}
+                    cy={room.position.y + 39}
+                    r="2"
+                    fill="#67e8f9"
+                  />
+                  {/* Water Drops */}
+                  <line
+                    x1={room.position.x + room.size.width - 13}
+                    y1={room.position.y + 41}
+                    x2={room.position.x + room.size.width - 13}
+                    y2={room.position.y + 44}
+                    stroke="#67e8f9"
+                    strokeWidth="0.5"
+                  />
+                  <line
+                    x1={room.position.x + room.size.width - 15}
+                    y1={room.position.y + 42}
+                    x2={room.position.x + room.size.width - 15}
+                    y2={room.position.y + 44}
+                    stroke="#67e8f9"
+                    strokeWidth="0.5"
+                  />
+                  <line
+                    x1={room.position.x + room.size.width - 11}
+                    y1={room.position.y + 42}
+                    x2={room.position.x + room.size.width - 11}
+                    y2={room.position.y + 44}
+                    stroke="#67e8f9"
+                    strokeWidth="0.5"
+                  />
+                </g>
+                
+                {/* Patient Name (if occupied) */}
                 {room.patient && (
                   <text
                     x={room.position.x + room.size.width / 2}
-                    y={room.position.y + 33}
+                    y={room.position.y + room.size.height - 5}
                     textAnchor="middle"
                     fill="#4b5563"
-                    fontSize="8"
+                    fontSize="7"
+                    fontWeight="500"
                   >
                     {room.patient.name.split(' ').slice(0, 2).join(' ')}
                   </text>
                 )}
-                {/* Bed Count */}
-                <text
-                  x={room.position.x + room.size.width / 2}
-                  y={room.position.y + 48}
-                  textAnchor="middle"
-                  fill="#6b7280"
-                  fontSize="8"
-                >
-                  🛏️ {room.bedCount} bed
-                </text>
+                
                 {/* Status Indicator */}
                 {(room.status === 'calling' || room.status === 'emergency') && (
                   <circle
