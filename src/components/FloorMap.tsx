@@ -229,28 +229,27 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
         <div className="relative w-full overflow-x-auto">
           <svg
-            viewBox="0 0 1200 320"
-            className="w-full min-w-[900px] h-auto"
-            style={{ maxHeight: '600px' }}
+            viewBox="0 0 1350 350"
+            className="w-full min-w-[1000px] h-auto"
+            style={{ maxHeight: '650px' }}
           >
             {/* Background */}
-            <rect x="0" y="0" width="1200" height="320" fill="#f8fafc" rx="12" stroke="#e2e8f0" strokeWidth="2" />
+            <rect x="0" y="0" width="1350" height="350" fill="#f8fafc" rx="12" stroke="#e2e8f0" strokeWidth="2" />
 
             {/* Corridor */}
-            <rect x="30" y="175" width="1140" height="20" fill="#e2e8f0" rx="4" />
-            <text x="600" y="189" textAnchor="middle" className="text-[10px]" fill="#64748b" fontSize="10">KORIDOR</text>
+            <rect x="30" y="180" width="1290" height="25" fill="#e2e8f0" rx="4" />
+            <text x="675" y="196" textAnchor="middle" className="text-[10px]" fill="#64748b" fontSize="10">KORIDOR</text>
 
             {/* Nurse Station */}
-            <rect x="550" y="260" width="100" height="45" fill="#dbeafe" stroke="#3b82f6" strokeWidth="2" rx="8" />
-            <text x="600" y="280" textAnchor="middle" fill="#1e40af" fontSize="10" fontWeight="bold">NURSE STATION</text>
-            <text x="600" y="295" textAnchor="middle" fill="#3b82f6" fontSize="9">👩‍⚕️ Pos Perawat</text>
+            <rect x="625" y="310" width="100" height="30" fill="#dbeafe" stroke="#3b82f6" strokeWidth="2" rx="8" />
+            <text x="675" y="328" textAnchor="middle" fill="#1e40af" fontSize="9" fontWeight="bold">👩‍⚕️ POS PERAWAT</text>
 
             {/* Wing Labels */}
-            <text x="300" y="50" textAnchor="middle" fill="#374151" fontSize="14" fontWeight="bold">SAYAP KIRI</text>
-            <text x="900" y="50" textAnchor="middle" fill="#374151" fontSize="14" fontWeight="bold">SAYAP KANAN</text>
+            <text x="325" y="55" textAnchor="middle" fill="#374151" fontSize="14" fontWeight="bold">SAYAP KIRI</text>
+            <text x="1025" y="55" textAnchor="middle" fill="#374151" fontSize="14" fontWeight="bold">SAYAP KANAN</text>
 
             {/* Divider */}
-            <line x1="600" y1="60" x2="600" y2="165" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="675" y1="65" x2="675" y2="170" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4 4" />
 
             {/* Rooms */}
             {filteredRooms.map(room => (
