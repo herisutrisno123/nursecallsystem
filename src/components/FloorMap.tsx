@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { rooms } from '../data/mockData';
 import { Room, RoomStatus } from '../types';
-import { MapPin, Bed, AlertTriangle, Phone } from 'lucide-react';
+import { MapPin, Bed, AlertTriangle, Phone, Eye } from 'lucide-react';
+import RoomDetailView from './RoomDetailView';
 
 interface FloorMapProps {
   onRoomSelect: (room: Room) => void;
@@ -36,6 +37,7 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
   const [hoveredRoom, setHoveredRoom] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<RoomStatus | 'all'>('all');
   const [selectedWard, setSelectedWard] = useState<string>('all');
+  const [showRoomDetail, setShowRoomDetail] = useState<Room | null>(null);
 
   // Get unique wards
   const wards = Array.from(new Set(rooms.map(r => r.ward)));
@@ -432,6 +434,34 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
                     className="animate-pulse"
                   />
                 )}
+
+                {/* View Floor Plan Button - Eye Icon */}
+                <g
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowRoomDetail(room);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <circle
+                    cx={room.position.x + 15}
+                    cy={room.position.y + room.size.height - 15}
+                    r="8"
+                    fill="#3b82f6"
+                    stroke="white"
+                    strokeWidth="1"
+                    opacity="0.8"
+                  />
+                  <text
+                    x={room.position.x + 15}
+                    y={room.position.y + room.size.height - 11}
+                    textAnchor="middle"
+                    fill="white"
+                    fontSize="10"
+                  >
+                    👁
+                  </text>
+                </g>
               </g>
             ))}
 
@@ -510,11 +540,7 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
           {filteredRooms.map(room => (
             <div
               key={room.id}
-              onClick={() => {
-                setSelectedRoom(room);
-                onRoomSelect(room);
-              }}
-              className={`p-3 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md ${statusColors[room.status]} ${
+              className={`p-3 rounded-lg border-2 transition-all hover:shadow-md ${statusColors[room.status]} ${
                 selectedRoom?.id === room.id ? 'ring-2 ring-offset-2 ring-blue-500 scale-105' : ''
               }`}
             >
@@ -537,11 +563,39 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
                   {room.status === 'normal' && <Bed className="w-3 h-3" />}
                   {room.status === 'offline' && <span className="text-xs">⚫</span>}
                 </div>
+                <div className="flex gap-1 mt-2">
+                  <button
+                    onClick={() => setShowRoomDetail(room)}
+                    className="flex-1 px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-medium transition-colors flex items-center justify-center gap-1"
+                    title="Lihat Denah Kamar"
+                  >
+                    <Eye className="w-3 h-3" />
+                    Denah
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedRoom(room);
+                      onRoomSelect(room);
+                    }}
+                    className="flex-1 px-2 py-1 bg-gray-500 hover:bg-gray-600 text-white rounded text-xs font-medium transition-colors"
+                    title="Detail Pasien"
+                  >
+                    Info
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Room Detail View Modal */}
+      {showRoomDetail && (
+        <RoomDetailView
+          room={showRoomDetail}
+          onClose={() => setShowRoomDetail(null)}
+        />
+      )}
     </div>
   );
 }
