@@ -17,28 +17,28 @@ const patients: Patient[] = [
 
 export const rooms: Room[] = [
   // Bangsal Mawar (Lantai 1 - Sayap Kiri Atas)
-  { id: 'r1', number: '101', floor: 1, wing: 'Kiri', ward: 'Mawar', bedCount: 2, status: 'calling', patients: [patients[0]], position: { x: 50, y: 80 }, size: { width: 130, height: 90 } },
-  { id: 'r2', number: '102', floor: 1, wing: 'Kiri', ward: 'Mawar', bedCount: 1, status: 'normal', patients: [patients[1]], position: { x: 200, y: 80 }, size: { width: 130, height: 90 } },
-  { id: 'r3', number: '103', floor: 1, wing: 'Kiri', ward: 'Mawar', bedCount: 2, status: 'emergency', patients: [patients[2]], position: { x: 350, y: 80 }, size: { width: 130, height: 90 } },
-  { id: 'r4', number: '104', floor: 1, wing: 'Kiri', ward: 'Mawar', bedCount: 1, status: 'answered', patients: [patients[3]], position: { x: 500, y: 80 }, size: { width: 130, height: 90 } },
+  { id: 'r1', number: '101', floor: 1, wing: 'Kiri', ward: 'Mawar', bedCount: 2, status: 'calling', patients: [patients[0]], position: { x: 30, y: 60 }, size: { width: 110, height: 75 } },
+  { id: 'r2', number: '102', floor: 1, wing: 'Kiri', ward: 'Mawar', bedCount: 1, status: 'normal', patients: [patients[1]], position: { x: 150, y: 60 }, size: { width: 110, height: 75 } },
+  { id: 'r3', number: '103', floor: 1, wing: 'Kiri', ward: 'Mawar', bedCount: 2, status: 'emergency', patients: [patients[2]], position: { x: 270, y: 60 }, size: { width: 110, height: 75 } },
+  { id: 'r4', number: '104', floor: 1, wing: 'Kiri', ward: 'Mawar', bedCount: 1, status: 'answered', patients: [patients[3]], position: { x: 390, y: 60 }, size: { width: 110, height: 75 } },
   
   // Bangsal Melati (Lantai 1 - Sayap Kiri Bawah)
-  { id: 'r5', number: '105', floor: 1, wing: 'Kiri', ward: 'Melati', bedCount: 2, status: 'normal', patients: [patients[4]], position: { x: 50, y: 210 }, size: { width: 130, height: 90 } },
-  { id: 'r6', number: '106', floor: 1, wing: 'Kiri', ward: 'Melati', bedCount: 1, status: 'calling', patients: [patients[5]], position: { x: 200, y: 210 }, size: { width: 130, height: 90 } },
-  { id: 'r7', number: '107', floor: 1, wing: 'Kiri', ward: 'Melati', bedCount: 2, status: 'normal', patients: [patients[6]], position: { x: 350, y: 210 }, size: { width: 130, height: 90 } },
-  { id: 'r8', number: '108', floor: 1, wing: 'Kiri', ward: 'Melati', bedCount: 1, status: 'offline', position: { x: 500, y: 210 }, size: { width: 130, height: 90 } },
+  { id: 'r5', number: '105', floor: 1, wing: 'Kiri', ward: 'Melati', bedCount: 2, status: 'normal', patients: [patients[4]], position: { x: 30, y: 165 }, size: { width: 110, height: 75 } },
+  { id: 'r6', number: '106', floor: 1, wing: 'Kiri', ward: 'Melati', bedCount: 1, status: 'calling', patients: [patients[5]], position: { x: 150, y: 165 }, size: { width: 110, height: 75 } },
+  { id: 'r7', number: '107', floor: 1, wing: 'Kiri', ward: 'Melati', bedCount: 2, status: 'normal', patients: [patients[6]], position: { x: 270, y: 165 }, size: { width: 110, height: 75 } },
+  { id: 'r8', number: '108', floor: 1, wing: 'Kiri', ward: 'Melati', bedCount: 1, status: 'offline', position: { x: 390, y: 165 }, size: { width: 110, height: 75 } },
   
   // Bangsal Anggrek (Lantai 1 - Sayap Kanan Atas)
-  { id: 'r9', number: '109', floor: 1, wing: 'Kanan', ward: 'Anggrek', bedCount: 2, status: 'normal', patients: [patients[7]], position: { x: 700, y: 80 }, size: { width: 130, height: 90 } },
-  { id: 'r10', number: '110', floor: 1, wing: 'Kanan', ward: 'Anggrek', bedCount: 1, status: 'calling', patients: [patients[8]], position: { x: 850, y: 80 }, size: { width: 130, height: 90 } },
-  { id: 'r11', number: '111', floor: 1, wing: 'Kanan', ward: 'Anggrek', bedCount: 2, status: 'normal', patients: [patients[9]], position: { x: 1000, y: 80 }, size: { width: 130, height: 90 } },
-  { id: 'r12', number: '112', floor: 1, wing: 'Kanan', ward: 'Anggrek', bedCount: 1, status: 'answered', patients: [patients[10]], position: { x: 1150, y: 80 }, size: { width: 130, height: 90 } },
+  { id: 'r9', number: '109', floor: 1, wing: 'Kanan', ward: 'Anggrek', bedCount: 2, status: 'normal', patients: [patients[7]], position: { x: 560, y: 60 }, size: { width: 110, height: 75 } },
+  { id: 'r10', number: '110', floor: 1, wing: 'Kanan', ward: 'Anggrek', bedCount: 1, status: 'calling', patients: [patients[8]], position: { x: 680, y: 60 }, size: { width: 110, height: 75 } },
+  { id: 'r11', number: '111', floor: 1, wing: 'Kanan', ward: 'Anggrek', bedCount: 2, status: 'normal', patients: [patients[9]], position: { x: 800, y: 60 }, size: { width: 110, height: 75 } },
+  { id: 'r12', number: '112', floor: 1, wing: 'Kanan', ward: 'Anggrek', bedCount: 1, status: 'answered', patients: [patients[10]], position: { x: 920, y: 60 }, size: { width: 110, height: 75 } },
   
   // Bangsal Tulip (Lantai 1 - Sayap Kanan Bawah)
-  { id: 'r13', number: '113', floor: 1, wing: 'Kanan', ward: 'Tulip', bedCount: 2, status: 'normal', patients: [patients[11]], position: { x: 700, y: 210 }, size: { width: 130, height: 90 } },
-  { id: 'r14', number: '114', floor: 1, wing: 'Kanan', ward: 'Tulip', bedCount: 1, status: 'emergency', position: { x: 850, y: 210 }, size: { width: 130, height: 90 } },
-  { id: 'r15', number: '115', floor: 1, wing: 'Kanan', ward: 'Tulip', bedCount: 2, status: 'normal', position: { x: 1000, y: 210 }, size: { width: 130, height: 90 } },
-  { id: 'r16', number: '116', floor: 1, wing: 'Kanan', ward: 'Tulip', bedCount: 1, status: 'calling', position: { x: 1150, y: 210 }, size: { width: 130, height: 90 } },
+  { id: 'r13', number: '113', floor: 1, wing: 'Kanan', ward: 'Tulip', bedCount: 2, status: 'normal', patients: [patients[11]], position: { x: 560, y: 165 }, size: { width: 110, height: 75 } },
+  { id: 'r14', number: '114', floor: 1, wing: 'Kanan', ward: 'Tulip', bedCount: 1, status: 'emergency', position: { x: 680, y: 165 }, size: { width: 110, height: 75 } },
+  { id: 'r15', number: '115', floor: 1, wing: 'Kanan', ward: 'Tulip', bedCount: 2, status: 'normal', position: { x: 800, y: 165 }, size: { width: 110, height: 75 } },
+  { id: 'r16', number: '116', floor: 1, wing: 'Kanan', ward: 'Tulip', bedCount: 1, status: 'calling', position: { x: 920, y: 165 }, size: { width: 110, height: 75 } },
 ];
 
 export const floorPlans: FloorPlan[] = [
