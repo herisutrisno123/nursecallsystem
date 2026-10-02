@@ -55,7 +55,7 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
 
         {/* Content - Full Screen Layout */}
         <div className="flex-1 flex overflow-hidden p-4 gap-4">
-          {/* Left Side - Room Layout SVG */}
+          {/* Left Side - Room Layout SVG - 4x LEBIH BESAR */}
           <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-lg relative overflow-hidden">
             <svg 
               viewBox="0 0 2400 1800" 
@@ -63,140 +63,140 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
               preserveAspectRatio="xMidYMid meet"
               style={{ display: 'block' }}
             >
-                {/* Room Walls */}
-                <rect x="200" y="200" width="2000" height="1400" fill="#f8fafc" stroke="#64748b" strokeWidth="16" rx="16" />
-                
-                {/* Floor Pattern */}
-                <pattern id="floorPattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-                  <rect width="80" height="80" fill="#f1f5f9" />
-                  <rect width="40" height="40" fill="#e2e8f0" />
-                  <rect x="40" y="40" width="40" height="40" fill="#e2e8f0" />
-                </pattern>
-                <rect x="200" y="200" width="2000" height="1400" fill="url(#floorPattern)" />
+              {/* Room Walls - 4x lebih besar */}
+              <rect x="200" y="200" width="2000" height="1400" fill="#f8fafc" stroke="#64748b" strokeWidth="16" rx="16" />
+              
+              {/* Floor Pattern */}
+              <pattern id="floorPattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+                <rect width="80" height="80" fill="#f1f5f9" />
+                <rect width="40" height="40" fill="#e2e8f0" />
+                <rect x="40" y="40" width="40" height="40" fill="#e2e8f0" />
+              </pattern>
+              <rect x="200" y="200" width="2000" height="1400" fill="url(#floorPattern)" />
 
-                {/* Door - Pintu Masuk */}
-                <rect x="200" y="800" width="16" height="240" fill="#8b5cf6" />
-                <path d="M 200 800 Q 80 920 200 1040" fill="none" stroke="#8b5cf6" strokeWidth="8" strokeDasharray="20,20" />
-                <text x="60" y="940" fontSize="48" fill="#6b7280" fontWeight="bold">PINTU</text>
+              {/* Door - Pintu Masuk - 4x lebih besar */}
+              <rect x="200" y="800" width="16" height="240" fill="#8b5cf6" />
+              <path d="M 200 800 Q 80 920 200 1040" fill="none" stroke="#8b5cf6" strokeWidth="8" strokeDasharray="20,20" />
+              <text x="60" y="940" fontSize="48" fill="#6b7280" fontWeight="bold">PINTU</text>
 
-                {/* Window - Jendela */}
-                <rect x="2184" y="480" width="16" height="320" fill="#06b6d4" />
-                <line x1="2192" y1="480" x2="2192" y2="800" stroke="#67e8f9" strokeWidth="8" />
-                <text x="2220" y="660" fontSize="40" fill="#6b7280">JENDELA</text>
+              {/* Window - Jendela - 4x lebih besar */}
+              <rect x="2184" y="480" width="16" height="320" fill="#06b6d4" />
+              <line x1="2192" y1="480" x2="2192" y2="800" stroke="#67e8f9" strokeWidth="8" />
+              <text x="2220" y="660" fontSize="40" fill="#6b7280">JENDELA</text>
 
-                {/* Bathroom - Kamar Mandi */}
-                <rect x="1520" y="200" width="680" height="480" fill="#e0f2fe" stroke="#0284c7" strokeWidth="8" rx="16" />
-                <text x="1860" y="300" textAnchor="middle" fontSize="56" fill="#0369a1" fontWeight="bold">KAMAR MANDI</text>
-                
-                {/* Shower */}
-                <circle cx="1680" cy="440" r="60" fill="#67e8f9" stroke="#0891b2" strokeWidth="8" />
-                <circle cx="1680" cy="440" r="32" fill="#22d3ee" />
-                <line x1="1680" y1="380" x2="1680" y2="440" stroke="#0891b2" strokeWidth="12" />
-                <line x1="1660" y1="500" x2="1660" y2="540" stroke="#67e8f9" strokeWidth="6" />
-                <line x1="1680" y1="500" x2="1680" y2="540" stroke="#67e8f9" strokeWidth="6" />
-                <line x1="1700" y1="500" x2="1700" y2="540" stroke="#67e8f9" strokeWidth="6" />
-                <text x="1680" y="600" textAnchor="middle" fontSize="40" fill="#0369a1">Shower</text>
+              {/* Bathroom - Kamar Mandi - 4x lebih besar */}
+              <rect x="1520" y="200" width="680" height="480" fill="#e0f2fe" stroke="#0284c7" strokeWidth="8" rx="16" />
+              <text x="1860" y="300" textAnchor="middle" fontSize="56" fill="#0369a1" fontWeight="bold">KAMAR MANDI</text>
+              
+              {/* Shower - 4x lebih besar */}
+              <circle cx="1680" cy="440" r="60" fill="#67e8f9" stroke="#0891b2" strokeWidth="8" />
+              <circle cx="1680" cy="440" r="32" fill="#22d3ee" />
+              <line x1="1680" y1="380" x2="1680" y2="440" stroke="#0891b2" strokeWidth="12" />
+              <line x1="1660" y1="500" x2="1660" y2="540" stroke="#67e8f9" strokeWidth="6" />
+              <line x1="1680" y1="500" x2="1680" y2="540" stroke="#67e8f9" strokeWidth="6" />
+              <line x1="1700" y1="500" x2="1700" y2="540" stroke="#67e8f9" strokeWidth="6" />
+              <text x="1680" y="600" textAnchor="middle" fontSize="40" fill="#0369a1">Shower</text>
 
-                {/* Toilet */}
-                <ellipse cx="1960" cy="440" rx="72" ry="100" fill="#f0f9ff" stroke="#0284c7" strokeWidth="8" />
-                <ellipse cx="1960" cy="420" rx="48" ry="60" fill="#e0f2fe" stroke="#0284c7" strokeWidth="4" />
-                <rect x="1912" y="340" width="96" height="32" fill="#0284c7" rx="8" />
-                <text x="1960" y="600" textAnchor="middle" fontSize="40" fill="#0369a1">Toilet</text>
+              {/* Toilet - 4x lebih besar */}
+              <ellipse cx="1960" cy="440" rx="72" ry="100" fill="#f0f9ff" stroke="#0284c7" strokeWidth="8" />
+              <ellipse cx="1960" cy="420" rx="48" ry="60" fill="#e0f2fe" stroke="#0284c7" strokeWidth="4" />
+              <rect x="1912" y="340" width="96" height="32" fill="#0284c7" rx="8" />
+              <text x="1960" y="600" textAnchor="middle" fontSize="40" fill="#0369a1">Toilet</text>
 
-                {/* Sink */}
-                <rect x="1760" y="620" width="120" height="40" fill="#f0f9ff" stroke="#0284c7" strokeWidth="6" rx="8" />
-                <circle cx="1820" cy="640" r="12" fill="#0284c7" />
-                <text x="1820" y="700" textAnchor="middle" fontSize="36" fill="#0369a1">Wastafel</text>
+              {/* Sink - 4x lebih besar */}
+              <rect x="1760" y="620" width="120" height="40" fill="#f0f9ff" stroke="#0284c7" strokeWidth="6" rx="8" />
+              <circle cx="1820" cy="640" r="12" fill="#0284c7" />
+              <text x="1820" y="700" textAnchor="middle" fontSize="36" fill="#0369a1">Wastafel</text>
 
-                {/* Beds - Tempat Tidur */}
-                {Array.from({ length: room.bedCount }).map((_, idx) => {
-                  const bedX = 320 + (idx * 560);
-                  const bedY = 880;
-                  return (
-                    <g key={idx}>
-                      {/* Bed Frame */}
-                      <rect x={bedX} y={bedY} width="480" height="320" fill="#8b5cf6" stroke="#6d28d9" strokeWidth="8" rx="16" />
-                      
-                      {/* Mattress */}
-                      <rect x={bedX + 20} y={bedY + 20} width="440" height="280" fill="#c4b5fd" stroke="#a78bfa" strokeWidth="4" rx="12" />
-                      
-                      {/* Pillow */}
-                      <rect x={bedX + 40} y={bedY + 40} width="120" height="80" fill="#e9d5ff" stroke="#c4b5fd" strokeWidth="4" rx="12" />
-                      <text x={bedX + 100} y={bedY + 92} textAnchor="middle" fontSize="32" fill="#6d28d9">Bantal</text>
-                      
-                      {/* Blanket */}
-                      <rect x={bedX + 180} y={bedY + 40} width="260" height="240" fill="#ddd6fe" stroke="#a78bfa" strokeWidth="4" rx="8" />
-                      <line x1={bedX + 200} y1={bedY + 80} x2={bedX + 420} y2={bedY + 80} stroke="#a78bfa" strokeWidth="2" />
-                      <line x1={bedX + 200} y1={bedY + 140} x2={bedX + 420} y2={bedY + 140} stroke="#a78bfa" strokeWidth="2" />
-                      <line x1={bedX + 200} y1={bedY + 200} x2={bedX + 420} y2={bedY + 200} stroke="#a78bfa" strokeWidth="2" />
-                      <line x1={bedX + 200} y1={bedY + 260} x2={bedX + 420} y2={bedY + 260} stroke="#a78bfa" strokeWidth="2" />
-                      
-                      {/* Bed Label */}
-                      <text x={bedX + 240} y={bedY + 380} textAnchor="middle" fontSize="44" fill="#6d28d9" fontWeight="bold">
-                        TT {idx + 1}
+              {/* Beds - Tempat Tidur - 4x LEBIH BESAR */}
+              {Array.from({ length: room.bedCount }).map((_, idx) => {
+                const bedX = 320 + (idx * 560);
+                const bedY = 880;
+                return (
+                  <g key={idx}>
+                    {/* Bed Frame - 480x320 (4x dari 120x80) */}
+                    <rect x={bedX} y={bedY} width="480" height="320" fill="#8b5cf6" stroke="#6d28d9" strokeWidth="8" rx="16" />
+                    
+                    {/* Mattress - 440x280 */}
+                    <rect x={bedX + 20} y={bedY + 20} width="440" height="280" fill="#c4b5fd" stroke="#a78bfa" strokeWidth="4" rx="12" />
+                    
+                    {/* Pillow - 120x80 (4x dari 30x20) */}
+                    <rect x={bedX + 40} y={bedY + 40} width="120" height="80" fill="#e9d5ff" stroke="#c4b5fd" strokeWidth="4" rx="12" />
+                    <text x={bedX + 100} y={bedY + 92} textAnchor="middle" fontSize="32" fill="#6d28d9">Bantal</text>
+                    
+                    {/* Blanket - 260x240 (4x dari 65x60) */}
+                    <rect x={bedX + 180} y={bedY + 40} width="260" height="240" fill="#ddd6fe" stroke="#a78bfa" strokeWidth="4" rx="8" />
+                    <line x1={bedX + 200} y1={bedY + 80} x2={bedX + 420} y2={bedY + 80} stroke="#a78bfa" strokeWidth="2" />
+                    <line x1={bedX + 200} y1={bedY + 140} x2={bedX + 420} y2={bedY + 140} stroke="#a78bfa" strokeWidth="2" />
+                    <line x1={bedX + 200} y1={bedY + 200} x2={bedX + 420} y2={bedY + 200} stroke="#a78bfa" strokeWidth="2" />
+                    <line x1={bedX + 200} y1={bedY + 260} x2={bedX + 420} y2={bedY + 260} stroke="#a78bfa" strokeWidth="2" />
+                    
+                    {/* Bed Label - fontSize 44 (4x dari 11) */}
+                    <text x={bedX + 240} y={bedY + 380} textAnchor="middle" fontSize="44" fill="#6d28d9" fontWeight="bold">
+                      TT {idx + 1}
+                    </text>
+
+                    {/* Patient Name - fontSize 40 (4x dari 10) */}
+                    {room.patients && room.patients[idx] && (
+                      <text x={bedX + 240} y={bedY - 40} textAnchor="middle" fontSize="40" fill="#4b5563" fontStyle="italic">
+                        {room.patients[idx].name}
                       </text>
+                    )}
+                  </g>
+                );
+              })}
 
-                      {/* Patient Name (if occupied) */}
-                      {room.patients && room.patients[idx] && (
-                        <text x={bedX + 240} y={bedY - 40} textAnchor="middle" fontSize="40" fill="#4b5563" fontStyle="italic">
-                          {room.patients[idx].name}
-                        </text>
-                      )}
-                    </g>
-                  );
-                })}
+              {/* Nurse Call Button - r=48 (4x dari 12) */}
+              <circle cx="400" cy="400" r="48" fill="#ef4444" stroke="#dc2626" strokeWidth="8" />
+              <text x="400" y="420" textAnchor="middle" fontSize="40" fill="white" fontWeight="bold">!</text>
+              <text x="400" y="500" textAnchor="middle" fontSize="36" fill="#dc2626">Nurse Call</text>
 
-                {/* Nurse Call Button */}
-                <circle cx="400" cy="400" r="48" fill="#ef4444" stroke="#dc2626" strokeWidth="8" />
-                <text x="400" y="420" textAnchor="middle" fontSize="40" fill="white" fontWeight="bold">!</text>
-                <text x="400" y="500" textAnchor="middle" fontSize="36" fill="#dc2626">Nurse Call</text>
+              {/* Room Dimensions - 4x lebih besar */}
+              <line x1="200" y1="1640" x2="2200" y2="1640" stroke="#94a3b8" strokeWidth="4" markerStart="url(#arrowStart)" markerEnd="url(#arrowEnd)" />
+              <text x="1200" y="1720" textAnchor="middle" fontSize="48" fill="#64748b">6m</text>
+              
+              <line x1="2240" y1="200" x2="2240" y2="1600" stroke="#94a3b8" strokeWidth="4" />
+              <text x="2320" y="900" textAnchor="middle" fontSize="48" fill="#64748b" transform="rotate(90 2320 900)">4m</text>
 
-                {/* Room Dimensions */}
-                <line x1="200" y1="1640" x2="2200" y2="1640" stroke="#94a3b8" strokeWidth="4" markerStart="url(#arrowStart)" markerEnd="url(#arrowEnd)" />
-                <text x="1200" y="1720" textAnchor="middle" fontSize="48" fill="#64748b">6m</text>
-                
-                <line x1="2240" y1="200" x2="2240" y2="1600" stroke="#94a3b8" strokeWidth="4" />
-                <text x="2320" y="900" textAnchor="middle" fontSize="48" fill="#64748b" transform="rotate(90 2320 900)">4m</text>
+              {/* Arrow Markers - 4x lebih besar */}
+              <defs>
+                <marker id="arrowStart" markerWidth="40" markerHeight="40" refX="0" refY="12" orient="auto">
+                  <path d="M0,12 L40,0 L40,24 Z" fill="#94a3b8" />
+                </marker>
+                <marker id="arrowEnd" markerWidth="40" markerHeight="40" refX="40" refY="12" orient="auto">
+                  <path d="M0,0 L40,12 L0,24 Z" fill="#94a3b8" />
+                </marker>
+              </defs>
+            </svg>
 
-                {/* Arrow Markers */}
-                <defs>
-                  <marker id="arrowStart" markerWidth="40" markerHeight="40" refX="0" refY="12" orient="auto">
-                    <path d="M0,12 L40,0 L40,24 Z" fill="#94a3b8" />
-                  </marker>
-                  <marker id="arrowEnd" markerWidth="40" markerHeight="40" refX="40" refY="12" orient="auto">
-                    <path d="M0,0 L40,12 L0,24 Z" fill="#94a3b8" />
-                  </marker>
-                </defs>
-              </svg>
-
-              {/* Legend - Overlay */}
-              <div className="absolute bottom-4 left-4 right-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur rounded-lg p-3 shadow-lg">
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-purple-500 rounded"></div>
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">Pintu</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-cyan-500 rounded"></div>
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">Jendela</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-blue-400 rounded"></div>
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">KM Mandi</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-purple-600 rounded"></div>
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">Kasur</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">Nurse Call</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">📏 6m x 4m</span>
-                  </div>
+            {/* Legend - Overlay */}
+            <div className="absolute bottom-4 left-4 right-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur rounded-lg p-3 shadow-lg">
+              <div className="flex flex-wrap gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Pintu</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-cyan-500 rounded"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Jendela</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-blue-400 rounded"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">KM Mandi</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-purple-600 rounded"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Kasur</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Nurse Call</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">📏 6m x 4m</span>
                 </div>
               </div>
+            </div>
           </div>
 
           {/* Right Side - Room Info */}
