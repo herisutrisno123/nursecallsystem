@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { rooms } from '../data/mockData';
+import { rooms as initialRooms } from '../data/mockData';
 import { Room, RoomStatus } from '../types';
-import { MapPin, Bed, AlertTriangle, Phone, Eye } from 'lucide-react';
+import { MapPin, Bed, AlertTriangle, Phone, Eye, Plus, Edit } from 'lucide-react';
 import RoomDetailView from './RoomDetailView';
+import RoomFormModal from './RoomFormModal';
 
 interface FloorMapProps {
   onRoomSelect: (room: Room) => void;
@@ -33,50 +34,80 @@ const statusLabels: Record<RoomStatus, string> = {
 };
 
 export default function FloorMap({ onRoomSelect }: FloorMapProps) {
+  const [rooms, setRooms] = useState<Room[]>(initialRooms);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [hoveredRoom, setHoveredRoom] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<RoomStatus | 'all'>('all');
   const [selectedWard, setSelectedWard] = useState<string>('all');
   const [showRoomDetail, setShowRoomDetail] = useState<Room | null>(null);
+  const [showRoomForm, setShowRoomForm] = useState<Room | null>(null);
 
   // Get unique wards
-  const wards = Array.from(new Set(rooms.map(r => r.ward)));
+  const wards = Array.from(new Set(rooms.map((r: Room) => r.ward)));
   
   // Filter rooms by ward and status
-  const filteredRooms = rooms.filter(r => {
+  const filteredRooms = rooms.filter((r: Room) => {
     const wardMatch = selectedWard === 'all' || r.ward === selectedWard;
     const statusMatch = filterStatus === 'all' || r.status === filterStatus;
     return wardMatch && statusMatch;
   });
 
   const statusCounts = {
-    normal: rooms.filter(r => r.status === 'normal').length,
-    calling: rooms.filter(r => r.status === 'calling').length,
-    emergency: rooms.filter(r => r.status === 'emergency').length,
-    answered: rooms.filter(r => r.status === 'answered').length,
-    offline: rooms.filter(r => r.status === 'offline').length,
+    normal: rooms.filter((r: Room) => r.status === 'normal').length,
+    calling: rooms.filter((r: Room) => r.status === 'calling').length,
+    emergency: rooms.filter((r: Room) => r.status === 'emergency').length,
+    answered: rooms.filter((r: Room) => r.status === 'answered').length,
+    offline: rooms.filter((r: Room) => r.status === 'offline').length,
   };
 
   // Ward statistics
   const wardStats = wards.map(ward => {
-    const wardRooms = rooms.filter(r => r.ward === ward);
+    const wardRooms = rooms.filter((r: Room) => r.ward === ward);
     return {
       name: ward,
       totalRooms: wardRooms.length,
-      totalBeds: wardRooms.reduce((sum, r) => sum + r.bedCount, 0),
-      occupiedBeds: wardRooms.filter(r => r.patient).reduce((sum, r) => sum + r.bedCount, 0),
-      calling: wardRooms.filter(r => r.status === 'calling').length,
-      emergency: wardRooms.filter(r => r.status === 'emergency').length,
+      totalBeds: wardRooms.reduce((sum: number, r: Room) => sum + r.bedCount, 0),
+      occupiedBeds: wardRooms.filter((r: Room) => r.patient).reduce((sum: number, r: Room) => sum + r.bedCount, 0),
+      calling: wardRooms.filter((r: Room) => r.status === 'calling').length,
+      emergency: wardRooms.filter((r: Room) => r.status === 'emergency').length,
     };
   });
+
+  // Handle save room (add or edit)
+  const handleSaveRoom = (room: Room) => {
+    const existingIndex = rooms.findIndex((r: Room) => r.id === room.id);
+    if (existingIndex >= 0) {
+      // Update existing room
+      const updatedRooms = [...rooms];
+      updatedRooms[existingIndex] = room;
+      setRooms(updatedRooms);
+    } else {
+      // Add new room with calculated position
+      const lastRoom = rooms[rooms.length - 1];
+      const newPosition = {
+        x: lastRoom ? lastRoom.position.x + 140 : 50,
+        y: lastRoom ? lastRoom.position.y : 80,
+      };
+      setRooms([...rooms, { ...room, position: newPosition }]);
+    }
+  };
 
   return (
     <div className="space-y-4">
       {/* Ward Filter */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <MapPin className="w-5 h-5 text-purple-500" />
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Filter Bangsal</h3>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-purple-500" />
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Filter Bangsal</h3>
+          </div>
+          <button
+            onClick={() => setShowRoomForm({} as Room)}
+            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Tambah Kamar
+          </button>
         </div>
         <div className="flex flex-wrap gap-2">
           <FilterButton
@@ -573,6 +604,14 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
                     Denah
                   </button>
                   <button
+                    onClick={() => setShowRoomForm(room)}
+                    className="flex-1 px-2 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded text-xs font-medium transition-colors flex items-center justify-center gap-1"
+                    title="Edit Kamar"
+                  >
+                    <Edit className="w-3 h-3" />
+                    Edit
+                  </button>
+                  <button
                     onClick={() => {
                       setSelectedRoom(room);
                       onRoomSelect(room);
@@ -594,6 +633,16 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
         <RoomDetailView
           room={showRoomDetail}
           onClose={() => setShowRoomDetail(null)}
+        />
+      )}
+
+      {/* Room Form Modal */}
+      {showRoomForm && (
+        <RoomFormModal
+          room={showRoomForm.id ? showRoomForm : null}
+          wards={wards}
+          onSave={handleSaveRoom}
+          onClose={() => setShowRoomForm(null)}
         />
       )}
     </div>
