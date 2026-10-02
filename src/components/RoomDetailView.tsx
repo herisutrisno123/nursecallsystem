@@ -1,5 +1,5 @@
 import { Room } from '../types';
-import { X } from 'lucide-react';
+import { X, ArrowLeft } from 'lucide-react';
 
 interface RoomDetailViewProps {
   room: Room;
@@ -18,27 +18,37 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
   const status = statusColors[room.status];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={onClose}>
       <div 
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-[95vw] h-[95vh] overflow-hidden flex flex-col"
+        className="absolute inset-0 bg-white dark:bg-gray-800 flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className={`px-4 py-2 ${status.bg} ${status.border} border-b-2 flex-shrink-0`}>
+        <div className={`px-6 py-4 ${status.bg} ${status.border} border-b-2 flex-shrink-0`}>
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold text-gray-800 dark:text-white">
-                Denah Kamar {room.number}
-              </h2>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
-                Bangsal {room.ward} • Lantai {room.floor}
-              </p>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={onClose}
+                className="flex items-center gap-2 px-4 py-2 bg-white/30 hover:bg-white/50 rounded-lg transition-colors font-medium"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                Kembali
+              </button>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                  Denah Kamar {room.number}
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Bangsal {room.ward} • Lantai {room.floor}
+                </p>
+              </div>
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
+              className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
+              title="Tutup"
             >
-              <X className="w-5 h-5 text-gray-800 dark:text-white" />
+              <X className="w-6 h-6 text-gray-800 dark:text-white" />
             </button>
           </div>
         </div>
@@ -46,9 +56,9 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
         {/* Content - Full Screen Layout */}
         <div className="flex-1 flex overflow-hidden">
           {/* Left Side - Room Layout SVG */}
-          <div className="flex-1 p-3 flex flex-col">
-            <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-lg p-2 flex items-center justify-center">
-              <svg viewBox="0 0 600 450" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+          <div className="flex-1 p-4 flex flex-col">
+            <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+              <svg viewBox="0 0 600 450" className="w-full h-full" preserveAspectRatio="xMidYMid meet" style={{ maxHeight: '100%', maxWidth: '100%' }}>
                 {/* Room Walls */}
                 <rect x="50" y="50" width="500" height="350" fill="#f8fafc" stroke="#64748b" strokeWidth="4" rx="4" />
                 
@@ -157,30 +167,30 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
             </div>
 
             {/* Legend - Inline */}
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-2 mt-2">
-              <div className="flex flex-wrap gap-3 text-xs">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 bg-purple-500 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300">Pintu</span>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 mt-3 flex-shrink-0">
+              <div className="flex flex-wrap gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Pintu</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 bg-cyan-500 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300">Jendela</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-cyan-500 rounded"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Jendela</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 bg-blue-400 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300">KM Mandi</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-blue-400 rounded"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">KM Mandi</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 bg-purple-600 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300">Kasur</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-purple-600 rounded"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Kasur</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span className="text-gray-700 dark:text-gray-300">Nurse Call</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Nurse Call</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-gray-700 dark:text-gray-300">📏 6m x 4m</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">📏 6m x 4m</span>
                 </div>
               </div>
             </div>
