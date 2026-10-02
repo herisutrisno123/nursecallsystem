@@ -67,7 +67,7 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
       name: ward,
       totalRooms: wardRooms.length,
       totalBeds: wardRooms.reduce((sum: number, r: Room) => sum + r.bedCount, 0),
-      occupiedBeds: wardRooms.filter((r: Room) => r.patient).reduce((sum: number, r: Room) => sum + r.bedCount, 0),
+      occupiedBeds: wardRooms.filter((r: Room) => r.patients && r.patients.length > 0).reduce((sum: number, r: Room) => sum + (r.patients?.length || 0), 0),
       calling: wardRooms.filter((r: Room) => r.status === 'calling').length,
       emergency: wardRooms.filter((r: Room) => r.status === 'emergency').length,
     };
@@ -440,7 +440,7 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
                 </g>
                 
                 {/* Patient Name (if occupied) */}
-                {room.patient && (
+                {room.patients && room.patients.length > 0 && (
                   <text
                     x={room.position.x + room.size.width / 2}
                     y={room.position.y + room.size.height - 8}
@@ -449,7 +449,7 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
                     fontSize="9"
                     fontWeight="500"
                   >
-                    {room.patient.name.split(' ').slice(0, 2).join(' ')}
+                    {room.patients[0].name.split(' ').slice(0, 2).join(' ')}
                   </text>
                 )}
                 
@@ -512,7 +512,7 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
                     🏠 Bangsal {room.ward}
                   </text>
                   <text x={tooltipX + 10} y={tooltipY + 46} fill="#d1d5db" fontSize="9">
-                    👤 {room.patient?.name || 'Kosong'}
+                    👤 {room.patients?.[0]?.name || 'Kosong'}
                   </text>
                   <text x={tooltipX + 10} y={tooltipY + 60} fill="#d1d5db" fontSize="9">
                     🛏️ {room.bedCount} Kasur | 🚿 Kamar Mandi
@@ -581,7 +581,7 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
                   {room.ward}
                 </p>
                 <p className="text-xs mt-1 truncate">
-                  {room.patient?.name.split(' ')[0] || 'Kosong'}
+                  {room.patients?.[0]?.name.split(' ')[0] || 'Kosong'}
                 </p>
                 <div className="flex justify-center gap-1 mt-2 text-xs">
                   <span title={`${room.bedCount} Kasur`}>🛏️{room.bedCount}</span>

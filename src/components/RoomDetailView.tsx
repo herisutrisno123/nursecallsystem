@@ -122,9 +122,9 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                     </text>
 
                     {/* Patient Name (if occupied) */}
-                    {room.patient && idx === 0 && (
+                    {room.patients && room.patients[idx] && (
                       <text x={bedX + 50} y={bedY - 8} textAnchor="middle" fontSize="8" fill="#4b5563" fontStyle="italic">
-                        {room.patient.name}
+                        {room.patients[idx].name}
                       </text>
                     )}
                   </g>
@@ -173,7 +173,7 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-2">
               <p className="text-xs text-gray-600 dark:text-gray-400">Pasien</p>
               <p className="text-sm font-bold text-gray-800 dark:text-white truncate">
-                {room.patient ? room.patient.name.split(' ')[0] : 'Kosong'}
+                {room.patients && room.patients.length > 0 ? room.patients[0].name.split(' ')[0] : 'Kosong'}
               </p>
             </div>
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-2">

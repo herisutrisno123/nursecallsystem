@@ -53,7 +53,7 @@ function AppContent() {
 
   const allTabs = [
     { id: 'dashboard' as Tab, label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, menuId: 'dashboard' },
-    { id: 'map' as Tab, label: 'Peta Kamar', icon: <Map className="w-5 h-5" />, menuId: 'map' },
+    { id: 'map' as Tab, label: 'Bangsal', icon: <Map className="w-5 h-5" />, menuId: 'map' },
     { id: 'calls' as Tab, label: 'Log Panggilan', icon: <PhoneCall className="w-5 h-5" />, menuId: 'calls' },
     { id: 'accounts' as Tab, label: 'Kelola Akun', icon: <Users className="w-5 h-5" />, menuId: 'accounts' },
     { id: 'reports' as Tab, label: 'Laporan', icon: <FileText className="w-5 h-5" />, menuId: 'reports' },
