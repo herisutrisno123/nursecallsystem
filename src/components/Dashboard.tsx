@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { dashboardStats, hourlyCallData, callTypeData, responseTimeData, nurseCalls, rooms } from '../data/mockData';
+import { Room } from '../types';
 import { AreaChart, PieChart, LineChart } from './Charts';
 import { useAuth } from '../context/AuthContext';
 import { Activity, Phone, Clock, AlertTriangle, CheckCircle, XCircle, TrendingUp, Users, Lock, Home, Filter } from 'lucide-react';
@@ -17,7 +18,7 @@ export default function Dashboard() {
     : rooms.filter(r => r.ward === selectedWard);
 
   // Filter nurse calls by ward (based on room numbers)
-  const filteredRoomNumbers = filteredRooms.map(r => r.number);
+  const filteredRoomNumbers = filteredRooms.map((r: Room) => r.number);
   const filteredCalls = nurseCalls.filter(c => filteredRoomNumbers.includes(c.roomNumber));
 
   // Calculate stats based on filtered data
@@ -37,18 +38,18 @@ export default function Dashboard() {
 
   // Ward statistics for all wards
   const wardStats = wards.map(ward => {
-    const wardRooms = rooms.filter(r => r.ward === ward);
-    const wardRoomNumbers = wardRooms.map(r => r.number);
+    const wardRooms = rooms.filter((r: Room) => r.ward === ward);
+    const wardRoomNumbers = wardRooms.map((r: Room) => r.number);
     const wardCalls = nurseCalls.filter(c => wardRoomNumbers.includes(c.roomNumber));
     
     return {
       name: ward,
       totalRooms: wardRooms.length,
-      totalBeds: wardRooms.reduce((sum, r) => sum + r.bedCount, 0),
-      occupiedBeds: wardRooms.filter(r => r.patient).reduce((sum, r) => sum + r.bedCount, 0),
-      calling: wardRooms.filter(r => r.status === 'calling').length,
-      emergency: wardRooms.filter(r => r.status === 'emergency').length,
-      normal: wardRooms.filter(r => r.status === 'normal').length,
+      totalBeds: wardRooms.reduce((sum: number, r: Room) => sum + r.bedCount, 0),
+      occupiedBeds: wardRooms.filter((r: Room) => r.patients && r.patients.length > 0).reduce((sum: number, r: Room) => sum + r.bedCount, 0),
+      calling: wardRooms.filter((r: Room) => r.status === 'calling').length,
+      emergency: wardRooms.filter((r: Room) => r.status === 'emergency').length,
+      normal: wardRooms.filter((r: Room) => r.status === 'normal').length,
       totalCalls: wardCalls.length,
     };
   });

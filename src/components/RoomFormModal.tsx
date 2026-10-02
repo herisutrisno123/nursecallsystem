@@ -17,11 +17,14 @@ export default function RoomFormModal({ room, wards, onSave, onClose }: RoomForm
     wing: 'Kiri',
     bedCount: 1,
     status: 'normal' as RoomStatus,
-    patientName: '',
-    patientAge: '',
-    patientDiagnosis: '',
-    patientDoctor: '',
   });
+
+  const [patientsData, setPatientsData] = useState<Array<{
+    name: string;
+    age: string;
+    diagnosis: string;
+    doctor: string;
+  }>>([{ name: '', age: '', diagnosis: '', doctor: '' }]);
 
   useEffect(() => {
     if (room) {
@@ -32,16 +35,55 @@ export default function RoomFormModal({ room, wards, onSave, onClose }: RoomForm
         wing: room.wing,
         bedCount: room.bedCount,
         status: room.status,
-        patientName: room.patient?.name || '',
-        patientAge: room.patient?.age?.toString() || '',
-        patientDiagnosis: room.patient?.diagnosis || '',
-        patientDoctor: room.patient?.doctor || '',
       });
+      
+      // Initialize patients data based on bedCount
+      const patientsArray = Array.from({ length: room.bedCount }, (_, idx) => ({
+        name: room.patients?.[idx]?.name || '',
+        age: room.patients?.[idx]?.age?.toString() || '',
+        diagnosis: room.patients?.[idx]?.diagnosis || '',
+        doctor: room.patients?.[idx]?.doctor || '',
+      }));
+      setPatientsData(patientsArray);
     }
   }, [room]);
 
+  useEffect(() => {
+    // Adjust patients array when bedCount changes
+    setPatientsData(prev => {
+      if (prev.length < formData.bedCount) {
+        return [...prev, ...Array.from({ length: formData.bedCount - prev.length }, () => ({
+          name: '', age: '', diagnosis: '', doctor: ''
+        }))];
+      } else if (prev.length > formData.bedCount) {
+        return prev.slice(0, formData.bedCount);
+      }
+      return prev;
+    });
+  }, [formData.bedCount]);
+
+  const handlePatientChange = (index: number, field: string, value: string) => {
+    setPatientsData(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const patients = patientsData
+      .filter(p => p.name.trim() !== '')
+      .map((p, idx) => ({
+        id: room?.patients?.[idx]?.id || `p${Date.now()}_${idx}`,
+        name: p.name,
+        age: parseInt(p.age) || 0,
+        diagnosis: p.diagnosis,
+        doctor: p.doctor,
+        admissionDate: room?.patients?.[idx]?.admissionDate || new Date().toISOString().split('T')[0],
+        allergies: room?.patients?.[idx]?.allergies || [],
+      }));
 
     const newRoom: Room = {
       id: room?.id || `r${Date.now()}`,
@@ -53,15 +95,7 @@ export default function RoomFormModal({ room, wards, onSave, onClose }: RoomForm
       status: formData.status,
       position: room?.position || { x: 0, y: 0 },
       size: room?.size || { width: 120, height: 90 },
-      patient: formData.patientName ? {
-        id: room?.patient?.id || `p${Date.now()}`,
-        name: formData.patientName,
-        age: parseInt(formData.patientAge) || 0,
-        diagnosis: formData.patientDiagnosis,
-        doctor: formData.patientDoctor,
-        admissionDate: room?.patient?.admissionDate || new Date().toISOString().split('T')[0],
-        allergies: room?.patient?.allergies || [],
-      } : undefined,
+      patients: patients.length > 0 ? patients : undefined,
     };
 
     onSave(newRoom);
@@ -186,66 +220,76 @@ export default function RoomFormModal({ room, wards, onSave, onClose }: RoomForm
             </div>
           </div>
 
-          {/* Patient Info Section */}
+          {/* Patients Info Section - Per Bed */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 border-b pb-2">
-              Informasi Pasien (Opsional)
+              Informasi Pasien per Tempat Tidur (Opsional)
             </h3>
             
-            <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Nama Pasien
-                </label>
-                <input
-                  type="text"
-                  value={formData.patientName}
-                  onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                  placeholder="Contoh: Ahmad Suryadi"
-                />
-              </div>
+            <div className="space-y-4">
+              {patientsData.map((patient, idx) => (
+                <div key={idx} className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-900/50">
+                  <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300 mb-3 flex items-center gap-2">
+                    🛏️ Tempat Tidur {idx + 1}
+                  </h4>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Nama Pasien
+                      </label>
+                      <input
+                        type="text"
+                        value={patient.name}
+                        onChange={(e) => handlePatientChange(idx, 'name', e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                        placeholder={`Pasien TT ${idx + 1}`}
+                      />
+                    </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Usia
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max="150"
-                  value={formData.patientAge}
-                  onChange={(e) => setFormData({ ...formData, patientAge: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                  placeholder="Contoh: 45"
-                />
-              </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Usia
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="150"
+                        value={patient.age}
+                        onChange={(e) => handlePatientChange(idx, 'age', e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                        placeholder="45"
+                      />
+                    </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Dokter Penanggung Jawab
-                </label>
-                <input
-                  type="text"
-                  value={formData.patientDoctor}
-                  onChange={(e) => setFormData({ ...formData, patientDoctor: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                  placeholder="Contoh: dr. Siti Rahayu"
-                />
-              </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Dokter PJ
+                      </label>
+                      <input
+                        type="text"
+                        value={patient.doctor}
+                        onChange={(e) => handlePatientChange(idx, 'doctor', e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                        placeholder="dr. Nama"
+                      />
+                    </div>
 
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Diagnosa
-                </label>
-                <input
-                  type="text"
-                  value={formData.patientDiagnosis}
-                  onChange={(e) => setFormData({ ...formData, patientDiagnosis: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                  placeholder="Contoh: Hipertensi"
-                />
-              </div>
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Diagnosa
+                      </label>
+                      <input
+                        type="text"
+                        value={patient.diagnosis}
+                        onChange={(e) => handlePatientChange(idx, 'diagnosis', e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                        placeholder="Hipertensi, DM, dll"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
