@@ -54,11 +54,15 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
         </div>
 
         {/* Content - Full Screen Layout */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden p-4 gap-4">
           {/* Left Side - Room Layout SVG */}
-          <div className="flex-1 p-4 flex flex-col">
-            <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
-              <svg viewBox="0 0 2400 1800" className="w-full h-full" preserveAspectRatio="xMidYMid meet" style={{ maxHeight: '100%', maxWidth: '100%' }}>
+          <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-lg relative overflow-hidden">
+            <svg 
+              viewBox="0 0 2400 1800" 
+              className="w-full h-full" 
+              preserveAspectRatio="xMidYMid meet"
+              style={{ display: 'block' }}
+            >
                 {/* Room Walls */}
                 <rect x="200" y="200" width="2000" height="1400" fill="#f8fafc" stroke="#64748b" strokeWidth="16" rx="16" />
                 
@@ -164,40 +168,39 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                   </marker>
                 </defs>
               </svg>
-            </div>
 
-            {/* Legend - Inline */}
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 mt-3 flex-shrink-0">
-              <div className="flex flex-wrap gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-purple-500 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">Pintu</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-cyan-500 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">Jendela</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-blue-400 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">KM Mandi</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-purple-600 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">Kasur</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">Nurse Call</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">📏 6m x 4m</span>
+              {/* Legend - Overlay */}
+              <div className="absolute bottom-4 left-4 right-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur rounded-lg p-3 shadow-lg">
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">Pintu</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-cyan-500 rounded"></div>
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">Jendela</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-blue-400 rounded"></div>
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">KM Mandi</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-purple-600 rounded"></div>
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">Kasur</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">Nurse Call</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">📏 6m x 4m</span>
+                  </div>
                 </div>
               </div>
-            </div>
           </div>
 
           {/* Right Side - Room Info */}
-          <div className="w-64 p-3 flex flex-col gap-2 border-l border-gray-200 dark:border-gray-700">
+          <div className="w-80 p-4 flex flex-col gap-3 border-l border-gray-200 dark:border-gray-700 overflow-y-auto">
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
               <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Status</p>
               <p className={`text-sm font-bold ${status.text}`}>
