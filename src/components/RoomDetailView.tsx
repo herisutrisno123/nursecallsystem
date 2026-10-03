@@ -108,19 +108,29 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
               style={{ width: '100%', height: '100%', display: 'block' }}
               preserveAspectRatio="xMidYMid meet"
             >
-              {/* Room Walls - Ukuran dinamis berdasarkan jumlah tempat tidur */}
+              {/* Room Walls - Ukuran dinamis berdasarkan tempat tidur + kamar mandi */}
               {(() => {
                 const bedWidth = 480;
                 const bedHeight = 320;
                 const gap = 40;
                 const maxPerRow = 3;
-                const padding = 200;
+                const padding = 150;
                 
                 const rows = Math.ceil(room.bedCount / maxPerRow);
                 const maxColsInAnyRow = Math.min(maxPerRow, room.bedCount);
                 
-                const roomWidth = (maxColsInAnyRow * bedWidth) + ((maxColsInAnyRow - 1) * gap) + (padding * 2);
-                const roomHeight = (rows * bedHeight) + ((rows - 1) * gap) + (padding * 2) + 400; // +400 untuk kamar mandi di atas
+                // Kamar mandi di atas tempat tidur
+                const bathroomWidth = 480;
+                const bathroomHeight = 320;
+                
+                // Hitung total width (ambil yang lebih besar antara TT atau KM)
+                const contentWidth = Math.max(maxColsInAnyRow * bedWidth + (maxColsInAnyRow - 1) * gap, bathroomWidth);
+                
+                // Hitung total height (KM + gap + TT rows)
+                const contentHeight = bathroomHeight + gap + (rows * bedHeight) + ((rows - 1) * gap);
+                
+                const roomWidth = contentWidth + (padding * 2);
+                const roomHeight = contentHeight + (padding * 2);
                 
                 const roomX = (2400 - roomWidth) / 2;
                 const roomY = (1800 - roomHeight) / 2;
@@ -140,39 +150,132 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                 );
               })()}
 
-              {/* Door - Pintu Masuk - 4x lebih besar */}
-              <rect x="200" y="800" width="16" height="240" fill="#8b5cf6" />
-              <path d="M 200 800 Q 80 920 200 1040" fill="none" stroke="#8b5cf6" strokeWidth="8" strokeDasharray="20,20" />
-              <text x="60" y="940" fontSize="48" fill="#6b7280" fontWeight="bold">PINTU</text>
+              {/* Door - Pintu Masuk - posisi dinamis */}
+              {(() => {
+                const bedWidth = 480;
+                const bedHeight = 320;
+                const gap = 40;
+                const maxPerRow = 3;
+                const padding = 150;
+                
+                const rows = Math.ceil(room.bedCount / maxPerRow);
+                const maxColsInAnyRow = Math.min(maxPerRow, room.bedCount);
+                const bathroomWidth = 480;
+                const bathroomHeight = 320;
+                
+                const contentWidth = Math.max(maxColsInAnyRow * bedWidth + (maxColsInAnyRow - 1) * gap, bathroomWidth);
+                const contentHeight = bathroomHeight + gap + (rows * bedHeight) + ((rows - 1) * gap);
+                
+                const roomWidth = contentWidth + (padding * 2);
+                const roomHeight = contentHeight + (padding * 2);
+                
+                const roomX = (2400 - roomWidth) / 2;
+                const roomY = (1800 - roomHeight) / 2;
+                
+                const doorX = roomX;
+                const doorY = roomY + roomHeight / 2 - 120;
+                
+                return (
+                  <>
+                    <rect x={doorX} y={doorY} width="16" height="240" fill="#8b5cf6" />
+                    <path d={`M ${doorX} ${doorY} Q ${doorX - 120} ${doorY + 120} ${doorX} ${doorY + 240}`} fill="none" stroke="#8b5cf6" strokeWidth="8" strokeDasharray="20,20" />
+                    <text x={doorX - 140} y={doorY + 140} fontSize="48" fill="#6b7280" fontWeight="bold">PINTU</text>
+                  </>
+                );
+              })()}
 
-              {/* Window - Jendela - 4x lebih besar */}
-              <rect x="2184" y="480" width="16" height="320" fill="#06b6d4" />
-              <line x1="2192" y1="480" x2="2192" y2="800" stroke="#67e8f9" strokeWidth="8" />
-              <text x="2220" y="660" fontSize="40" fill="#6b7280">JENDELA</text>
+              {/* Window - Jendela - posisi dinamis */}
+              {(() => {
+                const bedWidth = 480;
+                const bedHeight = 320;
+                const gap = 40;
+                const maxPerRow = 3;
+                const padding = 150;
+                
+                const rows = Math.ceil(room.bedCount / maxPerRow);
+                const maxColsInAnyRow = Math.min(maxPerRow, room.bedCount);
+                const bathroomWidth = 480;
+                const bathroomHeight = 320;
+                
+                const contentWidth = Math.max(maxColsInAnyRow * bedWidth + (maxColsInAnyRow - 1) * gap, bathroomWidth);
+                const contentHeight = bathroomHeight + gap + (rows * bedHeight) + ((rows - 1) * gap);
+                
+                const roomWidth = contentWidth + (padding * 2);
+                const roomHeight = contentHeight + (padding * 2);
+                
+                const roomX = (2400 - roomWidth) / 2;
+                const roomY = (1800 - roomHeight) / 2;
+                
+                const windowX = roomX + roomWidth - 16;
+                const windowY = roomY + roomHeight / 2 - 160;
+                
+                return (
+                  <>
+                    <rect x={windowX} y={windowY} width="16" height="320" fill="#06b6d4" />
+                    <line x1={windowX + 8} y1={windowY} x2={windowX + 8} y2={windowY + 320} stroke="#67e8f9" strokeWidth="8" />
+                    <text x={windowX + 30} y={windowY + 180} fontSize="40" fill="#6b7280">JENDELA</text>
+                  </>
+                );
+              })()}
 
-              {/* Bathroom - Kamar Mandi - ukuran sama dengan tempat tidur (480x320) */}
-              <rect x="1520" y="200" width="480" height="320" fill="#e0f2fe" stroke="#0284c7" strokeWidth="8" rx="16" />
-              <text x="1760" y="260" textAnchor="middle" fontSize="40" fill="#0369a1" fontWeight="bold">KAMAR MANDI</text>
-              
-              {/* Shower - diperkecil proporsional */}
-              <circle cx="1640" cy="360" r="40" fill="#67e8f9" stroke="#0891b2" strokeWidth="6" />
-              <circle cx="1640" cy="360" r="22" fill="#22d3ee" />
-              <line x1="1640" y1="320" x2="1640" y2="360" stroke="#0891b2" strokeWidth="8" />
-              <line x1="1625" y1="400" x2="1625" y2="430" stroke="#67e8f9" strokeWidth="4" />
-              <line x1="1640" y1="400" x2="1640" y2="430" stroke="#67e8f9" strokeWidth="4" />
-              <line x1="1655" y1="400" x2="1655" y2="430" stroke="#67e8f9" strokeWidth="4" />
-              <text x="1640" y="470" textAnchor="middle" fontSize="28" fill="#0369a1">Shower</text>
+              {/* Bathroom - Kamar Mandi - posisi dinamis di atas tempat tidur */}
+              {(() => {
+                const bedWidth = 480;
+                const bedHeight = 320;
+                const gap = 40;
+                const maxPerRow = 3;
+                const padding = 150;
+                
+                const rows = Math.ceil(room.bedCount / maxPerRow);
+                const maxColsInAnyRow = Math.min(maxPerRow, room.bedCount);
+                
+                // Kamar mandi di atas tempat tidur
+                const bathroomWidth = 480;
+                const bathroomHeight = 320;
+                
+                // Hitung total width (ambil yang lebih besar antara TT atau KM)
+                const contentWidth = Math.max(maxColsInAnyRow * bedWidth + (maxColsInAnyRow - 1) * gap, bathroomWidth);
+                
+                // Hitung total height (KM + gap + TT rows)
+                const contentHeight = bathroomHeight + gap + (rows * bedHeight) + ((rows - 1) * gap);
+                
+                const roomWidth = contentWidth + (padding * 2);
+                const roomHeight = contentHeight + (padding * 2);
+                
+                const roomX = (2400 - roomWidth) / 2;
+                const roomY = (1800 - roomHeight) / 2;
+                
+                // Posisi kamar mandi: di atas, center horizontal
+                const bathroomX = roomX + (roomWidth - bathroomWidth) / 2;
+                const bathroomY = roomY + padding;
+                
+                return (
+                  <>
+                    <rect x={bathroomX} y={bathroomY} width={bathroomWidth} height={bathroomHeight} fill="#e0f2fe" stroke="#0284c7" strokeWidth="8" rx="16" />
+                    <text x={bathroomX + bathroomWidth / 2} y={bathroomY + 60} textAnchor="middle" fontSize="40" fill="#0369a1" fontWeight="bold">KAMAR MANDI</text>
+                    
+                    {/* Shower - diperkecil proporsional */}
+                    <circle cx={bathroomX + 120} cy={bathroomY + 160} r="40" fill="#67e8f9" stroke="#0891b2" strokeWidth="6" />
+                    <circle cx={bathroomX + 120} cy={bathroomY + 160} r="22" fill="#22d3ee" />
+                    <line x1={bathroomX + 120} y1={bathroomY + 120} x2={bathroomX + 120} y2={bathroomY + 160} stroke="#0891b2" strokeWidth="8" />
+                    <line x1={bathroomX + 105} y1={bathroomY + 200} x2={bathroomX + 105} y2={bathroomY + 230} stroke="#67e8f9" strokeWidth="4" />
+                    <line x1={bathroomX + 120} y1={bathroomY + 200} x2={bathroomX + 120} y2={bathroomY + 230} stroke="#67e8f9" strokeWidth="4" />
+                    <line x1={bathroomX + 135} y1={bathroomY + 200} x2={bathroomX + 135} y2={bathroomY + 230} stroke="#67e8f9" strokeWidth="4" />
+                    <text x={bathroomX + 120} y={bathroomY + 270} textAnchor="middle" fontSize="28" fill="#0369a1">Shower</text>
 
-              {/* Toilet - diperkecil proporsional */}
-              <ellipse cx="1880" cy="360" rx="48" ry="66" fill="#f0f9ff" stroke="#0284c7" strokeWidth="6" />
-              <ellipse cx="1880" cy="346" rx="32" ry="40" fill="#e0f2fe" stroke="#0284c7" strokeWidth="3" />
-              <rect x="1848" y="294" width="64" height="22" fill="#0284c7" rx="6" />
-              <text x="1880" y="470" textAnchor="middle" fontSize="28" fill="#0369a1">Toilet</text>
+                    {/* Toilet - diperkecil proporsional */}
+                    <ellipse cx={bathroomX + 360} cy={bathroomY + 160} rx="48" ry="66" fill="#f0f9ff" stroke="#0284c7" strokeWidth="6" />
+                    <ellipse cx={bathroomX + 360} cy={bathroomY + 146} rx="32" ry="40" fill="#e0f2fe" stroke="#0284c7" strokeWidth="3" />
+                    <rect x={bathroomX + 328} y={bathroomY + 94} width="64" height="22" fill="#0284c7" rx="6" />
+                    <text x={bathroomX + 360} y={bathroomY + 270} textAnchor="middle" fontSize="28" fill="#0369a1">Toilet</text>
 
-              {/* Sink - diperkecil proporsional */}
-              <rect x="1720" y="480" width="80" height="26" fill="#f0f9ff" stroke="#0284c7" strokeWidth="4" rx="6" />
-              <circle cx="1760" cy="493" r="8" fill="#0284c7" />
-              <text x="1760" y="530" textAnchor="middle" fontSize="24" fill="#0369a1">Wastafel</text>
+                    {/* Sink - diperkecil proporsional */}
+                    <rect x={bathroomX + 200} y={bathroomY + 280} width="80" height="26" fill="#f0f9ff" stroke="#0284c7" strokeWidth="4" rx="6" />
+                    <circle cx={bathroomX + 240} cy={bathroomY + 293} r="8" fill="#0284c7" />
+                    <text x={bathroomX + 240} y={bathroomY + 330} textAnchor="middle" fontSize="24" fill="#0369a1">Wastafel</text>
+                  </>
+                );
+              })()}
 
               {/* Beds - Tempat Tidur dengan layout dinamis (max 3 per baris) */}
               {Array.from({ length: room.bedCount }).map((_, idx) => {
@@ -180,6 +283,29 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                 const bedHeight = 320;
                 const gap = 40;
                 const maxPerRow = 3;
+                const padding = 150;
+                
+                const rows = Math.ceil(room.bedCount / maxPerRow);
+                const maxColsInAnyRow = Math.min(maxPerRow, room.bedCount);
+                
+                // Kamar mandi di atas tempat tidur
+                const bathroomWidth = 480;
+                const bathroomHeight = 320;
+                
+                // Hitung total width (ambil yang lebih besar antara TT atau KM)
+                const contentWidth = Math.max(maxColsInAnyRow * bedWidth + (maxColsInAnyRow - 1) * gap, bathroomWidth);
+                
+                // Hitung total height (KM + gap + TT rows)
+                const contentHeight = bathroomHeight + gap + (rows * bedHeight) + ((rows - 1) * gap);
+                
+                const roomWidth = contentWidth + (padding * 2);
+                const roomHeight = contentHeight + (padding * 2);
+                
+                const roomX = (2400 - roomWidth) / 2;
+                const roomY = (1800 - roomHeight) / 2;
+                
+                // Posisi tempat tidur: di bawah kamar mandi
+                const bedsStartY = roomY + padding + bathroomHeight + gap;
                 
                 // Hitung posisi berdasarkan index
                 const row = Math.floor(idx / maxPerRow);
@@ -192,10 +318,10 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                 const totalRowWidth = (bedsInThisRow * bedWidth) + ((bedsInThisRow - 1) * gap);
                 
                 // Center horizontally
-                const startX = (2400 - totalRowWidth) / 2;
+                const startX = roomX + (roomWidth - totalRowWidth) / 2;
                 
                 const bedX = startX + (col * (bedWidth + gap));
-                const bedY = 700 + (row * (bedHeight + gap));
+                const bedY = bedsStartY + (row * (bedHeight + gap));
                 
                 return (
                   <g key={idx}>
@@ -220,27 +346,39 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                 );
               })}
 
-              {/* Nurse Call Button - r=48 (4x dari 12) */}
-              <circle cx="400" cy="400" r="48" fill="#ef4444" stroke="#dc2626" strokeWidth="8" />
-              <text x="400" y="420" textAnchor="middle" fontSize="40" fill="white" fontWeight="bold">!</text>
-              <text x="400" y="500" textAnchor="middle" fontSize="36" fill="#dc2626">Nurse Call</text>
-
-              {/* Room Dimensions - 4x lebih besar */}
-              <line x1="200" y1="1640" x2="2200" y2="1640" stroke="#94a3b8" strokeWidth="4" markerStart="url(#arrowStart)" markerEnd="url(#arrowEnd)" />
-              <text x="1200" y="1720" textAnchor="middle" fontSize="48" fill="#64748b">6m</text>
-              
-              <line x1="2240" y1="200" x2="2240" y2="1600" stroke="#94a3b8" strokeWidth="4" />
-              <text x="2320" y="900" textAnchor="middle" fontSize="48" fill="#64748b" transform="rotate(90 2320 900)">4m</text>
-
-              {/* Arrow Markers - 4x lebih besar */}
-              <defs>
-                <marker id="arrowStart" markerWidth="40" markerHeight="40" refX="0" refY="12" orient="auto">
-                  <path d="M0,12 L40,0 L40,24 Z" fill="#94a3b8" />
-                </marker>
-                <marker id="arrowEnd" markerWidth="40" markerHeight="40" refX="40" refY="12" orient="auto">
-                  <path d="M0,0 L40,12 L0,24 Z" fill="#94a3b8" />
-                </marker>
-              </defs>
+              {/* Nurse Call Button - posisi dinamis */}
+              {(() => {
+                const bedWidth = 480;
+                const bedHeight = 320;
+                const gap = 40;
+                const maxPerRow = 3;
+                const padding = 150;
+                
+                const rows = Math.ceil(room.bedCount / maxPerRow);
+                const maxColsInAnyRow = Math.min(maxPerRow, room.bedCount);
+                const bathroomWidth = 480;
+                const bathroomHeight = 320;
+                
+                const contentWidth = Math.max(maxColsInAnyRow * bedWidth + (maxColsInAnyRow - 1) * gap, bathroomWidth);
+                const contentHeight = bathroomHeight + gap + (rows * bedHeight) + ((rows - 1) * gap);
+                
+                const roomWidth = contentWidth + (padding * 2);
+                const roomHeight = contentHeight + (padding * 2);
+                
+                const roomX = (2400 - roomWidth) / 2;
+                const roomY = (1800 - roomHeight) / 2;
+                
+                const nurseCallX = roomX + 80;
+                const nurseCallY = roomY + 80;
+                
+                return (
+                  <>
+                    <circle cx={nurseCallX} cy={nurseCallY} r="48" fill="#ef4444" stroke="#dc2626" strokeWidth="8" />
+                    <text x={nurseCallX} y={nurseCallY + 20} textAnchor="middle" fontSize="40" fill="white" fontWeight="bold">!</text>
+                    <text x={nurseCallX} y={nurseCallY + 100} textAnchor="middle" fontSize="36" fill="#dc2626">Nurse Call</text>
+                  </>
+                );
+              })()}
             </svg>
           </div>
         </div>
