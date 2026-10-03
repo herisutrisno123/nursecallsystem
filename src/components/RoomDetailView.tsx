@@ -62,8 +62,8 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                 <h2 className="text-lg font-bold text-gray-800 dark:text-white">
                   Kamar {room.number}
                 </h2>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  {room.ward} • Lantai {room.floor}
+                <p className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                  Bangsal {room.ward} • Lantai {room.floor}
                 </p>
               </div>
             </div>
@@ -143,14 +143,14 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                     {/* Mattress - 440x280 */}
                     <rect x={bedX + 20} y={bedY + 20} width="440" height="280" fill="#c4b5fd" stroke="#a78bfa" strokeWidth="4" rx="12" />
                     
-                    {/* Bed Label - fontSize 44 (4x dari 11) */}
-                    <text x={bedX + 240} y={bedY + 180} textAnchor="middle" fontSize="56" fill="#6d28d9" fontWeight="bold">
+                    {/* Bed Label - fontSize 72 */}
+                    <text x={bedX + 240} y={bedY + 180} textAnchor="middle" fontSize="72" fill="#6d28d9" fontWeight="bold">
                       TT {idx + 1}
                     </text>
 
-                    {/* Patient Name - fontSize 40 (4x dari 10) */}
+                    {/* Patient Name - fontSize 70 */}
                     {room.patients && room.patients[idx] && (
-                      <text x={bedX + 240} y={bedY - 40} textAnchor="middle" fontSize="40" fill="#4b5563" fontStyle="italic">
+                      <text x={bedX + 240} y={bedY - 60} textAnchor="middle" fontSize="70" fill="#1f2937" fontWeight="bold">
                         {room.patients[idx].name}
                       </text>
                     )}
