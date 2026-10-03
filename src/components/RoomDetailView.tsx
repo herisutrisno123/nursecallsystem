@@ -18,9 +18,33 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
   const status = statusColors[room.status];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      }}
+      onClick={onClose}
+    >
       <div 
-        className="absolute inset-0 bg-white dark:bg-gray-800 flex flex-col"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
