@@ -72,56 +72,63 @@ export default function RoomDetail({ room, onClose }: RoomDetailProps) {
           </div>
 
           {/* Patient Info */}
-          {room.patient ? (
-            <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 space-y-3">
+          {room.patients && room.patients.length > 0 ? (
+            <div className="space-y-3">
               <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2">
                 <User className="w-4 h-4 text-blue-500" />
-                Data Pasien
+                Data Pasien ({room.patients.length})
               </h3>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400">Nama</p>
-                  <p className="font-medium text-gray-800 dark:text-white">{room.patient.name}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400">Usia</p>
-                  <p className="font-medium text-gray-800 dark:text-white">{room.patient.age} tahun</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400">Diagnosa</p>
-                  <p className="font-medium text-gray-800 dark:text-white">{room.patient.diagnosis}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400">Dokter</p>
-                  <p className="font-medium text-gray-800 dark:text-white">{room.patient.doctor}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                    <Calendar className="w-3 h-3" /> Tanggal Masuk
-                  </p>
-                  <p className="font-medium text-gray-800 dark:text-white">
-                    {new Date(room.patient.admissionDate).toLocaleDateString('id-ID', {
-                      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                    })}
-                  </p>
-                </div>
-              </div>
-
-              {/* Allergies */}
-              {room.patient.allergies.length > 0 && (
-                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-2">
-                    <AlertCircle className="w-3 h-3 text-red-500" /> Alergi
-                  </p>
-                  <div className="flex flex-wrap gap-1">
-                    {room.patient.allergies.map((allergy, idx) => (
-                      <span key={idx} className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full text-xs font-medium">
-                        ⚠️ {allergy}
-                      </span>
-                    ))}
+              {room.patients.map((patient, idx) => (
+                <div key={patient.id || idx} className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 space-y-3">
+                  <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300 flex items-center gap-2">
+                    🛏️ Tempat Tidur {idx + 1}
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-gray-500 dark:text-gray-400">Nama</p>
+                      <p className="font-medium text-gray-800 dark:text-white">{patient.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 dark:text-gray-400">Usia</p>
+                      <p className="font-medium text-gray-800 dark:text-white">{patient.age} tahun</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 dark:text-gray-400">Diagnosa</p>
+                      <p className="font-medium text-gray-800 dark:text-white">{patient.diagnosis}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 dark:text-gray-400">Dokter</p>
+                      <p className="font-medium text-gray-800 dark:text-white">{patient.doctor}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <Calendar className="w-3 h-3" /> Tanggal Masuk
+                      </p>
+                      <p className="font-medium text-gray-800 dark:text-white">
+                        {new Date(patient.admissionDate).toLocaleDateString('id-ID', {
+                          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                        })}
+                      </p>
+                    </div>
                   </div>
+
+                  {/* Allergies */}
+                  {patient.allergies && patient.allergies.length > 0 && (
+                    <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-2">
+                        <AlertCircle className="w-3 h-3 text-red-500" /> Alergi
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        {patient.allergies.map((allergy: string, allergyIdx: number) => (
+                          <span key={allergyIdx} className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full text-xs font-medium">
+                            ⚠️ {allergy}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+              ))}
             </div>
           ) : (
             <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-center text-gray-500 dark:text-gray-400">

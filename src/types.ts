@@ -17,9 +17,10 @@ export interface Room {
   number: string;
   floor: number;
   wing: string;
+  ward: string;
   bedCount: number;
   status: RoomStatus;
-  patient?: Patient;
+  patients?: Patient[];
   position: { x: number; y: number };
   size: { width: number; height: number };
 }

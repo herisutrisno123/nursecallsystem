@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Kasur Sederhana - Tanpa Bantal & Selimut</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .info {
+            background: #dcfce7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #22c55e;
+        }
+        .info h2 {
+            margin: 0 0 10px 0;
+            color: #166534;
+            font-size: 18px;
+        }
+        .info p {
+            margin: 5px 0;
+            color: #14532d;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .box {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+        .box h3 {
+            margin: 0 0 10px 0;
+            color: #1f2937;
+            font-size: 16px;
+        }
+        svg {
+            width: 100%;
+            height: auto;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            background: white;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 4px solid #f59e0b;
+        }
+        .highlight p {
+            margin: 5px 0;
+            color: #92400e;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛏️ Test Kasur Sederhana - Tanpa Bantal & Selimut</h1>
+        
+        <div class="info">
+            <h2>✅ Perubahan yang Sudah Diterapkan</h2>
+            <p><strong>1.</strong> Bantal (Pillow) telah DIHAPUS</p>
+            <p><strong>2.</strong> Selimut (Blanket) dengan motif garis telah DIHAPUS</p>
+            <p><strong>3.</strong> Teks "Bantal" telah DIHAPUS</p>
+            <p><strong>4.</strong> Sekarang hanya ada: Frame Kasur + Matras + Label "TT 1/TT 2"</p>
+        </div>
+
+        <div class="comparison">
+            <!-- SEBELUM -->
+            <div class="box">
+                <h3>❌ SEBELUM (Dengan Bantal & Selimut)</h3>
+                <svg viewBox="0 0 600 400">
+                    <!-- Bed Frame -->
+                    <rect x="50" y="50" width="500" height="300" fill="#8b5cf6" stroke="#6d28d9" stroke-width="4" rx="8"/>
+                    
+                    <!-- Mattress -->
+                    <rect x="70" y="70" width="460" height="260" fill="#c4b5fd" stroke="#a78bfa" stroke-width="2" rx="6"/>
+                    
+                    <!-- Pillow (AKAN DIHAPUS) -->
+                    <rect x="90" y="90" width="120" height="80" fill="#e9d5ff" stroke="#c4b5fd" stroke-width="2" rx="6"/>
+                    <text x="150" y="140" text-anchor="middle" font-size="20" fill="#6d28d9">Bantal</text>
+                    
+                    <!-- Blanket (AKAN DIHAPUS) -->
+                    <rect x="230" y="90" width="280" height="220" fill="#ddd6fe" stroke="#a78bfa" stroke-width="2" rx="4"/>
+                    <line x1="250" y1="130" x2="490" y2="130" stroke="#a78bfa" stroke-width="2"/>
+                    <line x1="250" y1="180" x2="490" y2="180" stroke="#a78bfa" stroke-width="2"/>
+                    <line x1="250" y1="230" x2="490" y2="230" stroke="#a78bfa" stroke-width="2"/>
+                    <line x1="250" y1="280" x2="490" y2="280" stroke="#a78bfa" stroke-width="2"/>
+                    
+                    <!-- Label -->
+                    <text x="300" y="340" text-anchor="middle" font-size="24" fill="#6d28d9" font-weight="bold">TT 1</text>
+                </svg>
+                <div class="highlight">
+                    <p>⚠️ Ada bantal dan selimut dengan motif garis</p>
+                </div>
+            </div>
+
+            <!-- SESUDAH -->
+            <div class="box" style="border-color: #22c55e;">
+                <h3>✅ SESUDAH (Hanya Kasur Sederhana)</h3>
+                <svg viewBox="0 0 600 400">
+                    <!-- Bed Frame -->
+                    <rect x="50" y="50" width="500" height="300" fill="#8b5cf6" stroke="#6d28d9" stroke-width="4" rx="8"/>
+                    
+                    <!-- Mattress -->
+                    <rect x="70" y="70" width="460" height="260" fill="#c4b5fd" stroke="#a78bfa" stroke-width="2" rx="6"/>
+                    
+                    <!-- Label di tengah -->
+                    <text x="300" y="220" text-anchor="middle" font-size="48" fill="#6d28d9" font-weight="bold">TT 1</text>
+                </svg>
+                <div class="highlight" style="background: #dcfce7; border-color: #22c55e;">
+                    <p style="color: #166534;">✅ Hanya frame kasur + matras + label "TT 1"</p>
+                    <p style="color: #166534;">✅ Tidak ada bantal dan selimut</p>
+                    <p style="color: #166534;">✅ Lebih sederhana dan jelas</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info" style="margin-top: 20px; background: #dbeafe; border-color: #3b82f6;">
+            <h2 style="color: #1e40af;">📋 Cara Melihat Perubahan di Aplikasi</h2>
+            <p style="color: #1e3a8a;"><strong>1.</strong> Buka aplikasi NurseCall Monitor</p>
+            <p style="color: #1e3a8a;"><strong>2.</strong> Menu <strong>Bangsal</strong></p>
+            <p style="color: #1e3a8a;"><strong>3.</strong> Klik tombol <strong>"👁 Denah"</strong> pada card kamar</p>
+            <p style="color: #1e3a8a;"><strong>4.</strong> Lihat modal detail kamar</p>
+            <p style="color: #1e3a8a;"><strong>5.</strong> Kasur sekarang hanya menampilkan frame + matras + label "TT 1/TT 2"</p>
+        </div>
+
+        <div class="info" style="background: #fef3c7; border-color: #f59e0b;">
+            <h2 style="color: #92400e;">⚠️ Jika Masih Lihat Bantal & Selimut</h2>
+            <p style="color: #78350f;"><strong>Browser cache masih menyimpan file lama!</strong></p>
+            <p style="color: #78350f; margin-top: 10px;"><strong>Solusi 1 - Hard Refresh:</strong></p>
+            <p style="color: #78350f; margin-left: 20px;">• Windows/Linux: <code>Ctrl + Shift + R</code></p>
+            <p style="color: #78350f; margin-left: 20px;">• Mac: <code>Cmd + Shift + R</code></p>
+            
+            <p style="color: #78350f; margin-top: 10px;"><strong>Solusi 2 - Clear Cache Lengkap:</strong></p>
+            <p style="color: #78350f; margin-left: 20px;">1. Tekan <code>Ctrl + Shift + Delete</code></p>
+            <p style="color: #78350f; margin-left: 20px;">2. Pilih "All time" / "Semua waktu"</p>
+            <p style="color: #78350f; margin-left: 20px;">3. Centang "Cached images and files"</p>
+            <p style="color: #78350f; margin-left: 20px;">4. Klik "Clear data"</p>
+            <p style="color: #78350f; margin-left: 20px;">5. Refresh halaman</p>
+            
+            <p style="color: #78350f; margin-top: 10px;"><strong>Solusi 3 - Incognito Mode:</strong></p>
+            <p style="color: #78350f; margin-left: 20px;">• Chrome: <code>Ctrl + Shift + N</code></p>
+            <p style="color: #78350f; margin-left: 20px;">• Firefox: <code>Ctrl + Shift + P</code></p>
+            <p style="color: #78350f; margin-left: 20px;">• Edge: <code>Ctrl + Shift + N</code></p>
+        </div>
+    </div>
+</body>
+</html>

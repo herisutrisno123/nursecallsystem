@@ -68,8 +68,16 @@ export default function AccountManagement() {
   const handleSave = (account: UserAccount) => {
     if (editingAccount) {
       setAccounts(accounts.map(a => (a.id === account.id ? account : a)));
+      // Update in userAccounts too
+      const index = initialAccounts.findIndex(a => a.id === account.id);
+      if (index !== -1) {
+        initialAccounts[index] = account;
+      }
     } else {
-      setAccounts([...accounts, { ...account, id: `u${Date.now()}` }]);
+      const newAccount = { ...account, id: `u${Date.now()}` };
+      setAccounts([...accounts, newAccount]);
+      // Add to userAccounts
+      initialAccounts.push(newAccount);
     }
     setShowModal(false);
     setEditingAccount(null);
@@ -85,11 +93,17 @@ export default function AccountManagement() {
 
   const handleSavePermissions = (permissions: string[]) => {
     if (permissionManager) {
+      // Update local state
       setAccounts(
         accounts.map(a =>
           a.id === permissionManager.id ? { ...a, permissions } : a
         )
       );
+      // Update in userAccounts (global data)
+      const index = initialAccounts.findIndex(a => a.id === permissionManager.id);
+      if (index !== -1) {
+        initialAccounts[index].permissions = permissions;
+      }
       setPermissionManager(null);
     }
   };
@@ -418,11 +432,12 @@ function AccountFormModal({ account, onSave, onClose }: {
       department: '',
       createdAt: new Date().toISOString().split('T')[0],
       lastLogin: new Date().toISOString(),
-      permissions: rolePermissionPresets.nurse,
+      permissions: [], // Default kosong, user bisa pilih nanti
     }
   );
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [usePreset, setUsePreset] = useState(true); // Toggle untuk menggunakan preset atau custom
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -445,7 +460,14 @@ function AccountFormModal({ account, onSave, onClose }: {
   };
 
   const updateField = (field: keyof UserAccount, value: string) => {
-    setFormData({ ...formData, [field]: value });
+    const updatedData = { ...formData, [field]: value };
+    
+    // Jika role berubah dan menggunakan preset, update permission juga
+    if (field === 'role' && usePreset && !account) {
+      updatedData.permissions = rolePermissionPresets[value as UserRole];
+    }
+    
+    setFormData(updatedData);
     if (errors[field]) {
       setErrors({ ...errors, [field]: '' });
     }
@@ -594,6 +616,57 @@ function AccountFormModal({ account, onSave, onClose }: {
                 <option value="inactive">Nonaktif</option>
               </select>
             </div>
+
+            {/* Permission Setting - Only for new accounts */}
+            {!account && (
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  Pengaturan Hak Akses
+                </label>
+                <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      id="usePreset"
+                      checked={usePreset}
+                      onChange={() => {
+                        setUsePreset(true);
+                        setFormData({ ...formData, permissions: rolePermissionPresets[formData.role as UserRole] });
+                      }}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <label htmlFor="usePreset" className="text-sm text-gray-700 dark:text-gray-300">
+                      Gunakan preset role ({formData.role === 'admin' ? 'Admin' : formData.role === 'head_nurse' ? 'Head Nurse' : formData.role === 'doctor' ? 'Dokter' : 'Perawat'})
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      id="useCustom"
+                      checked={!usePreset}
+                      onChange={() => {
+                        setUsePreset(false);
+                        setFormData({ ...formData, permissions: [] });
+                      }}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <label htmlFor="useCustom" className="text-sm text-gray-700 dark:text-gray-300">
+                      Tanpa akses (atur nanti melalui menu Kelola Hak Akses)
+                    </label>
+                  </div>
+                  {usePreset && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 ml-7">
+                      User akan memiliki akses sesuai role yang dipilih. Anda bisa mengubahnya nanti.
+                    </p>
+                  )}
+                  {!usePreset && (
+                    <p className="text-xs text-orange-600 dark:text-orange-400 ml-7">
+                      ⚠️ User tidak akan memiliki akses menu apapun. Atur hak akses setelah akun dibuat.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Password */}
             <div>

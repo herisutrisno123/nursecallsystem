@@ -1,12 +1,22 @@
 import { useState } from 'react';
-import { nurseCalls } from '../data/mockData';
+import { nurseCalls, rooms } from '../data/mockData';
 import { NurseCall } from '../types';
-import { Phone, Search, Filter, Clock, AlertTriangle, CheckCircle, XCircle, PhoneCall } from 'lucide-react';
+import { Phone, Search, Filter, Clock, AlertTriangle, CheckCircle, XCircle, PhoneCall, Home } from 'lucide-react';
 
 export default function CallLog() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
+  const [filterWard, setFilterWard] = useState<string>('all');
+
+  // Get unique wards from rooms
+  const wards = Array.from(new Set(rooms.map(room => room.ward)));
+
+  // Helper function to get ward by room number
+  const getWardByRoomNumber = (roomNumber: string): string => {
+    const room = rooms.find(r => r.number === roomNumber);
+    return room?.ward || '';
+  };
 
   const filteredCalls = nurseCalls.filter(call => {
     const matchesSearch = call.roomNumber.includes(searchTerm) ||
@@ -14,7 +24,8 @@ export default function CallLog() {
       (call.notes && call.notes.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus = filterStatus === 'all' || call.status === filterStatus;
     const matchesType = filterType === 'all' || call.type === filterType;
-    return matchesSearch && matchesStatus && matchesType;
+    const matchesWard = filterWard === 'all' || getWardByRoomNumber(call.roomNumber) === filterWard;
+    return matchesSearch && matchesStatus && matchesType && matchesWard;
   });
 
   const getStatusIcon = (status: string) => {
@@ -103,6 +114,21 @@ export default function CallLog() {
             <option value="medication">Obat</option>
             <option value="meal">Makan</option>
           </select>
+
+          {/* Ward Filter */}
+          <div className="flex items-center gap-2">
+            <Home className="w-4 h-4 text-gray-400" />
+            <select
+              value={filterWard}
+              onChange={e => setFilterWard(e.target.value)}
+              className="px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-sm"
+            >
+              <option value="all">Semua Bangsal</option>
+              {wards.map(ward => (
+                <option key={ward} value={ward}>Bangsal {ward}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -114,6 +140,7 @@ export default function CallLog() {
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Waktu</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Kamar</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Bangsal</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Pasien</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Jenis</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Prioritas</th>
@@ -138,6 +165,11 @@ export default function CallLog() {
                   <td className="px-4 py-3">
                     <span className="text-sm font-semibold text-gray-800 dark:text-white">
                       {call.roomNumber}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-sm text-purple-700 dark:text-purple-300 font-medium">
+                      {getWardByRoomNumber(call.roomNumber)}
                     </span>
                   </td>
                   <td className="px-4 py-3">
