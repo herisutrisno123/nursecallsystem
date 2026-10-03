@@ -47,33 +47,57 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
         }}
         onClick={e => e.stopPropagation()}
       >
-        {/* Floating Back Button - Top Left */}
-        <button
-          onClick={onClose}
+        {/* Floating Info Bar - Top Left */}
+        <div
           style={{
             position: 'absolute',
             top: '16px',
             left: '16px',
             zIndex: 10,
-            padding: '8px 16px',
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            padding: '8px 12px',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
             color: 'white',
-            border: 'none',
             borderRadius: '8px',
-            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
+            gap: '12px',
             fontSize: '14px',
-            fontWeight: '500',
-            transition: 'background-color 0.2s',
+            backdropFilter: 'blur(4px)',
           }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.6)'}
         >
-          <ArrowLeft className="w-4 h-4" />
-          Kembali
-        </button>
+          <button
+            onClick={onClose}
+            style={{
+              padding: '4px 10px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '13px',
+              fontWeight: '500',
+              transition: 'background-color 0.2s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Kembali
+          </button>
+          
+          <div style={{ width: '1px', height: '20px', backgroundColor: 'rgba(255, 255, 255, 0.3)' }} />
+          
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <span style={{ fontWeight: '600' }}>Kamar {room.number}</span>
+            <span style={{ opacity: 0.6 }}>•</span>
+            <span>Bangsal {room.ward}</span>
+            <span style={{ opacity: 0.6 }}>•</span>
+            <span>Lantai {room.floor}</span>
+          </div>
+        </div>
 
         {/* Content - Full Screen Layout */}
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden', padding: '0' }}>
