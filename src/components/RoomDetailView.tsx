@@ -146,9 +146,9 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                       TT {idx + 1}
                     </text>
 
-                    {/* Patient Name - fontSize 70 */}
+                    {/* Patient Name - fontSize 48 */}
                     {room.patients && room.patients[idx] && (
-                      <text x={bedX + 240} y={bedY - 60} textAnchor="middle" fontSize="70" fill="#1f2937" fontWeight="bold">
+                      <text x={bedX + 240} y={bedY - 40} textAnchor="middle" fontSize="48" fill="#1f2937" fontWeight="bold">
                         {room.patients[idx].name}
                       </text>
                     )}
