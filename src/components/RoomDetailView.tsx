@@ -245,9 +245,9 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                 const roomX = (2400 - roomWidth) / 2;
                 const roomY = (1800 - roomHeight) / 2;
                 
-                // Posisi kamar mandi: di atas, center horizontal
-                const bathroomX = roomX + (roomWidth - bathroomWidth) / 2;
-                const bathroomY = roomY + padding;
+                // Posisi kamar mandi: di pojok kanan atas
+                const bathroomX = roomX + roomWidth - bathroomWidth - (padding / 2);
+                const bathroomY = roomY + (padding / 2);
                 
                 return (
                   <>
