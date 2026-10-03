@@ -304,8 +304,8 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                 const roomX = (2400 - roomWidth) / 2;
                 const roomY = (1800 - roomHeight) / 2;
                 
-                // Posisi tempat tidur: di bawah kamar mandi
-                const bedsStartY = roomY + padding + bathroomHeight + gap;
+                // Posisi tempat tidur: di bawah kamar mandi dengan ruang lebih untuk nama pasien
+                const bedsStartY = roomY + padding + bathroomHeight + gap + 80; // +80 untuk ruang nama pasien
                 
                 // Hitung posisi berdasarkan index
                 const row = Math.floor(idx / maxPerRow);
@@ -336,9 +336,9 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                       TT {idx + 1}
                     </text>
 
-                    {/* Patient Name - fontSize 48 */}
+                    {/* Patient Name - fontSize 48 - di dalam tempat tidur */}
                     {room.patients && room.patients[idx] && (
-                      <text x={bedX + bedWidth / 2} y={bedY - 40} textAnchor="middle" fontSize="48" fill="#1f2937" fontWeight="bold">
+                      <text x={bedX + bedWidth / 2} y={bedY + 60} textAnchor="middle" fontSize="48" fill="#1f2937" fontWeight="bold">
                         {room.patients[idx].name}
                       </text>
                     )}
