@@ -78,9 +78,9 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
         </div>
 
         {/* Content - Full Screen Layout */}
-        <div style={{ flex: 1, display: 'flex', overflow: 'hidden', padding: '8px', gap: '8px' }}>
-          {/* Left Side - Room Layout SVG - 4x LEBIH BESAR */}
-          <div style={{ flex: 1, backgroundColor: '#f8fafc', borderRadius: '8px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden', padding: '4px' }}>
+          {/* Room Layout SVG - Full Width */}
+          <div style={{ flex: 1, backgroundColor: '#f8fafc', borderRadius: '4px', position: 'relative', overflow: 'hidden' }}>
             <svg 
               viewBox="0 0 2400 1800" 
               style={{ width: '100%', height: '100%', display: 'block' }}
@@ -180,77 +180,6 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                 </marker>
               </defs>
             </svg>
-
-            {/* Legend - Overlay */}
-            <div className="absolute bottom-4 left-4 right-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur rounded-lg p-3 shadow-lg">
-              <div className="flex flex-wrap gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-purple-500 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">Pintu</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-cyan-500 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">Jendela</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-blue-400 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">KM Mandi</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-purple-600 rounded"></div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">Kasur</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">Nurse Call</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">📏 6m x 4m</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Side - Room Info */}
-          <div className="w-80 p-4 flex flex-col gap-3 border-l border-gray-200 dark:border-gray-700 overflow-y-auto">
-            <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Status</p>
-              <p className={`text-sm font-bold ${status.text}`}>
-                {room.status === 'normal' ? 'Normal' :
-                 room.status === 'calling' ? 'Memanggil' :
-                 room.status === 'emergency' ? 'Emergency' :
-                 room.status === 'answered' ? 'Dijawab' : 'Offline'}
-              </p>
-            </div>
-            <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Tempat Tidur</p>
-              <p className="text-sm font-bold text-gray-800 dark:text-white">{room.bedCount} Unit</p>
-            </div>
-            <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Fasilitas</p>
-              <p className="text-sm font-bold text-gray-800 dark:text-white">
-                🛏️ {room.bedCount} Kasur<br/>
-                🚿 1 Kamar Mandi
-              </p>
-            </div>
-            <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 flex-1">
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Pasien</p>
-              {room.patients && room.patients.length > 0 ? (
-                <div className="space-y-2">
-                  {room.patients.map((patient, idx) => (
-                    <div key={idx} className="text-xs">
-                      <p className="font-bold text-gray-800 dark:text-white">TT {idx + 1}:</p>
-                      <p className="text-gray-700 dark:text-gray-300">{patient.name}</p>
-                      <p className="text-gray-600 dark:text-gray-400 text-[10px]">
-                        {patient.age} tahun • {patient.diagnosis}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400">Kosong</p>
-              )}
-            </div>
           </div>
         </div>
       </div>
