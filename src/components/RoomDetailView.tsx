@@ -159,26 +159,15 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                 const bedY = 880;
                 return (
                   <g key={idx}>
-                    {/* Bed Frame - Kepala Tempat Tidur */}
-                    <rect x={bedX} y={bedY} width="480" height="40" fill="#92400e" stroke="#78350f" strokeWidth="4" rx="8" />
-                    <rect x={bedX + 10} y={bedY + 5} width="460" height="30" fill="#a16207" rx="4" />
+                    {/* Bed Frame - Kembali ke warna ungu sebelumnya */}
+                    <rect x={bedX} y={bedY} width="480" height="320" fill="#8b5cf6" stroke="#6d28d9" strokeWidth="8" rx="16" />
                     
-                    {/* Bed Frame - Kaki Tempat Tidur */}
-                    <rect x={bedX} y={bedY + 280} width="480" height="40" fill="#92400e" stroke="#78350f" strokeWidth="4" rx="8" />
-                    <rect x={bedX + 10} y={bedY + 285} width="460" height="30" fill="#a16207" rx="4" />
-                    
-                    {/* Bed Frame - Sisi Kiri */}
-                    <rect x={bedX} y={bedY} width="20" height="320" fill="#92400e" stroke="#78350f" strokeWidth="3" rx="4" />
-                    
-                    {/* Bed Frame - Sisi Kanan */}
-                    <rect x={bedX + 460} y={bedY} width="20" height="320" fill="#92400e" stroke="#78350f" strokeWidth="3" rx="4" />
-                    
-                    {/* Mattress - Kasur dengan 3D effect */}
+                    {/* Mattress - Kasur BIRU dengan 3D effect */}
                     <defs>
                       <linearGradient id={`mattressGrad${idx}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: '#fef3c7', stopOpacity: 1 }} />
-                        <stop offset="50%" style={{ stopColor: '#fde68a', stopOpacity: 1 }} />
-                        <stop offset="100%" style={{ stopColor: '#fcd34d', stopOpacity: 1 }} />
+                        <stop offset="0%" style={{ stopColor: '#dbeafe', stopOpacity: 1 }} />
+                        <stop offset="50%" style={{ stopColor: '#93c5fd', stopOpacity: 1 }} />
+                        <stop offset="100%" style={{ stopColor: '#3b82f6', stopOpacity: 1 }} />
                       </linearGradient>
                       <filter id={`mattressShadow${idx}`}>
                         <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
@@ -193,14 +182,14 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                       </filter>
                     </defs>
                     
-                    {/* Mattress Base */}
-                    <rect x={bedX + 25} y={bedY + 45} width="430" height="230" fill={`url(#mattressGrad${idx})`} stroke="#f59e0b" strokeWidth="3" rx="8" filter={`url(#mattressShadow${idx})`} />
+                    {/* Mattress Base - BIRU */}
+                    <rect x={bedX + 20} y={bedY + 20} width="440" height="280" fill={`url(#mattressGrad${idx})`} stroke="#2563eb" strokeWidth="3" rx="12" filter={`url(#mattressShadow${idx})`} />
                     
                     {/* Mattress Top Highlight */}
-                    <rect x={bedX + 30} y={bedY + 50} width="420" height="20" fill="#fef9c3" opacity="0.6" rx="4" />
+                    <rect x={bedX + 25} y={bedY + 25} width="430" height="20" fill="#bfdbfe" opacity="0.6" rx="4" />
                     
                     {/* Sheet/Sprei Putih */}
-                    <rect x={bedX + 30} y={bedY + 90} width="420" height="180" fill="#ffffff" stroke="#e5e7eb" strokeWidth="2" rx="6" />
+                    <rect x={bedX + 30} y={bedY + 90} width="420" height="200" fill="#ffffff" stroke="#e5e7eb" strokeWidth="2" rx="6" />
                     
                     {/* Sheet Pattern - Garis-garis sprei */}
                     <line x1={bedX + 30} y1={bedY + 130} x2={bedX + 450} y2={bedY + 130} stroke="#f3f4f6" strokeWidth="2" />
@@ -209,41 +198,27 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                     <line x1={bedX + 30} y1={bedY + 250} x2={bedX + 450} y2={bedY + 250} stroke="#f3f4f6" strokeWidth="2" />
                     
                     {/* Sheet Folds - Lipatan sprei 3D */}
-                    <path d={`M ${bedX + 50} ${bedY + 100} Q ${bedX + 100} ${bedY + 115} ${bedX + 150} ${bedY + 100}`} 
+                    <path d={`M ${bedX + 50} ${bedY + 100} Q ${bedX + 150} ${bedY + 120} ${bedX + 250} ${bedY + 100}`} 
                           fill="none" stroke="#d1d5db" strokeWidth="3" opacity="0.8" />
-                    <path d={`M ${bedX + 200} ${bedY + 140} Q ${bedX + 280} ${bedY + 160} ${bedX + 360} ${bedY + 140}`} 
+                    <path d={`M ${bedX + 200} ${bedY + 150} Q ${bedX + 300} ${bedY + 170} ${bedX + 400} ${bedY + 150}`} 
                           fill="none" stroke="#d1d5db" strokeWidth="3" opacity="0.8" />
-                    <path d={`M ${bedX + 80} ${bedY + 180} Q ${bedX + 180} ${bedY + 200} ${bedX + 280} ${bedY + 180}`} 
-                          fill="none" stroke="#d1d5db" strokeWidth="3" opacity="0.8" />
-                    <path d={`M ${bedX + 300} ${bedY + 220} Q ${bedX + 380} ${bedY + 240} ${bedX + 440} ${bedY + 220}`} 
+                    <path d={`M ${bedX + 80} ${bedY + 200} Q ${bedX + 200} ${bedY + 220} ${bedX + 320} ${bedY + 200}`} 
                           fill="none" stroke="#d1d5db" strokeWidth="3" opacity="0.8" />
                     
-                    {/* Pillow 1 - Bantal Kiri dengan 3D effect */}
+                    {/* Pillow - HANYA 1 BANTAL di tengah dengan 3D effect */}
                     <defs>
-                      <linearGradient id={`pillowGrad1_${idx}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                      <linearGradient id={`pillowGrad${idx}`} x1="0%" y1="0%" x2="0%" y2="100%">
                         <stop offset="0%" style={{ stopColor: '#ffffff', stopOpacity: 1 }} />
                         <stop offset="100%" style={{ stopColor: '#e5e7eb', stopOpacity: 1 }} />
                       </linearGradient>
                     </defs>
-                    <ellipse cx={bedX + 120} cy={bedY + 70} rx="70" ry="20" fill="url(#pillowGrad1_${idx})" stroke="#9ca3af" strokeWidth="2" />
-                    <ellipse cx={bedX + 120} cy={bedY + 68} rx="65" ry="15" fill="#ffffff" opacity="0.7" />
-                    <path d={`M ${bedX + 70} ${bedY + 70} Q ${bedX + 120} ${bedY + 80} ${bedX + 170} ${bedY + 70}`} 
-                          fill="none" stroke="#d1d5db" strokeWidth="2" />
-                    
-                    {/* Pillow 2 - Bantal Kanan dengan 3D effect */}
-                    <defs>
-                      <linearGradient id={`pillowGrad2_${idx}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: '#ffffff', stopOpacity: 1 }} />
-                        <stop offset="100%" style={{ stopColor: '#e5e7eb', stopOpacity: 1 }} />
-                      </linearGradient>
-                    </defs>
-                    <ellipse cx={bedX + 360} cy={bedY + 70} rx="70" ry="20" fill="url(#pillowGrad2_${idx})" stroke="#9ca3af" strokeWidth="2" />
-                    <ellipse cx={bedX + 360} cy={bedY + 68} rx="65" ry="15" fill="#ffffff" opacity="0.7" />
-                    <path d={`M ${bedX + 310} ${bedY + 70} Q ${bedX + 360} ${bedY + 80} ${bedX + 410} ${bedY + 70}`} 
+                    <ellipse cx={bedX + 240} cy={bedY + 55} rx="100" ry="25" fill="url(#pillowGrad${idx})" stroke="#9ca3af" strokeWidth="2" />
+                    <ellipse cx={bedX + 240} cy={bedY + 53} rx="95" ry="20" fill="#ffffff" opacity="0.7" />
+                    <path d={`M ${bedX + 160} ${bedY + 55} Q ${bedX + 240} ${bedY + 70} ${bedX + 320} ${bedY + 55}`} 
                           fill="none" stroke="#d1d5db" strokeWidth="2" />
                     
                     {/* Bed Label - TT 1, TT 2, dst */}
-                    <text x={bedX + 240} y={bedY + 190} textAnchor="middle" fontSize="56" fill="#78350f" fontWeight="bold" opacity="0.5">
+                    <text x={bedX + 240} y={bedY + 200} textAnchor="middle" fontSize="56" fill="#6d28d9" fontWeight="bold" opacity="0.5">
                       TT {idx + 1}
                     </text>
 
