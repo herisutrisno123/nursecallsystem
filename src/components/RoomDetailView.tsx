@@ -129,29 +129,29 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
               <line x1="2192" y1="480" x2="2192" y2="800" stroke="#67e8f9" strokeWidth="8" />
               <text x="2220" y="660" fontSize="40" fill="#6b7280">JENDELA</text>
 
-              {/* Bathroom - Kamar Mandi - 4x lebih besar */}
-              <rect x="1520" y="200" width="680" height="480" fill="#e0f2fe" stroke="#0284c7" strokeWidth="8" rx="16" />
-              <text x="1860" y="300" textAnchor="middle" fontSize="56" fill="#0369a1" fontWeight="bold">KAMAR MANDI</text>
+              {/* Bathroom - Kamar Mandi - ukuran sama dengan tempat tidur (480x320) */}
+              <rect x="1520" y="200" width="480" height="320" fill="#e0f2fe" stroke="#0284c7" strokeWidth="8" rx="16" />
+              <text x="1760" y="260" textAnchor="middle" fontSize="40" fill="#0369a1" fontWeight="bold">KAMAR MANDI</text>
               
-              {/* Shower - 4x lebih besar */}
-              <circle cx="1680" cy="440" r="60" fill="#67e8f9" stroke="#0891b2" strokeWidth="8" />
-              <circle cx="1680" cy="440" r="32" fill="#22d3ee" />
-              <line x1="1680" y1="380" x2="1680" y2="440" stroke="#0891b2" strokeWidth="12" />
-              <line x1="1660" y1="500" x2="1660" y2="540" stroke="#67e8f9" strokeWidth="6" />
-              <line x1="1680" y1="500" x2="1680" y2="540" stroke="#67e8f9" strokeWidth="6" />
-              <line x1="1700" y1="500" x2="1700" y2="540" stroke="#67e8f9" strokeWidth="6" />
-              <text x="1680" y="600" textAnchor="middle" fontSize="40" fill="#0369a1">Shower</text>
+              {/* Shower - diperkecil proporsional */}
+              <circle cx="1640" cy="360" r="40" fill="#67e8f9" stroke="#0891b2" strokeWidth="6" />
+              <circle cx="1640" cy="360" r="22" fill="#22d3ee" />
+              <line x1="1640" y1="320" x2="1640" y2="360" stroke="#0891b2" strokeWidth="8" />
+              <line x1="1625" y1="400" x2="1625" y2="430" stroke="#67e8f9" strokeWidth="4" />
+              <line x1="1640" y1="400" x2="1640" y2="430" stroke="#67e8f9" strokeWidth="4" />
+              <line x1="1655" y1="400" x2="1655" y2="430" stroke="#67e8f9" strokeWidth="4" />
+              <text x="1640" y="470" textAnchor="middle" fontSize="28" fill="#0369a1">Shower</text>
 
-              {/* Toilet - 4x lebih besar */}
-              <ellipse cx="1960" cy="440" rx="72" ry="100" fill="#f0f9ff" stroke="#0284c7" strokeWidth="8" />
-              <ellipse cx="1960" cy="420" rx="48" ry="60" fill="#e0f2fe" stroke="#0284c7" strokeWidth="4" />
-              <rect x="1912" y="340" width="96" height="32" fill="#0284c7" rx="8" />
-              <text x="1960" y="600" textAnchor="middle" fontSize="40" fill="#0369a1">Toilet</text>
+              {/* Toilet - diperkecil proporsional */}
+              <ellipse cx="1880" cy="360" rx="48" ry="66" fill="#f0f9ff" stroke="#0284c7" strokeWidth="6" />
+              <ellipse cx="1880" cy="346" rx="32" ry="40" fill="#e0f2fe" stroke="#0284c7" strokeWidth="3" />
+              <rect x="1848" y="294" width="64" height="22" fill="#0284c7" rx="6" />
+              <text x="1880" y="470" textAnchor="middle" fontSize="28" fill="#0369a1">Toilet</text>
 
-              {/* Sink - 4x lebih besar */}
-              <rect x="1760" y="620" width="120" height="40" fill="#f0f9ff" stroke="#0284c7" strokeWidth="6" rx="8" />
-              <circle cx="1820" cy="640" r="12" fill="#0284c7" />
-              <text x="1820" y="700" textAnchor="middle" fontSize="36" fill="#0369a1">Wastafel</text>
+              {/* Sink - diperkecil proporsional */}
+              <rect x="1720" y="480" width="80" height="26" fill="#f0f9ff" stroke="#0284c7" strokeWidth="4" rx="6" />
+              <circle cx="1760" cy="493" r="8" fill="#0284c7" />
+              <text x="1760" y="530" textAnchor="middle" fontSize="24" fill="#0369a1">Wastafel</text>
 
               {/* Beds - Tempat Tidur - 4x LEBIH BESAR */}
               {Array.from({ length: room.bedCount }).map((_, idx) => {
