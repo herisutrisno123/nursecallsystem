@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Denah Kamar - 4x Lebih Besar</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .info {
+            background: #dbeafe;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .info h2 {
+            margin: 0 0 10px 0;
+            color: #1e40af;
+            font-size: 18px;
+        }
+        .info p {
+            margin: 5px 0;
+            color: #1e3a8a;
+        }
+        svg {
+            width: 100%;
+            height: auto;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Test Denah Kamar - Versi 4x Lebih Besar</h1>
+        
+        <div class="info">
+            <h2>📋 Informasi Test</h2>
+            <p><strong>ViewBox:</strong> 3800 x 800 (4x lebih besar dari sebelumnya)</p>
+            <p><strong>Ukuran Kamar:</strong> 440 x 300 pixels (sebelumnya 110 x 75)</p>
+            <p><strong>Ukuran Kasur:</strong> 96 x 60 pixels (sebelumnya 24 x 15)</p>
+            <p><strong>Ukuran Kamar Mandi:</strong> 96 x 96 pixels (sebelumnya 24 x 24)</p>
+            <p><strong>Font Nomor Kamar:</strong> 32px (sebelumnya 10px)</p>
+            <p><strong>Font Nama Pasien:</strong> 24px (sebelumnya 7px)</p>
+        </div>
+
+        <h2>Denah Peta Lantai 1 (4 Kamar per Bangsal)</h2>
+        <svg viewBox="0 0 3800 800" preserveAspectRatio="xMidYMid meet">
+            <!-- Background -->
+            <rect x="0" y="0" width="3800" height="800" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+
+            <!-- Corridor -->
+            <rect x="20" y="380" width="3760" height="40" fill="#e2e8f0" rx="6"/>
+            <text x="1900" y="405" text-anchor="middle" fill="#64748b" font-size="24" font-weight="bold">KORIDOR</text>
+
+            <!-- Nurse Station -->
+            <rect x="1700" y="740" width="400" height="50" fill="#dbeafe" stroke="#3b82f6" stroke-width="4" rx="12"/>
+            <text x="1900" y="770" text-anchor="middle" fill="#1e40af" font-size="20" font-weight="bold">👩‍⚕️ POS PERAWAT</text>
+
+            <!-- Wing Labels -->
+            <text x="950" y="50" text-anchor="middle" fill="#374151" font-size="32" font-weight="bold">SAYAP KIRI</text>
+            <text x="2850" y="50" text-anchor="middle" fill="#374151" font-size="32" font-weight="bold">SAYAP KANAN</text>
+
+            <!-- Divider -->
+            <line x1="1900" y1="60" x2="1900" y2="370" stroke="#cbd5e1" stroke-width="3" stroke-dasharray="12 12"/>
+
+            <!-- Room 101 - Example with 2 beds -->
+            <g>
+                <!-- Room Background -->
+                <rect x="50" y="80" width="440" height="300" fill="#fef3c7" stroke="#f59e0b" stroke-width="4" rx="12"/>
+                
+                <!-- Room Number -->
+                <text x="270" y="120" text-anchor="middle" fill="#1f2937" font-size="32" font-weight="bold">101</text>
+                
+                <!-- Ward Name -->
+                <text x="270" y="152" text-anchor="middle" fill="#6b7280" font-size="20">Mawar</text>
+                
+                <!-- Bed 1 -->
+                <g>
+                    <rect x="80" y="180" width="96" height="60" fill="#8b5cf6" stroke="#6d28d9" stroke-width="3" rx="6"/>
+                    <rect x="86" y="186" width="24" height="20" fill="#e9d5ff" stroke="#c4b5fd" stroke-width="1.5" rx="3"/>
+                    <rect x="116" y="186" width="52" height="48" fill="#c4b5fd" stroke="#a78bfa" stroke-width="1.5" rx="3"/>
+                    <line x1="120" y1="192" x2="164" y2="192" stroke="#a78bfa" stroke-width="1.2"/>
+                    <line x1="120" y1="206" x2="164" y2="206" stroke="#a78bfa" stroke-width="1.2"/>
+                    <line x1="120" y1="220" x2="164" y2="220" stroke="#a78bfa" stroke-width="1.2"/>
+                </g>
+                
+                <!-- Bed 2 -->
+                <g>
+                    <rect x="190" y="180" width="96" height="60" fill="#8b5cf6" stroke="#6d28d9" stroke-width="3" rx="6"/>
+                    <rect x="196" y="186" width="24" height="20" fill="#e9d5ff" stroke="#c4b5fd" stroke-width="1.5" rx="3"/>
+                    <rect x="226" y="186" width="52" height="48" fill="#c4b5fd" stroke="#a78bfa" stroke-width="1.5" rx="3"/>
+                    <line x1="230" y1="192" x2="274" y2="192" stroke="#a78bfa" stroke-width="1.2"/>
+                    <line x1="230" y1="206" x2="274" y2="206" stroke="#a78bfa" stroke-width="1.2"/>
+                    <line x1="230" y1="220" x2="274" y2="220" stroke="#a78bfa" stroke-width="1.2"/>
+                </g>
+                
+                <!-- Bathroom -->
+                <g>
+                    <rect x="320" y="180" width="96" height="96" fill="#06b6d4" stroke="#0891b2" stroke-width="3" rx="8"/>
+                    <circle cx="368" cy="208" r="14" fill="#67e8f9" stroke="#22d3ee" stroke-width="1.5"/>
+                    <line x1="368" y1="194" x2="368" y2="208" stroke="#22d3ee" stroke-width="5"/>
+                    <line x1="368" y1="222" x2="368" y2="240" stroke="#67e8f9" stroke-width="3"/>
+                    <line x1="356" y1="228" x2="356" y2="240" stroke="#67e8f9" stroke-width="3"/>
+                    <line x1="380" y1="228" x2="380" y2="240" stroke="#67e8f9" stroke-width="3"/>
+                    <ellipse cx="344" cy="256" rx="10" ry="14" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+                </g>
+                
+                <!-- Patient Name -->
+                <text x="270" y="360" text-anchor="middle" fill="#4b5563" font-size="24" font-weight="500">Ahmad Suryadi</text>
+                
+                <!-- Status Indicator -->
+                <circle cx="460" cy="110" r="20" fill="#f59e0b" stroke="white" stroke-width="4"/>
+                
+                <!-- Eye Icon -->
+                <circle cx="90" cy="340" r="24" fill="#3b82f6" stroke="white" stroke-width="3" opacity="0.9"/>
+                <text x="90" y="348" text-anchor="middle" fill="white" font-size="28">👁</text>
+            </g>
+
+            <!-- Room 102 - Example with 1 bed -->
+            <g>
+                <rect x="520" y="80" width="440" height="300" fill="#dcfce7" stroke="#22c55e" stroke-width="4" rx="12"/>
+                <text x="740" y="120" text-anchor="middle" fill="#1f2937" font-size="32" font-weight="bold">102</text>
+                <text x="740" y="152" text-anchor="middle" fill="#6b7280" font-size="20">Mawar</text>
+                
+                <!-- Bed 1 -->
+                <g>
+                    <rect x="550" y="180" width="96" height="60" fill="#8b5cf6" stroke="#6d28d9" stroke-width="3" rx="6"/>
+                    <rect x="556" y="186" width="24" height="20" fill="#e9d5ff" stroke="#c4b5fd" stroke-width="1.5" rx="3"/>
+                    <rect x="586" y="186" width="52" height="48" fill="#c4b5fd" stroke="#a78bfa" stroke-width="1.5" rx="3"/>
+                    <line x1="590" y1="192" x2="634" y2="192" stroke="#a78bfa" stroke-width="1.2"/>
+                    <line x1="590" y1="206" x2="634" y2="206" stroke="#a78bfa" stroke-width="1.2"/>
+                    <line x1="590" y1="220" x2="634" y2="220" stroke="#a78bfa" stroke-width="1.2"/>
+                </g>
+                
+                <!-- Bathroom -->
+                <g>
+                    <rect x="790" y="180" width="96" height="96" fill="#06b6d4" stroke="#0891b2" stroke-width="3" rx="8"/>
+                    <circle cx="838" cy="208" r="14" fill="#67e8f9" stroke="#22d3ee" stroke-width="1.5"/>
+                    <line x1="838" y1="194" x2="838" y2="208" stroke="#22d3ee" stroke-width="5"/>
+                    <line x1="838" y1="222" x2="838" y2="240" stroke="#67e8f9" stroke-width="3"/>
+                    <line x1="826" y1="228" x2="826" y2="240" stroke="#67e8f9" stroke-width="3"/>
+                    <line x1="850" y1="228" x2="850" y2="240" stroke="#67e8f9" stroke-width="3"/>
+                    <ellipse cx="814" cy="256" rx="10" ry="14" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+                </g>
+                
+                <text x="740" y="360" text-anchor="middle" fill="#4b5563" font-size="24" font-weight="500">Budi Hartono</text>
+                <circle cx="930" cy="340" r="24" fill="#3b82f6" stroke="white" stroke-width="3" opacity="0.9"/>
+                <text x="930" y="348" text-anchor="middle" fill="white" font-size="28">👁</text>
+            </g>
+
+            <!-- More rooms would continue... -->
+            <text x="1900" y="450" text-anchor="middle" fill="#6b7280" font-size="28">
+                (Ini hanya contoh 2 kamar dari 16 kamar total)
+            </text>
+            <text x="1900" y="490" text-anchor="middle" fill="#6b7280" font-size="24">
+                Semua kamar sudah diperbesar 4x lipat
+            </text>
+        </svg>
+
+        <div class="info" style="margin-top: 20px; background: #fef3c7;">
+            <h2 style="color: #92400e;">✅ Yang Harus Anda Lihat</h2>
+            <p style="color: #78350f;"><strong>1.</strong> Kamar sangat besar (440x300 pixels)</p>
+            <p style="color: #78350f;"><strong>2.</strong> Kasur terlihat jelas dengan bantal dan selimut detail</p>
+            <p style="color: #78350f;"><strong>3.</strong> Kamar mandi besar dengan shower, toilet, wastafel</p>
+            <p style="color: #78350f;"><strong>4.</strong> Teks nomor kamar sangat besar (32px)</p>
+            <p style="color: #78350f;"><strong>5.</strong> Nama pasien terlihat jelas (24px)</p>
+            <p style="color: #78350f;"><strong>6.</strong> Semua detail terlihat tanpa perlu zoom</p>
+        </div>
+
+        <div class="info" style="background: #fee2e2;">
+            <h2 style="color: #991b1b;">❓ Jika Tidak Terlihat Perubahan</h2>
+            <p style="color: #7f1d1d;"><strong>1.</strong> Clear cache browser: Ctrl + Shift + Delete</p>
+            <p style="color: #7f1d1d;"><strong>2.</strong> Hard refresh: Ctrl + Shift + R</p>
+            <p style="color: #7f1d1d;"><strong>3.</strong> Coba buka di Incognito Mode: Ctrl + Shift + N</p>
+            <p style="color: #7f1d1d;"><strong>4.</strong> Cek browser console (F12) untuk error</p>
+        </div>
+    </div>
+</body>
+</html>
