@@ -47,38 +47,36 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
         }}
         onClick={e => e.stopPropagation()}
       >
-        {/* Header - Compact */}
-        <div className={`px-3 py-2 ${status.bg} ${status.border} border-b-2 flex-shrink-0`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={onClose}
-                className="flex items-center gap-1 px-2 py-1 bg-white/30 hover:bg-white/50 rounded transition-colors text-sm"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Kembali
-              </button>
-              <div>
-                <h2 className="text-lg font-bold text-gray-800 dark:text-white">
-                  Kamar {room.number}
-                </h2>
-                <p className="text-base font-semibold text-gray-700 dark:text-gray-300">
-                  Bangsal {room.ward} • Lantai {room.floor}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-1 rounded bg-white/20 hover:bg-white/30 transition-colors"
-              title="Tutup"
-            >
-              <X className="w-5 h-5 text-gray-800 dark:text-white" />
-            </button>
-          </div>
-        </div>
+        {/* Floating Back Button - Top Left */}
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '16px',
+            left: '16px',
+            zIndex: 10,
+            padding: '8px 16px',
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '14px',
+            fontWeight: '500',
+            transition: 'background-color 0.2s',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.6)'}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Kembali
+        </button>
 
         {/* Content - Full Screen Layout */}
-        <div style={{ flex: 1, display: 'flex', overflow: 'hidden', padding: '4px' }}>
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden', padding: '0' }}>
           {/* Room Layout SVG - Full Width */}
           <div style={{ flex: 1, backgroundColor: '#f8fafc', borderRadius: '4px', position: 'relative', overflow: 'hidden' }}>
             <svg 
