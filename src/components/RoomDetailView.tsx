@@ -120,19 +120,8 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                     {/* Mattress - 440x280 */}
                     <rect x={bedX + 20} y={bedY + 20} width="440" height="280" fill="#c4b5fd" stroke="#a78bfa" strokeWidth="4" rx="12" />
                     
-                    {/* Pillow - 120x80 (4x dari 30x20) */}
-                    <rect x={bedX + 40} y={bedY + 40} width="120" height="80" fill="#e9d5ff" stroke="#c4b5fd" strokeWidth="4" rx="12" />
-                    <text x={bedX + 100} y={bedY + 92} textAnchor="middle" fontSize="32" fill="#6d28d9">Bantal</text>
-                    
-                    {/* Blanket - 260x240 (4x dari 65x60) */}
-                    <rect x={bedX + 180} y={bedY + 40} width="260" height="240" fill="#ddd6fe" stroke="#a78bfa" strokeWidth="4" rx="8" />
-                    <line x1={bedX + 200} y1={bedY + 80} x2={bedX + 420} y2={bedY + 80} stroke="#a78bfa" strokeWidth="2" />
-                    <line x1={bedX + 200} y1={bedY + 140} x2={bedX + 420} y2={bedY + 140} stroke="#a78bfa" strokeWidth="2" />
-                    <line x1={bedX + 200} y1={bedY + 200} x2={bedX + 420} y2={bedY + 200} stroke="#a78bfa" strokeWidth="2" />
-                    <line x1={bedX + 200} y1={bedY + 260} x2={bedX + 420} y2={bedY + 260} stroke="#a78bfa" strokeWidth="2" />
-                    
                     {/* Bed Label - fontSize 44 (4x dari 11) */}
-                    <text x={bedX + 240} y={bedY + 380} textAnchor="middle" fontSize="44" fill="#6d28d9" fontWeight="bold">
+                    <text x={bedX + 240} y={bedY + 180} textAnchor="middle" fontSize="56" fill="#6d28d9" fontWeight="bold">
                       TT {idx + 1}
                     </text>
 
