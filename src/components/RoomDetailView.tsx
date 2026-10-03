@@ -108,16 +108,37 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
               style={{ width: '100%', height: '100%', display: 'block' }}
               preserveAspectRatio="xMidYMid meet"
             >
-              {/* Room Walls - 4x lebih besar */}
-              <rect x="200" y="200" width="2000" height="1400" fill="#f8fafc" stroke="#64748b" strokeWidth="16" rx="16" />
-              
-              {/* Floor Pattern */}
-              <pattern id="floorPattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-                <rect width="80" height="80" fill="#f1f5f9" />
-                <rect width="40" height="40" fill="#e2e8f0" />
-                <rect x="40" y="40" width="40" height="40" fill="#e2e8f0" />
-              </pattern>
-              <rect x="200" y="200" width="2000" height="1400" fill="url(#floorPattern)" />
+              {/* Room Walls - Ukuran dinamis berdasarkan jumlah tempat tidur */}
+              {(() => {
+                const bedWidth = 480;
+                const bedHeight = 320;
+                const gap = 40;
+                const maxPerRow = 3;
+                const padding = 200;
+                
+                const rows = Math.ceil(room.bedCount / maxPerRow);
+                const maxColsInAnyRow = Math.min(maxPerRow, room.bedCount);
+                
+                const roomWidth = (maxColsInAnyRow * bedWidth) + ((maxColsInAnyRow - 1) * gap) + (padding * 2);
+                const roomHeight = (rows * bedHeight) + ((rows - 1) * gap) + (padding * 2) + 400; // +400 untuk kamar mandi di atas
+                
+                const roomX = (2400 - roomWidth) / 2;
+                const roomY = (1800 - roomHeight) / 2;
+                
+                return (
+                  <>
+                    <rect x={roomX} y={roomY} width={roomWidth} height={roomHeight} fill="#f8fafc" stroke="#64748b" strokeWidth="16" rx="16" />
+                    
+                    {/* Floor Pattern */}
+                    <pattern id="floorPattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+                      <rect width="80" height="80" fill="#f1f5f9" />
+                      <rect width="40" height="40" fill="#e2e8f0" />
+                      <rect x="40" y="40" width="40" height="40" fill="#e2e8f0" />
+                    </pattern>
+                    <rect x={roomX} y={roomY} width={roomWidth} height={roomHeight} fill="url(#floorPattern)" />
+                  </>
+                );
+              })()}
 
               {/* Door - Pintu Masuk - 4x lebih besar */}
               <rect x="200" y="800" width="16" height="240" fill="#8b5cf6" />
@@ -153,26 +174,45 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
               <circle cx="1760" cy="493" r="8" fill="#0284c7" />
               <text x="1760" y="530" textAnchor="middle" fontSize="24" fill="#0369a1">Wastafel</text>
 
-              {/* Beds - Tempat Tidur dengan Kasur 3D Lengkap */}
+              {/* Beds - Tempat Tidur dengan layout dinamis (max 3 per baris) */}
               {Array.from({ length: room.bedCount }).map((_, idx) => {
-                const bedX = 320 + (idx * 560);
-                const bedY = 880;
+                const bedWidth = 480;
+                const bedHeight = 320;
+                const gap = 40;
+                const maxPerRow = 3;
+                
+                // Hitung posisi berdasarkan index
+                const row = Math.floor(idx / maxPerRow);
+                const col = idx % maxPerRow;
+                
+                // Hitung jumlah kolom di baris ini
+                const bedsInThisRow = Math.min(maxPerRow, room.bedCount - (row * maxPerRow));
+                
+                // Hitung total width untuk baris ini
+                const totalRowWidth = (bedsInThisRow * bedWidth) + ((bedsInThisRow - 1) * gap);
+                
+                // Center horizontally
+                const startX = (2400 - totalRowWidth) / 2;
+                
+                const bedX = startX + (col * (bedWidth + gap));
+                const bedY = 700 + (row * (bedHeight + gap));
+                
                 return (
                   <g key={idx}>
                     {/* Bed Frame - Kotak tempat tidur ungu */}
-                    <rect x={bedX} y={bedY} width="480" height="320" fill="#8b5cf6" stroke="#6d28d9" strokeWidth="8" rx="16" />
+                    <rect x={bedX} y={bedY} width={bedWidth} height={bedHeight} fill="#8b5cf6" stroke="#6d28d9" strokeWidth="8" rx="16" />
                     
                     {/* Mattress - Matras sederhana */}
-                    <rect x={bedX + 20} y={bedY + 20} width="440" height="280" fill="#c4b5fd" stroke="#a78bfa" strokeWidth="4" rx="12" />
+                    <rect x={bedX + 20} y={bedY + 20} width={bedWidth - 40} height={bedHeight - 40} fill="#c4b5fd" stroke="#a78bfa" strokeWidth="4" rx="12" />
                     
                     {/* Bed Label - TT 1, TT 2, dst */}
-                    <text x={bedX + 240} y={bedY + 200} textAnchor="middle" fontSize="56" fill="#6d28d9" fontWeight="bold" opacity="0.5">
+                    <text x={bedX + bedWidth / 2} y={bedY + bedHeight / 2 + 20} textAnchor="middle" fontSize="56" fill="#6d28d9" fontWeight="bold" opacity="0.5">
                       TT {idx + 1}
                     </text>
 
                     {/* Patient Name - fontSize 48 */}
                     {room.patients && room.patients[idx] && (
-                      <text x={bedX + 240} y={bedY - 40} textAnchor="middle" fontSize="48" fill="#1f2937" fontWeight="bold">
+                      <text x={bedX + bedWidth / 2} y={bedY - 40} textAnchor="middle" fontSize="48" fill="#1f2937" fontWeight="bold">
                         {room.patients[idx].name}
                       </text>
                     )}
