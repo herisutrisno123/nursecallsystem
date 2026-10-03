@@ -47,45 +47,44 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
         }}
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className={`px-6 py-4 ${status.bg} ${status.border} border-b-2 flex-shrink-0`}>
+        {/* Header - Compact */}
+        <div className={`px-3 py-2 ${status.bg} ${status.border} border-b-2 flex-shrink-0`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <button
                 onClick={onClose}
-                className="flex items-center gap-2 px-4 py-2 bg-white/30 hover:bg-white/50 rounded-lg transition-colors font-medium"
+                className="flex items-center gap-1 px-2 py-1 bg-white/30 hover:bg-white/50 rounded transition-colors text-sm"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4" />
                 Kembali
               </button>
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                  Denah Kamar {room.number}
+                <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+                  Kamar {room.number}
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Bangsal {room.ward} • Lantai {room.floor}
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  {room.ward} • Lantai {room.floor}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
+              className="p-1 rounded bg-white/20 hover:bg-white/30 transition-colors"
               title="Tutup"
             >
-              <X className="w-6 h-6 text-gray-800 dark:text-white" />
+              <X className="w-5 h-5 text-gray-800 dark:text-white" />
             </button>
           </div>
         </div>
 
         {/* Content - Full Screen Layout */}
-        <div className="flex-1 flex overflow-hidden p-4 gap-4">
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden', padding: '8px', gap: '8px' }}>
           {/* Left Side - Room Layout SVG - 4x LEBIH BESAR */}
-          <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-lg relative overflow-hidden">
+          <div style={{ flex: 1, backgroundColor: '#f8fafc', borderRadius: '8px', position: 'relative', overflow: 'hidden' }}>
             <svg 
               viewBox="0 0 2400 1800" 
-              className="w-full h-full" 
+              style={{ width: '100%', height: '100%', display: 'block' }}
               preserveAspectRatio="xMidYMid meet"
-              style={{ display: 'block' }}
             >
               {/* Room Walls - 4x lebih besar */}
               <rect x="200" y="200" width="2000" height="1400" fill="#f8fafc" stroke="#64748b" strokeWidth="16" rx="16" />
