@@ -331,8 +331,8 @@ export default function RoomDetailView({ room, onClose }: RoomDetailViewProps) {
                     {/* Mattress - Matras sederhana */}
                     <rect x={bedX + 20} y={bedY + 20} width={bedWidth - 40} height={bedHeight - 40} fill="#c4b5fd" stroke="#a78bfa" strokeWidth="4" rx="12" />
                     
-                    {/* Bed Label - TT 1, TT 2, dst */}
-                    <text x={bedX + bedWidth / 2} y={bedY + bedHeight / 2 + 20} textAnchor="middle" fontSize="56" fill="#6d28d9" fontWeight="bold" opacity="0.5">
+                    {/* Bed Label - TT 1, TT 2, dst - warna hitam */}
+                    <text x={bedX + bedWidth / 2} y={bedY + bedHeight / 2 + 20} textAnchor="middle" fontSize="56" fill="#000000" fontWeight="bold">
                       TT {idx + 1}
                     </text>
 

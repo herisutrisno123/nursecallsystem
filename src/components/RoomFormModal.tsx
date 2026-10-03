@@ -194,7 +194,7 @@ export default function RoomFormModal({ room, wards, onSave, onClose }: RoomForm
                 <input
                   type="number"
                   min="1"
-                  max="4"
+                  max="10"
                   value={formData.bedCount}
                   onChange={(e) => setFormData({ ...formData, bedCount: parseInt(e.target.value) })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
