@@ -23,34 +23,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (savedUsername) {
       const user = userAccounts.find(u => u.username === savedUsername);
       if (user) {
-        // Always refresh permissions from presets based on role
-        const freshPermissions = rolePermissionPresets[user.role] || [];
-        const updatedUser = { ...user, permissions: freshPermissions };
+        // Use stored permissions, only use preset if empty
+        const permissions = user.permissions && user.permissions.length > 0 
+          ? user.permissions 
+          : (rolePermissionPresets[user.role] || []);
+        const updatedUser = { ...user, permissions };
         setCurrentUser(updatedUser);
       }
     }
   }, []);
 
-  // Auto-refresh permissions when component mounts (ensures new permissions are loaded)
-  useEffect(() => {
-    if (currentUser) {
-      const freshPermissions = rolePermissionPresets[currentUser.role] || [];
-      if (JSON.stringify(currentUser.permissions) !== JSON.stringify(freshPermissions)) {
-        setCurrentUser({ ...currentUser, permissions: freshPermissions });
-      }
-    }
-  }, [currentUser?.role]);
-
   const login = (username: string) => {
     const user = userAccounts.find(u => u.username === username);
     if (user) {
-      // Refresh permissions from presets based on role
-      const freshPermissions = rolePermissionPresets[user.role] || [];
-      const updatedUser = { ...user, permissions: freshPermissions };
+      // Use stored permissions, only use preset if empty
+      const permissions = user.permissions && user.permissions.length > 0 
+        ? user.permissions 
+        : (rolePermissionPresets[user.role] || []);
+      const updatedUser = { ...user, permissions };
       setCurrentUser(updatedUser);
       localStorage.setItem('nurseCallUser', username);
     } else {
-      // Fallback for demo users not in the list - create with nurse permissions
+      // Fallback for demo users not in the list - create with empty permissions
       const defaultUser: UserAccount = {
         id: `u-${Date.now()}`,
         username,
@@ -62,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         department: 'Rawat Inap',
         createdAt: new Date().toISOString().split('T')[0],
         lastLogin: new Date().toISOString(),
-        permissions: rolePermissionPresets.nurse,
+        permissions: [], // Empty permissions for unknown users
       };
       setCurrentUser(defaultUser);
       localStorage.setItem('nurseCallUser', username);
