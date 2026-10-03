@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Denah Detail Kamar - 4x Lebih Besar</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .info {
+            background: #dbeafe;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .info h2 {
+            margin: 0 0 10px 0;
+            color: #1e40af;
+            font-size: 18px;
+        }
+        .info p {
+            margin: 5px 0;
+            color: #1e3a8a;
+        }
+        .modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: #fef3c7;
+            border-bottom: 3px solid #f59e0b;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h2 {
+            margin: 0;
+            font-size: 28px;
+            color: #1f2937;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .close-btn {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .content {
+            flex: 1;
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            overflow: hidden;
+        }
+        .svg-container {
+            flex: 1;
+            background: #f8fafc;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .sidebar {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+        .info-card {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .info-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+        .info-card p {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.95);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Test Denah Detail Kamar - 4x Lebih Besar</h1>
+        
+        <div class="info">
+            <h2>📋 Informasi Test</h2>
+            <p><strong>ViewBox:</strong> 2400 x 1800 (4x lebih besar dari 600x450)</p>
+            <p><strong>Ukuran Kamar:</strong> 2000 x 1400 pixels</p>
+            <p><strong>Ukuran Kasur:</strong> 480 x 320 pixels (4x dari 120x80)</p>
+            <p><strong>Ukuran Bantal:</strong> 120 x 80 pixels (4x dari 30x20)</p>
+            <p><strong>Ukuran Selimut:</strong> 260 x 240 pixels (4x dari 65x60)</p>
+            <p><strong>Ukuran Kamar Mandi:</strong> 680 x 480 pixels (4x dari 170x120)</p>
+            <p><strong>Font Label:</strong> 32-56px (4x dari 8-14px)</p>
+        </div>
+
+        <div class="modal">
+            <!-- Header -->
+            <div class="header">
+                <div>
+                    <h2>Denah Kamar 101</h2>
+                    <p>Bangsal Mawar • Lantai 1</p>
+                </div>
+                <button class="close-btn">✕</button>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- SVG Container -->
+                <div class="svg-container">
+                    <svg viewBox="0 0 2400 1800" preserveAspectRatio="xMidYMid meet">
+                        <!-- Room Walls - 4x lebih besar -->
+                        <rect x="200" y="200" width="2000" height="1400" fill="#f8fafc" stroke="#64748b" stroke-width="16" rx="16"/>
+                        
+                        <!-- Floor Pattern -->
+                        <pattern id="floorPattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+                            <rect width="80" height="80" fill="#f1f5f9"/>
+                            <rect width="40" height="40" fill="#e2e8f0"/>
+                            <rect x="40" y="40" width="40" height="40" fill="#e2e8f0"/>
+                        </pattern>
+                        <rect x="200" y="200" width="2000" height="1400" fill="url(#floorPattern)"/>
+
+                        <!-- Door - Pintu Masuk - 4x lebih besar -->
+                        <rect x="200" y="800" width="16" height="240" fill="#8b5cf6"/>
+                        <path d="M 200 800 Q 80 920 200 1040" fill="none" stroke="#8b5cf6" stroke-width="8" stroke-dasharray="20,20"/>
+                        <text x="60" y="940" font-size="48" fill="#6b7280" font-weight="bold">PINTU</text>
+
+                        <!-- Window - Jendela - 4x lebih besar -->
+                        <rect x="2184" y="480" width="16" height="320" fill="#06b6d4"/>
+                        <line x1="2192" y1="480" x2="2192" y2="800" stroke="#67e8f9" stroke-width="8"/>
+                        <text x="2220" y="660" font-size="40" fill="#6b7280">JENDELA</text>
+
+                        <!-- Bathroom - Kamar Mandi - 4x lebih besar -->
+                        <rect x="1520" y="200" width="680" height="480" fill="#e0f2fe" stroke="#0284c7" stroke-width="8" rx="16"/>
+                        <text x="1860" y="300" text-anchor="middle" font-size="56" fill="#0369a1" font-weight="bold">KAMAR MANDI</text>
+                        
+                        <!-- Shower - 4x lebih besar -->
+                        <circle cx="1680" cy="440" r="60" fill="#67e8f9" stroke="#0891b2" stroke-width="8"/>
+                        <circle cx="1680" cy="440" r="32" fill="#22d3ee"/>
+                        <line x1="1680" y1="380" x2="1680" y2="440" stroke="#0891b2" stroke-width="12"/>
+                        <line x1="1660" y1="500" x2="1660" y2="540" stroke="#67e8f9" stroke-width="6"/>
+                        <line x1="1680" y1="500" x2="1680" y2="540" stroke="#67e8f9" stroke-width="6"/>
+                        <line x1="1700" y1="500" x2="1700" y2="540" stroke="#67e8f9" stroke-width="6"/>
+                        <text x="1680" y="600" text-anchor="middle" font-size="40" fill="#0369a1">Shower</text>
+
+                        <!-- Toilet - 4x lebih besar -->
+                        <ellipse cx="1960" cy="440" rx="72" ry="100" fill="#f0f9ff" stroke="#0284c7" stroke-width="8"/>
+                        <ellipse cx="1960" cy="420" rx="48" ry="60" fill="#e0f2fe" stroke="#0284c7" stroke-width="4"/>
+                        <rect x="1912" y="340" width="96" height="32" fill="#0284c7" rx="8"/>
+                        <text x="1960" y="600" text-anchor="middle" font-size="40" fill="#0369a1">Toilet</text>
+
+                        <!-- Sink - 4x lebih besar -->
+                        <rect x="1760" y="620" width="120" height="40" fill="#f0f9ff" stroke="#0284c7" stroke-width="6" rx="8"/>
+                        <circle cx="1820" cy="640" r="12" fill="#0284c7"/>
+                        <text x="1820" y="700" text-anchor="middle" font-size="36" fill="#0369a1">Wastafel</text>
+
+                        <!-- Bed 1 - 4x lebih besar (480x320) -->
+                        <g>
+                            <!-- Bed Frame -->
+                            <rect x="320" y="880" width="480" height="320" fill="#8b5cf6" stroke="#6d28d9" stroke-width="8" rx="16"/>
+                            
+                            <!-- Mattress -->
+                            <rect x="340" y="900" width="440" height="280" fill="#c4b5fd" stroke="#a78bfa" stroke-width="4" rx="12"/>
+                            
+                            <!-- Pillow - 120x80 -->
+                            <rect x="360" y="920" width="120" height="80" fill="#e9d5ff" stroke="#c4b5fd" stroke-width="4" rx="12"/>
+                            <text x="420" y="972" text-anchor="middle" font-size="32" fill="#6d28d9">Bantal</text>
+                            
+                            <!-- Blanket - 260x240 -->
+                            <rect x="500" y="920" width="260" height="240" fill="#ddd6fe" stroke="#a78bfa" stroke-width="4" rx="8"/>
+                            <line x1="520" y1="960" x2="740" y2="960" stroke="#a78bfa" stroke-width="2"/>
+                            <line x1="520" y1="1020" x2="740" y2="1020" stroke="#a78bfa" stroke-width="2"/>
+                            <line x1="520" y1="1080" x2="740" y2="1080" stroke="#a78bfa" stroke-width="2"/>
+                            <line x1="520" y1="1140" x2="740" y2="1140" stroke="#a78bfa" stroke-width="2"/>
+                            
+                            <!-- Bed Label -->
+                            <text x="560" y="1260" text-anchor="middle" font-size="44" fill="#6d28d9" font-weight="bold">TT 1</text>
+
+                            <!-- Patient Name -->
+                            <text x="560" y="840" text-anchor="middle" font-size="40" fill="#4b5563" font-style="italic">Ahmad Suryadi</text>
+                        </g>
+
+                        <!-- Bed 2 - 4x lebih besar (480x320) -->
+                        <g>
+                            <!-- Bed Frame -->
+                            <rect x="880" y="880" width="480" height="320" fill="#8b5cf6" stroke="#6d28d9" stroke-width="8" rx="16"/>
+                            
+                            <!-- Mattress -->
+                            <rect x="900" y="900" width="440" height="280" fill="#c4b5fd" stroke="#a78bfa" stroke-width="4" rx="12"/>
+                            
+                            <!-- Pillow - 120x80 -->
+                            <rect x="920" y="920" width="120" height="80" fill="#e9d5ff" stroke="#c4b5fd" stroke-width="4" rx="12"/>
+                            <text x="980" y="972" text-anchor="middle" font-size="32" fill="#6d28d9">Bantal</text>
+                            
+                            <!-- Blanket - 260x240 -->
+                            <rect x="1060" y="920" width="260" height="240" fill="#ddd6fe" stroke="#a78bfa" stroke-width="4" rx="8"/>
+                            <line x1="1080" y1="960" x2="1300" y2="960" stroke="#a78bfa" stroke-width="2"/>
+                            <line x1="1080" y1="1020" x2="1300" y2="1020" stroke="#a78bfa" stroke-width="2"/>
+                            <line x1="1080" y1="1080" x2="1300" y2="1080" stroke="#a78bfa" stroke-width="2"/>
+                            <line x1="1080" y1="1140" x2="1300" y2="1140" stroke="#a78bfa" stroke-width="2"/>
+                            
+                            <!-- Bed Label -->
+                            <text x="1120" y="1260" text-anchor="middle" font-size="44" fill="#6d28d9" font-weight="bold">TT 2</text>
+
+                            <!-- Patient Name -->
+                            <text x="1120" y="840" text-anchor="middle" font-size="40" fill="#4b5563" font-style="italic">Budi Hartono</text>
+                        </g>
+
+                        <!-- Nurse Call Button - r=48 (4x dari 12) -->
+                        <circle cx="400" cy="400" r="48" fill="#ef4444" stroke="#dc2626" stroke-width="8"/>
+                        <text x="400" y="420" text-anchor="middle" font-size="40" fill="white" font-weight="bold">!</text>
+                        <text x="400" y="500" text-anchor="middle" font-size="36" fill="#dc2626">Nurse Call</text>
+
+                        <!-- Room Dimensions - 4x lebih besar -->
+                        <line x1="200" y1="1640" x2="2200" y2="1640" stroke="#94a3b8" stroke-width="4"/>
+                        <text x="1200" y="1720" text-anchor="middle" font-size="48" fill="#64748b">6m</text>
+                        
+                        <line x1="2240" y1="200" x2="2240" y2="1600" stroke="#94a3b8" stroke-width="4"/>
+                        <text x="2320" y="900" text-anchor="middle" font-size="48" fill="#64748b" transform="rotate(90 2320 900)">4m</text>
+                    </svg>
+
+                    <!-- Legend -->
+                    <div class="legend">
+                        <div class="legend-items">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #8b5cf6;"></div>
+                                <span>Pintu</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #06b6d4;"></div>
+                                <span>Jendela</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #0ea5e9;"></div>
+                                <span>KM Mandi</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #a855f7;"></div>
+                                <span>Kasur</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ef4444; border-radius: 50%;"></div>
+                                <span>Nurse Call</span>
+                            </div>
+                            <div class="legend-item">
+                                <span>📏 6m x 4m</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <div class="info-card">
+                        <h3>Status</h3>
+                        <p style="color: #f59e0b;">Memanggil</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Tempat Tidur</h3>
+                        <p>2 Unit</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Fasilitas</h3>
+                        <p>🛏️ 2 Kasur<br/>🚿 1 Kamar Mandi</p>
+                    </div>
+                    <div class="info-card" style="flex: 1;">
+                        <h3>Pasien</h3>
+                        <div style="margin-top: 10px;">
+                            <p style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">TT 1:</p>
+                            <p style="font-size: 16px; margin-bottom: 3px;">Ahmad Suryadi</p>
+                            <p style="font-size: 12px; color: #6b7280;">67 tahun • Hipertensi</p>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <p style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">TT 2:</p>
+                            <p style="font-size: 16px; margin-bottom: 3px;">Budi Hartono</p>
+                            <p style="font-size: 12px; color: #6b7280;">54 tahun • Diabetes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info" style="margin-top: 20px; background: #fef3c7;">
+            <h2 style="color: #92400e;">✅ Yang Harus Anda Lihat</h2>
+            <p style="color: #78350f;"><strong>1.</strong> Kamar sangat besar (2000x1400 pixels di dalam SVG)</p>
+            <p style="color: #78350f;"><strong>2.</strong> Kasur sangat besar (480x320 pixels) dengan detail bantal dan selimut yang jelas</p>
+            <p style="color: #78350f;"><strong>3.</strong> Kamar mandi sangat besar (680x480 pixels) dengan shower, toilet, wastafel detail</p>
+            <p style="color: #78350f;"><strong>4.</strong> Teks "Bantal", "TT 1", "TT 2" sangat besar dan jelas</p>
+            <p style="color: #78350f;"><strong>5.</strong> Nama pasien di atas kasur terlihat jelas (fontSize 40)</p>
+            <p style="color: #78350f;"><strong>6.</strong> Nurse Call button sangat besar (r=48)</p>
+            <p style="color: #78350f;"><strong>7.</strong> Semua detail terlihat tanpa perlu zoom</p>
+        </div>
+
+        <div class="info" style="background: #fee2e2;">
+            <h2 style="color: #991b1b;">❓ Jika Tidak Terlihat Perubahan</h2>
+            <p style="color: #7f1d1d;"><strong>1.</strong> Clear cache browser: Ctrl + Shift + Delete</p>
+            <p style="color: #7f1d1d;"><strong>2.</strong> Hard refresh: Ctrl + Shift + R</p>
+            <p style="color: #7f1d1d;"><strong>3.</strong> Coba buka di Incognito Mode: Ctrl + Shift + N</p>
+            <p style="color: #7f1d1d;"><strong>4.</strong> Cek browser console (F12) untuk error</p>
+        </div>
+    </div>
+</body>
+</html>
