@@ -67,8 +67,36 @@ function AppContent() {
       return tab.id === 'settings';
     }
     // Jika lisensi valid, cek permission
-    return checkMenuAccess(tab.menuId);
+    const hasAccess = checkMenuAccess(tab.menuId);
+    console.log(`Tab ${tab.label} (${tab.menuId}): ${hasAccess ? 'AKSES' : 'TIDAK AKSES'}`);
+    return hasAccess;
   });
+
+  // Jika tidak ada tab yang bisa diakses, tampilkan pesan
+  if (tabs.length === 0 && isLicenseValid) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md text-center">
+          <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Tidak Ada Akses</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Akun Anda tidak memiliki akses ke menu manapun. Silakan hubungi administrator untuk mengatur hak akses.
+          </p>
+          <button
+            onClick={handleLogout}
+            className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Pastikan activeTab valid (ada di filtered tabs)
+  if (tabs.length > 0 && !tabs.find(t => t.id === activeTab)) {
+    setActiveTab(tabs[0].id);
+  }
 
   // Show login page if not logged in
   if (!currentUser) {

@@ -25,10 +25,19 @@ export default function PermissionManager({ account, onSave, onClose }: Permissi
     const modulePerms = allPermissions.filter(p => p.module === moduleName).map(p => p.code);
     const allSelected = modulePerms.every(p => selectedPermissions.includes(p));
 
+    console.log(`Toggle module: ${moduleName}`);
+    console.log(`Module permissions:`, modulePerms);
+    console.log(`All selected: ${allSelected}`);
+
     if (allSelected) {
-      setSelectedPermissions(prev => prev.filter(p => !modulePerms.includes(p)));
+      const newPerms = selectedPermissions.filter(p => !modulePerms.includes(p));
+      console.log(`Removing permissions. New count: ${newPerms.length}`);
+      setSelectedPermissions(newPerms);
     } else {
-      setSelectedPermissions(prev => [...new Set([...prev, ...modulePerms])]);
+      const newPerms = [...new Set([...selectedPermissions, ...modulePerms])];
+      console.log(`Adding permissions. New count: ${newPerms.length}`);
+      console.log(`New permissions:`, newPerms);
+      setSelectedPermissions(newPerms);
     }
   };
 
@@ -242,7 +251,12 @@ export default function PermissionManager({ account, onSave, onClose }: Permissi
               Batal
             </button>
             <button
-              onClick={() => onSave(selectedPermissions)}
+              onClick={() => {
+                console.log('=== SAVING PERMISSIONS ===');
+                console.log('Selected permissions:', selectedPermissions);
+                console.log('Count:', selectedPermissions.length);
+                onSave(selectedPermissions);
+              }}
               className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
