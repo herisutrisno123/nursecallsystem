@@ -227,29 +227,30 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
 
       {/* Floor Map SVG */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-        <div className="relative w-full">
+        <div className="relative w-full overflow-x-auto">
           <svg
-            viewBox="0 0 1060 300"
+            viewBox="0 0 3800 800"
             className="w-full h-auto"
             preserveAspectRatio="xMidYMid meet"
+            style={{ minWidth: '1200px' }}
           >
             {/* Background */}
-            <rect x="0" y="0" width="1060" height="300" fill="#f8fafc" rx="12" stroke="#e2e8f0" strokeWidth="2" />
+            <rect x="0" y="0" width="3800" height="800" fill="#f8fafc" rx="12" stroke="#e2e8f0" strokeWidth="2" />
 
             {/* Corridor */}
-            <rect x="20" y="145" width="1020" height="15" fill="#e2e8f0" rx="3" />
-            <text x="530" y="156" textAnchor="middle" fill="#64748b" fontSize="9">KORIDOR</text>
+            <rect x="20" y="380" width="3760" height="40" fill="#e2e8f0" rx="6" />
+            <text x="1900" y="405" textAnchor="middle" fill="#64748b" fontSize="24" fontWeight="bold">KORIDOR</text>
 
             {/* Nurse Station */}
-            <rect x="480" y="260" width="100" height="25" fill="#dbeafe" stroke="#3b82f6" strokeWidth="2" rx="6" />
-            <text x="530" y="276" textAnchor="middle" fill="#1e40af" fontSize="8" fontWeight="bold">👩‍⚕️ POS PERAWAT</text>
+            <rect x="1700" y="740" width="400" height="50" fill="#dbeafe" stroke="#3b82f6" strokeWidth="4" rx="12" />
+            <text x="1900" y="770" textAnchor="middle" fill="#1e40af" fontSize="20" fontWeight="bold">👩‍⚕️ POS PERAWAT</text>
 
             {/* Wing Labels */}
-            <text x="260" y="40" textAnchor="middle" fill="#374151" fontSize="12" fontWeight="bold">SAYAP KIRI</text>
-            <text x="800" y="40" textAnchor="middle" fill="#374151" fontSize="12" fontWeight="bold">SAYAP KANAN</text>
+            <text x="950" y="50" textAnchor="middle" fill="#374151" fontSize="32" fontWeight="bold">SAYAP KIRI</text>
+            <text x="2850" y="50" textAnchor="middle" fill="#374151" fontSize="32" fontWeight="bold">SAYAP KANAN</text>
 
             {/* Divider */}
-            <line x1="530" y1="45" x2="530" y2="140" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="1900" y1="60" x2="1900" y2="370" stroke="#cbd5e1" strokeWidth="3" strokeDasharray="12 12" />
 
             {/* Rooms */}
             {filteredRooms.map(room => (
@@ -279,193 +280,193 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
                   }}
                 />
                 
-                {/* Room Number */}
+                {/* Room Number - 4x LEBIH BESAR */}
                 <text
                   x={room.position.x + room.size.width / 2}
-                  y={room.position.y + 13}
+                  y={room.position.y + 40}
                   textAnchor="middle"
                   fill="#1f2937"
-                  fontSize="10"
+                  fontSize="32"
                   fontWeight="bold"
                 >
                   {room.number}
                 </text>
                 
-                {/* Ward Name */}
+                {/* Ward Name - 4x LEBIH BESAR */}
                 <text
                   x={room.position.x + room.size.width / 2}
-                  y={room.position.y + 22}
+                  y={room.position.y + 72}
                   textAnchor="middle"
                   fill="#6b7280"
-                  fontSize="6"
+                  fontSize="20"
                 >
                   {room.ward}
                 </text>
                 
-                {/* Bed Icons - Visualisasi Kasur */}
+                {/* Bed Icons - Visualisasi Kasur - 4x LEBIH BESAR */}
                 {Array.from({ length: room.bedCount }).map((_, idx) => {
-                  const bedX = room.position.x + 10 + (idx * 28);
-                  const bedY = room.position.y + 35;
+                  const bedX = room.position.x + 30 + (idx * 110);
+                  const bedY = room.position.y + 100;
                   return (
                     <g key={idx}>
                       {/* Bed Frame - Kasur */}
                       <rect
                         x={bedX}
                         y={bedY}
-                        width="24"
-                        height="15"
+                        width="96"
+                        height="60"
                         fill="#8b5cf6"
                         stroke="#6d28d9"
-                        strokeWidth="0.8"
-                        rx="1.5"
+                        strokeWidth="3"
+                        rx="6"
                       />
                       {/* Pillow - Bantal */}
                       <rect
-                        x={bedX + 1.5}
-                        y={bedY + 1.5}
-                        width="6"
-                        height="5"
+                        x={bedX + 6}
+                        y={bedY + 6}
+                        width="24"
+                        height="20"
                         fill="#e9d5ff"
                         stroke="#c4b5fd"
-                        strokeWidth="0.4"
-                        rx="0.8"
+                        strokeWidth="1.5"
+                        rx="3"
                       />
                       {/* Blanket - Selimut */}
                       <rect
-                        x={bedX + 9}
-                        y={bedY + 1.5}
-                        width="13"
-                        height="12"
+                        x={bedX + 36}
+                        y={bedY + 6}
+                        width="52"
+                        height="48"
                         fill="#c4b5fd"
                         stroke="#a78bfa"
-                        strokeWidth="0.4"
-                        rx="0.8"
+                        strokeWidth="1.5"
+                        rx="3"
                       />
                       {/* Blanket Pattern - Motif Selimut */}
                       <line
-                        x1={bedX + 10}
-                        y1={bedY + 3}
-                        x2={bedX + 21}
-                        y2={bedY + 3}
+                        x1={bedX + 40}
+                        y1={bedY + 12}
+                        x2={bedX + 84}
+                        y2={bedY + 12}
                         stroke="#a78bfa"
-                        strokeWidth="0.3"
+                        strokeWidth="1.2"
                       />
                       <line
-                        x1={bedX + 10}
-                        y1={bedY + 6.5}
-                        x2={bedX + 21}
-                        y2={bedY + 6.5}
+                        x1={bedX + 40}
+                        y1={bedY + 26}
+                        x2={bedX + 84}
+                        y2={bedY + 26}
                         stroke="#a78bfa"
-                        strokeWidth="0.3"
+                        strokeWidth="1.2"
                       />
                       <line
-                        x1={bedX + 10}
-                        y1={bedY + 10}
-                        x2={bedX + 21}
-                        y2={bedY + 10}
+                        x1={bedX + 40}
+                        y1={bedY + 40}
+                        x2={bedX + 84}
+                        y2={bedY + 40}
                         stroke="#a78bfa"
-                        strokeWidth="0.3"
+                        strokeWidth="1.2"
                       />
                     </g>
                   );
                 })}
                 
-                {/* Bathroom Icon - Kamar Mandi */}
+                {/* Bathroom Icon - Kamar Mandi - 4x LEBIH BESAR */}
                 <g>
                   {/* Bathroom Room - Ruangan Kamar Mandi */}
                   <rect
-                    x={room.position.x + room.size.width - 30}
-                    y={room.position.y + 35}
-                    width="24"
-                    height="24"
+                    x={room.position.x + room.size.width - 120}
+                    y={room.position.y + 100}
+                    width="96"
+                    height="96"
                     fill="#06b6d4"
                     stroke="#0891b2"
-                    strokeWidth="0.8"
-                    rx="2"
+                    strokeWidth="3"
+                    rx="8"
                   />
                   {/* Shower Head - Kepala Shower */}
                   <circle
-                    cx={room.position.x + room.size.width - 18}
-                    cy={room.position.y + 42}
-                    r="3.5"
+                    cx={room.position.x + room.size.width - 72}
+                    cy={room.position.y + 128}
+                    r="14"
                     fill="#67e8f9"
                     stroke="#22d3ee"
-                    strokeWidth="0.4"
+                    strokeWidth="1.5"
                   />
                   {/* Shower Pipe - Pipa Shower */}
                   <line
-                    x1={room.position.x + room.size.width - 18}
-                    y1={room.position.y + 38.5}
-                    x2={room.position.x + room.size.width - 18}
-                    y2={room.position.y + 42}
+                    x1={room.position.x + room.size.width - 72}
+                    y1={room.position.y + 114}
+                    x2={room.position.x + room.size.width - 72}
+                    y2={room.position.y + 128}
                     stroke="#22d3ee"
-                    strokeWidth="1.2"
+                    strokeWidth="5"
                   />
                   {/* Water Drops - Tetesan Air */}
                   <line
-                    x1={room.position.x + room.size.width - 18}
-                    y1={room.position.y + 45.5}
-                    x2={room.position.x + room.size.width - 18}
-                    y2={room.position.y + 50}
+                    x1={room.position.x + room.size.width - 72}
+                    y1={room.position.y + 142}
+                    x2={room.position.x + room.size.width - 72}
+                    y2={room.position.y + 160}
                     stroke="#67e8f9"
-                    strokeWidth="0.8"
+                    strokeWidth="3"
                   />
                   <line
-                    x1={room.position.x + room.size.width - 21}
-                    y1={room.position.y + 47}
-                    x2={room.position.x + room.size.width - 21}
-                    y2={room.position.y + 50}
+                    x1={room.position.x + room.size.width - 84}
+                    y1={room.position.y + 148}
+                    x2={room.position.x + room.size.width - 84}
+                    y2={room.position.y + 160}
                     stroke="#67e8f9"
-                    strokeWidth="0.8"
+                    strokeWidth="3"
                   />
                   <line
-                    x1={room.position.x + room.size.width - 15}
-                    y1={room.position.y + 47}
-                    x2={room.position.x + room.size.width - 15}
-                    y2={room.position.y + 50}
+                    x1={room.position.x + room.size.width - 60}
+                    y1={room.position.y + 148}
+                    x2={room.position.x + room.size.width - 60}
+                    y2={room.position.y + 160}
                     stroke="#67e8f9"
-                    strokeWidth="0.8"
+                    strokeWidth="3"
                   />
                   {/* Toilet Icon - Ikon Toilet */}
                   <ellipse
-                    cx={room.position.x + room.size.width - 24}
-                    cy={room.position.y + 54}
-                    rx="2.5"
-                    ry="3.5"
+                    cx={room.position.x + room.size.width - 96}
+                    cy={room.position.y + 176}
+                    rx="10"
+                    ry="14"
                     fill="#e0f2fe"
                     stroke="#0284c7"
-                    strokeWidth="0.4"
+                    strokeWidth="1.5"
                   />
                 </g>
                 
-                {/* Patient Name (if occupied) */}
+                {/* Patient Name (if occupied) - 4x LEBIH BESAR */}
                 {room.patients && room.patients.length > 0 && (
                   <text
                     x={room.position.x + room.size.width / 2}
-                    y={room.position.y + room.size.height - 6}
+                    y={room.position.y + room.size.height - 20}
                     textAnchor="middle"
                     fill="#4b5563"
-                    fontSize="7"
+                    fontSize="24"
                     fontWeight="500"
                   >
                     {room.patients[0].name.split(' ').slice(0, 2).join(' ')}
                   </text>
                 )}
                 
-                {/* Status Indicator */}
+                {/* Status Indicator - 4x LEBIH BESAR */}
                 {(room.status === 'calling' || room.status === 'emergency') && (
                   <circle
-                    cx={room.position.x + room.size.width - 8}
-                    cy={room.position.y + 8}
-                    r="5"
+                    cx={room.position.x + room.size.width - 30}
+                    cy={room.position.y + 30}
+                    r="20"
                     fill={room.status === 'emergency' ? '#ef4444' : '#f59e0b'}
                     stroke="white"
-                    strokeWidth="1.2"
+                    strokeWidth="4"
                     className="animate-pulse"
                   />
                 )}
 
-                {/* View Floor Plan Button - Eye Icon */}
+                {/* View Floor Plan Button - Eye Icon - 4x LEBIH BESAR */}
                 <g
                   onClick={(e) => {
                     e.stopPropagation();
@@ -474,20 +475,20 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
                   className="cursor-pointer"
                 >
                   <circle
-                    cx={room.position.x + 12}
-                    cy={room.position.y + room.size.height - 12}
-                    r="6"
+                    cx={room.position.x + 40}
+                    cy={room.position.y + room.size.height - 40}
+                    r="24"
                     fill="#3b82f6"
                     stroke="white"
-                    strokeWidth="0.8"
-                    opacity="0.8"
+                    strokeWidth="3"
+                    opacity="0.9"
                   />
                   <text
-                    x={room.position.x + 12}
-                    y={room.position.y + room.size.height - 9}
+                    x={room.position.x + 40}
+                    y={room.position.y + room.size.height - 30}
                     textAnchor="middle"
                     fill="white"
-                    fontSize="8"
+                    fontSize="28"
                   >
                     👁
                   </text>
@@ -495,46 +496,46 @@ export default function FloorMap({ onRoomSelect }: FloorMapProps) {
               </g>
             ))}
 
-            {/* Tooltip for hovered room */}
+            {/* Tooltip for hovered room - 4x LEBIH BESAR */}
             {hoveredRoom && (() => {
               const room = rooms.find(r => r.id === hoveredRoom);
               if (!room) return null;
               
               // Adjust tooltip position to avoid cutoff
-              let tooltipX = room.position.x + room.size.width + 5;
+              let tooltipX = room.position.x + room.size.width + 20;
               let tooltipY = room.position.y;
               
               // If tooltip would go off right edge, show it on the left
-              if (tooltipX + 160 > 1060) {
-                tooltipX = room.position.x - 165;
+              if (tooltipX + 640 > 3800) {
+                tooltipX = room.position.x - 660;
               }
               
               // If tooltip would go off bottom edge, move it up
-              if (tooltipY + 75 > 300) {
-                tooltipY = 300 - 75;
+              if (tooltipY + 300 > 800) {
+                tooltipY = 800 - 300;
               }
               
               return (
                 <g>
-                  <rect x={tooltipX} y={tooltipY} width="160" height="75" fill="#1f2937" rx="6" opacity="0.95" />
-                  <text x={tooltipX + 8} y={tooltipY + 16} fill="#fff" fontSize="10" fontWeight="bold">
+                  <rect x={tooltipX} y={tooltipY} width="640" height="300" fill="#1f2937" rx="24" opacity="0.95" />
+                  <text x={tooltipX + 32} y={tooltipY + 64} fill="#fff" fontSize="40" fontWeight="bold">
                     Kamar {room.number}
                   </text>
-                  <text x={tooltipX + 8} y={tooltipY + 28} fill="#a78bfa" fontSize="8">
+                  <text x={tooltipX + 32} y={tooltipY + 112} fill="#a78bfa" fontSize="32">
                     🏠 Bangsal {room.ward}
                   </text>
-                  <text x={tooltipX + 8} y={tooltipY + 40} fill="#d1d5db" fontSize="8">
+                  <text x={tooltipX + 32} y={tooltipY + 160} fill="#d1d5db" fontSize="32">
                     👤 {room.patients?.[0]?.name || 'Kosong'}
                   </text>
-                  <text x={tooltipX + 8} y={tooltipY + 52} fill="#d1d5db" fontSize="8">
+                  <text x={tooltipX + 32} y={tooltipY + 208} fill="#d1d5db" fontSize="32">
                     🛏️ {room.bedCount} Kasur | 🚿 KM
                   </text>
-                  <text x={tooltipX + 8} y={tooltipY + 66} fill={
+                  <text x={tooltipX + 32} y={tooltipY + 264} fill={
                     room.status === 'emergency' ? '#ef4444' :
                     room.status === 'calling' ? '#f59e0b' :
                     room.status === 'answered' ? '#3b82f6' :
                     room.status === 'offline' ? '#9ca3af' : '#22c55e'
-                  } fontSize="9" fontWeight="bold">
+                  } fontSize="36" fontWeight="bold">
                     {statusLabels[room.status]}
                   </text>
                 </g>
